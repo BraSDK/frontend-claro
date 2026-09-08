@@ -26,3 +26,6 @@ dist-ssr
 # Variables de entorno
 .env
 .env.*
+
+# Excepciones (Archivos que SÍ quieres subir)
+!.env.example
