@@ -1,6 +1,8 @@
 // src/App.tsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/Auth/Login';
+import { MainLayout } from './components/Layout/MainLayout';
+import { ServiciosPage } from './pages/ServiciosPage';
 
 function App() {
   return (
@@ -12,17 +14,12 @@ function App() {
         {/* Ruta Pública (camino)*/}
         <Route path="/login" element={<Login />} />
 
-        {/* Ruta Privada (Temporalmente pública para probar) */}
-        <Route
-          path="/servicios"
-          element={
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-              <h1 className="text-3xl font-bold text-gray-800">
-                ¡Bienvenido a la vista de Servicios!
-              </h1>
-            </div>
-          }
-        />
+        {/* Rutas Privadas */}
+        <Route element={<MainLayout />}>
+          <Route path="/servicios" element={<ServiciosPage />} />
+          {/* Aquí irán <Route path="/usuarios" element={<UsuariosPage />} /> */}
+
+        </Route>
       </Routes>
     </BrowserRouter>
   );
