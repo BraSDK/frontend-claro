@@ -10,6 +10,7 @@ interface ServicioFormProps {
 export const ServicioForm = ({ initialData, onSubmit, onCancel }: ServicioFormProps) => {
   // Inicializamos el estado con los datos a editar, o vacío si es nuevo
   const [formData, setFormData] = useState({
+    codigo: initialData?.codigo || '',
     nombre: initialData?.nombre || '',
     precio: initialData?.precio || 0,
     categoria: initialData?.categoria || 'HFC' as CategoriaServicio,
@@ -17,7 +18,7 @@ export const ServicioForm = ({ initialData, onSubmit, onCancel }: ServicioFormPr
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({ ...formData, codigo: Number(formData.codigo) });
   };
 
   return (

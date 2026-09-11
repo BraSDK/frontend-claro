@@ -19,6 +19,7 @@ export const ServiciosTable = ({ servicios, isLoading, onEdit }: Props) => {
           <tr>
             <th className="px-6 py-4">ID</th>
             <th className="px-6 py-4">Nombre del Servicio</th>
+            <th className="px-6 py-4">Precio</th>
             <th className="px-6 py-4">Estado</th>
             <th className="px-6 py-4 text-right">Acciones</th>
           </tr>
@@ -35,6 +36,7 @@ export const ServiciosTable = ({ servicios, isLoading, onEdit }: Props) => {
               <tr key={servicio.codigo} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 text-gray-500">#{servicio.codigo}</td>
                 <td className="px-6 py-4 font-medium text-gray-900">{servicio.nombre}</td>
+                <td className="px-6 py-4 font-medium text-gray-900">{servicio.precio}</td>
                 <td className="px-6 py-4">
                     <span className="px-3 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
                         {servicio.categoria} {/* Ahora imprimimos el texto directamente */}

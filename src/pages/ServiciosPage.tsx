@@ -6,7 +6,7 @@ import { ServicioForm } from '../components/Servicios/ServicioForm';
 import type { Servicio } from '../types/servicio';
 
 export const ServiciosPage = () => {
-    const { servicios, isLoading, error } = useServicios();
+    const { servicios, isLoading, error, editServicios } = useServicios();
     
     // Usamos el hook inyectándole el tipo <Servicio> para que TypeScript sepa de qué hablamos
     const { 
@@ -18,9 +18,19 @@ export const ServiciosPage = () => {
     } = useModal<Servicio>();
   
     const handleGuardarServicio = async (datosFormulario: Partial<Servicio>) => {
-      // Aquí irá la llamada POST/PUT hacia tu API
-      console.log("Datos capturados del formulario:", datosFormulario);
-      closeModal();
+      try{
+        if(itemToEdit) {
+            //Modo Edicion
+            await editServicios(itemToEdit.codigo, datosFormulario);
+        }else {
+            //Modo Registro
+            
+        }
+        //Solo si la peticion es exitosa
+        closeModal();
+      }catch(err){
+        console.error("Fallo al guardar el servicio:", err);
+      }
     };
 
     return (
@@ -56,11 +66,13 @@ export const ServiciosPage = () => {
         onClose={closeModal}
         title={itemToEdit ? 'Editar Servicio' : 'Registrar Nuevo Servicio'}
         >
+        {isOpen && (
         <ServicioForm 
             initialData={itemToEdit}
             onSubmit={handleGuardarServicio}
             onCancel={closeModal}
         />
+        )}
         </Modal>
     </div>
     );

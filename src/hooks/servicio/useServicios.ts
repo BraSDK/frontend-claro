@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getServicios } from '../../services/servicio.service';
+import { getServicios, updateServicios, postServicios } from '../../services/servicio.service';
 import type { Servicio } from '../../types/servicio';
 
 export const useServicios = () => {
@@ -22,5 +22,33 @@ export const useServicios = () => {
     useEffect(() => {
         fetchServicios();
     }, []);
-    return { servicios, isLoading, error, refetch: fetchServicios };
+
+    const createServicios = async (codigo:number) => {
+        try{
+
+        }catch{
+
+        }finally {
+
+        }
+    };
+
+    const editServicios = async (codigo: number, datosActualizados: Partial<Servicio>) => {
+        try{
+            setIsLoading(true);
+            const data = await updateServicios(codigo, datosActualizados);
+            setServicios((prevServicios) =>
+                prevServicios.map((servicio) =>
+                    servicio.codigo === codigo ? data : servicio
+            )
+        );
+        }catch (err: any){
+            setError('Error al cargar servicioEditar')
+            throw err;
+        }finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { servicios, isLoading, error, refetch: fetchServicios, editServicios, createServicios };
 }
