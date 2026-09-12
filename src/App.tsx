@@ -1,11 +1,24 @@
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
+import { ServicioService } from './services/Servicio/Servicio.service';
+import type { Servicio } from './types/Servicios/Servicios';
 
 function App() {
   const [count, setCount] = useState(0)
+  const[servicios,setServicios] = useState<Servicio[]>();
+  const [error,setError] = useState("");
+  
+  useEffect(() => {
+    ServicioService.getall()
+      .then((data) => setServicios(data))
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
+  }, []);
 
   return (
     <>
@@ -94,7 +107,7 @@ function App() {
                 >
                   <use href="/icons.svg#x-icon"></use>
                 </svg>
-                X.com
+                Pn.com
               </a>
             </li>
             <li>
@@ -115,6 +128,11 @@ function App() {
 
       <div className="ticks"></div>
       <section id="spacer"></section>
+      <div>
+        {error && <p>Error: {error}</p>}
+        <pre>{JSON.stringify(servicios, null, 2)}</pre>
+      </div>
+
     </>
   )
 }

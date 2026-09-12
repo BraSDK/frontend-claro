@@ -1,4 +1,4 @@
-import { api } from './api';
+import { api } from '../Api/api';
 // Aquí importarías tus interfaces DTO que crearemos luego
 // import { LoginRequest, AuthResponse } from '../types/auth.types';
 
