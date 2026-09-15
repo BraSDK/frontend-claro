@@ -6,7 +6,7 @@ import { ServicioForm } from '../components/Servicios/ServicioForm';
 import type { Servicio } from '../types/servicio';
 
 export const ServiciosPage = () => {
-    const { servicios, isLoading, error, editServicios } = useServicios();
+    const { servicios, isLoading, error, editServicios, createServicios, removeServicios } = useServicios();
     
     // Usamos el hook inyectándole el tipo <Servicio> para que TypeScript sepa de qué hablamos
     const { 
@@ -20,17 +20,32 @@ export const ServiciosPage = () => {
     const handleGuardarServicio = async (datosFormulario: Partial<Servicio>) => {
       try{
         if(itemToEdit) {
+            console.log("LO QUE REALMENTE ENVIÓ EL BACKEND:", itemToEdit);
             //Modo Edicion
             await editServicios(itemToEdit.codigo, datosFormulario);
         }else {
             //Modo Registro
-            
+            await createServicios(datosFormulario);
         }
         //Solo si la peticion es exitosa
         closeModal();
       }catch(err){
         console.error("Fallo al guardar el servicio:", err);
+        alert("Fallo la petición, mira el error en la consola.");
       }
+    };
+
+    const handleEliminarServicio = async (codigo: number) => {
+        const confirmar = window.confirm("¿Es(tas seguro de que deseas eliminar este servicio?");
+
+        if (confirmar) {
+            try{
+                await removeServicios(codigo);
+            }catch(err){
+                console.log("Fallto al eliminar", err);
+                alert("Hubo un error al intentar eliminar el servicio.");
+            }
+        }
     };
 
     return (
@@ -57,6 +72,7 @@ export const ServiciosPage = () => {
             servicios={servicios} 
             isLoading={isLoading} 
             onEdit={openForEdit} // <-- Usamos la función directa del hook
+            onDelete={handleEliminarServicio}
         />
         </div>
 
