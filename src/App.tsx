@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/Auth/Login';
 import { MainLayout } from './components/Layout/MainLayout';
 import { ServiciosPage } from './pages/ServiciosPage';
+import { UsuariosPage } from './pages/UsuariosPage';
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
         {/* Rutas Privadas */}
         <Route element={<MainLayout />}>
           <Route path="/servicios" element={<ServiciosPage />} />
-          {/* Aquí irán <Route path="/usuarios" element={<UsuariosPage />} /> */}
+          <Route path="/usuarios" element={<UsuariosPage />} />
 
         </Route>
       </Routes>
