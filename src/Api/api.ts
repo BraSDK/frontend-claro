@@ -3,9 +3,7 @@ import axios from 'axios';
 // 1. Creamos la instancia con la URL base de tu entorno
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+
 });
 
 // 2. Interceptor de Peticiones: El guardia de seguridad
