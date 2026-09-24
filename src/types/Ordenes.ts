@@ -6,6 +6,17 @@ export type EstadoOrden = 0 | 1 | 2 ;
 */
 
 
+//Para creacion de OT
+export interface OrdenCreateRequest //para crear  por parte del tecnico
+{
+    OrdenId? : number,
+    Sot : number,
+    Descripcion : string,
+    UsuarioId? : number,
+    Estado: EstadoOrden,
+    Imagenes : File[]
+}
+
 
 export interface OrdenTrabajoList{
     ordenId : number,
@@ -62,7 +73,7 @@ export interface OrdenDetalleTrabajo{
     Tipo:number
 }
 
-export interface OrdenInicialRequest //para crear  por parte del tecnico
+export interface OrdenInicialRequest 
 {
     OrdenId? : number,
     Sot : number,
@@ -71,6 +82,8 @@ export interface OrdenInicialRequest //para crear  por parte del tecnico
     Estado: EstadoOrden,
     Imagenes : Imagenes[]
 }
+
+
 
 export interface CambiosTecnico { //para editar del tecenico
   OrdenId?: number;
@@ -94,6 +107,6 @@ export interface Imagenes
     archivoId? : number,
     nombreArchivo: string,
     src : File,
-    url? : string
+    url : string
 }
 

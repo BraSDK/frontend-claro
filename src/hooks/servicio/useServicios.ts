@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getServicios, updateServicios, postServicios } from '../../services/servicio.service';
+import { getServicios, updateServicios, postServicios, deleteServicios } from '../../services/servicio.service';
 import type { Servicio } from '../../types/servicio';
 
 export const useServicios = () => {
@@ -23,32 +23,53 @@ export const useServicios = () => {
         fetchServicios();
     }, []);
 
-    const createServicios = async (codigo:number) => {
+    const createServicios = async (nuevoServicio: Partial<Servicio>) => {
         try{
-
-        }catch{
-
-        }finally {
-
-        }
-    };
-
-    const editServicios = async (codigo: number, datosActualizados: Partial<Servicio>) => {
-        try{
+            // Enviamos la solicitud al back
             setIsLoading(true);
-            const data = await updateServicios(codigo, datosActualizados);
-            setServicios((prevServicios) =>
-                prevServicios.map((servicio) =>
-                    servicio.codigo === codigo ? data : servicio
-            )
-        );
-        }catch (err: any){
-            setError('Error al cargar servicioEditar')
-            throw err;
+            await postServicios(nuevoServicio);
+            // refrescar
+            await fetchServicios();
+        }catch{
+            setError('Error al crear el servicio.')
         }finally {
             setIsLoading(false);
         }
     };
 
-    return { servicios, isLoading, error, refetch: fetchServicios, editServicios, createServicios };
+    const editServicios = async (codigo: number, datosActualizados: Partial<Servicio>) => {
+        try {
+            setIsLoading(true);
+            await updateServicios(codigo, datosActualizados);
+            
+            // Buscamos el servicio viejo y lo mezclamos con los datos nuevos
+            setServicios(serviciosActuales => 
+                serviciosActuales.map(servicio => 
+                    servicio.codigo === codigo 
+                        ? { ...servicio, ...datosActualizados } 
+                        : servicio
+                )
+            );
+        } catch (err: any) {
+            setError('Error al actualizar el servicio.');
+            throw err;
+        } finally{
+            setIsLoading(false);
+        }
+    };
+
+    const removeServicios = async (codigo: number) => {
+        try{
+            setIsLoading(true);
+            await deleteServicios(codigo);
+            await fetchServicios();
+        }catch(err: any){
+            setError('Error al eliminar el servicio');
+            throw err;
+        }finally{
+
+        }
+    }
+
+    return { servicios, isLoading, error, refetch: fetchServicios, editServicios, createServicios, removeServicios };
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect,useCallback} from 'react';
-import {  getOrdenById,getOrdenBySot,getOrdenes,crearOrdenTrabajo, editarByTecnico } from '../../services/Ordenes/OrdenesTrabajo.service';
+import {  getOrdenById,getOrdenBySot,getOrdenes,crearOrdenTrabajo, editarByTecnico,eliminarOrden } from '../../services/Ordenes/OrdenesTrabajo.service';
 import type { OrdenInicialRequest, OrdenTrabajo , OrdenTrabajoList, OrdenesTrabajoRequest,OrdenTrabajoDetalleResponse, CambiosTecnico  } from '../../types/Ordenes';
-import { useAuth } from '../useAuth';
+
 export function useOrdenTrabajo (params : OrdenesTrabajoRequest = {}){
     const [ordenSeleccionada, setOrdenSeleccionada] = useState<OrdenTrabajoDetalleResponse| null>(null);
     const [OrdenesT,setOrdenesT] = useState<OrdenTrabajoList[]>([]);
@@ -22,7 +22,7 @@ export function useOrdenTrabajo (params : OrdenesTrabajoRequest = {}){
 
     useEffect( ()=>{
         TraerOrdenes();
-    },[TraerOrdenes])
+    },[TraerOrdenes]);
 
     const TraerPorId = async (id:number) => {
 
@@ -36,11 +36,14 @@ export function useOrdenTrabajo (params : OrdenesTrabajoRequest = {}){
         }finally{
             setIsLoading(false);
         }
-    }
+    };
     const CrearOrden = async (orden : OrdenInicialRequest) => {
         try{
+            
             setIsLoading(true);
-            const ordenConfirm = await crearOrdenTrabajo(orden);
+            const ordenConfirm = await crearOrdenTrabajo({
+                ...orden,Imagenes:orden.Imagenes.map((img)=> img.src)
+            });
             await TraerOrdenes(); 
             return ordenConfirm;
         }catch(err : any){
@@ -50,7 +53,7 @@ export function useOrdenTrabajo (params : OrdenesTrabajoRequest = {}){
         }finally{
             setIsLoading(false);
         }
-    }
+    };
 
     const EditarOrden = async (id : number,orden : CambiosTecnico) => {
         try{
@@ -63,19 +66,22 @@ export function useOrdenTrabajo (params : OrdenesTrabajoRequest = {}){
             setIsLoading(false);
         }
         
-    }
+    };
 
     const EliminarOrden = async (id:number) => {
 
         try{
+            setIsLoading(true);
+            await eliminarOrden(id);
 
         }catch(err : any){
-
+            setError(err.response?.data?.message ?? "Error al crear la orden");
+            throw err;
         }finally{
-
+            setIsLoading(false);
         }
 
     }
 
-    return {OrdenesT, isLoading, error,ordenSeleccionada, refetch: TraerOrdenes, TraerPorId, CrearOrden, EditarOrden};
+    return {OrdenesT, isLoading, error,ordenSeleccionada, refetch: TraerOrdenes, TraerPorId, CrearOrden, EditarOrden, EliminarOrden};
 }

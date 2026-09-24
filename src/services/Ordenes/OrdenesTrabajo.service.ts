@@ -1,5 +1,5 @@
 import { api } from '../../api/api';
-import type { OrdenesTrabajoRequest, OrdenTrabajoList, OrdenTrabajoDetalleResponse,OrdenInicialRequest,CambiosTecnico } from '../../types/Ordenes';
+import type { OrdenesTrabajoRequest, OrdenTrabajoList, OrdenTrabajoDetalleResponse,OrdenInicialRequest,CambiosTecnico, OrdenCreateRequest } from '../../types/Ordenes';
 
 
 export const getOrdenes = async (params?: OrdenesTrabajoRequest): Promise<OrdenTrabajoList[]> => {
@@ -20,20 +20,19 @@ export const getOrdenBySot = async (sot: number): Promise<OrdenTrabajoDetalleRes
     return response.data;
 };
 
-export const crearOrdenTrabajo = async (ordenTrabajo : OrdenInicialRequest ): Promise<OrdenTrabajoDetalleResponse> => {
+export const crearOrdenTrabajo = async (ordenTrabajo : OrdenCreateRequest ): Promise<OrdenTrabajoDetalleResponse> => {
     const formData = new FormData();
     formData.append("Sot", ordenTrabajo.Sot.toString());
     formData.append("Descripcion", ordenTrabajo.Descripcion.toString());
     formData.append("UsuarioId", String(ordenTrabajo.UsuarioId ?? 0));
     formData.append("Estado",ordenTrabajo.Estado.toString());
-    ordenTrabajo.Imagenes.forEach((img, index) => {
-        formData.append(`Imagenes[${index}].Nombre`, img.nombreArchivo);
-        formData.append(`Imagenes[${index}].Archivo`, img.src);
+    ordenTrabajo.Imagenes.forEach((img) => {
+        formData.append("Imagenes", img);
     });
 
-    const response = await api.post<OrdenTrabajoDetalleResponse>('', formData);
+    const response = await api.post<OrdenTrabajoDetalleResponse>('OrdenTrabajo', formData);
     return response.data;
-}
+};
 
 export const editarByTecnico = async (id: number,ordenEdit : CambiosTecnico):Promise<string> => {
     const formData = new FormData();
@@ -52,5 +51,9 @@ export const editarByTecnico = async (id: number,ordenEdit : CambiosTecnico):Pro
     console.log(`${clave}:`, valor);
     }
     const response = await api.put<OrdenTrabajoDetalleResponse>(`OrdenTrabajo/${id}/tecnico`, formData);
-    return "response.data";
-}
+    return "response.data";;
+};
+export const eliminarOrden = async(id:number) => {
+    const response = await api.delete(`OrdenTrabajo/${id}/delete`);
+    return response.status;
+};

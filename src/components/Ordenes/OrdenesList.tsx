@@ -6,19 +6,22 @@ import { useEffect } from 'react';
 interface Propiedades {
   ordenes: OrdenTrabajoList[];
   isLoading: boolean;
+  onDelete: (ordenId:number) => void;
 }
 
 
-export const OrdenesTable = ({ ordenes , isLoading }:Propiedades) =>{
+export const OrdenesTable = ({ ordenes , isLoading , onDelete}:Propiedades) =>{
     const { esTecnico} = useAuth();;
     const navigate = useNavigate();
+    
 
     if(isLoading){
         return <div className="p-8 text-center text-gray-500">Cargando datos...</div>;
     }
 
     const handleDelete = (ordenId:number) => {
-        
+        onDelete(ordenId);
+        window.location.reload();   
     }
 
     const handleEdit = (ordenId:number) => {
@@ -31,6 +34,7 @@ export const OrdenesTable = ({ ordenes , isLoading }:Propiedades) =>{
         
     }
 
+  
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">

@@ -5,9 +5,10 @@ interface Props {
   servicios: Servicio[];
   isLoading: boolean;
   onEdit: (servicio: Servicio) => void;
+  onDelete: (codigo: number) => void;
 }
 
-export const ServiciosTable = ({ servicios, isLoading, onEdit }: Props) => {
+export const ServiciosTable = ({ servicios, isLoading, onEdit, onDelete }: Props) => {
   if (isLoading) {
     return <div className="p-8 text-center text-gray-500">Cargando datos...</div>;
   }
@@ -53,6 +54,7 @@ export const ServiciosTable = ({ servicios, isLoading, onEdit }: Props) => {
                         </button>
                         <button 
                         title="Eliminar"
+                        onClick={() => onDelete(servicio.codigo)}
                         className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                         >
                         <Trash2 size={18} />

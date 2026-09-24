@@ -1,7 +1,7 @@
 import { EditarOrdenByTecnico } from '../../components/Ordenes/OrdenesFormEditarTecnico'
 import { useOrdenTrabajo } from '../../hooks/ordenes/useOrden';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import type { CambiosTecnico } from '../../types/Ordenes';
 
 

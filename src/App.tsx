@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/Auth/Login';
 import { MainLayout } from './components/Layout/MainLayout';
 import { ServiciosPage } from './pages/ServiciosPage';
+import { UsuariosPage } from './pages/UsuariosPage';
 import { OrdenesPage } from './pages/OrdenesPage/OrdenesPage';
 import { OrdenesCrearPage } from './pages/OrdenesPage/OrdenesCrearPage';
 import './App.css'
@@ -25,6 +26,8 @@ function App() {
           <Route path="/ordenesCrear" element={<OrdenesCrearPage />} />
           <Route path="/ordenes/:id/editar" element={<OrdenEditarByTecnico/>} />
           
+          <Route path="/usuarios" element={<UsuariosPage />} />
+
         </Route>
         
       </Routes>
