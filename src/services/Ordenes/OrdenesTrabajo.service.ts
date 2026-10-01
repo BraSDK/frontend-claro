@@ -1,17 +1,30 @@
 import { api } from '../../api/api';
-import type { OrdenesTrabajoRequest, OrdenTrabajoList, OrdenTrabajoDetalleResponse,OrdenInicialRequest,CambiosTecnico, OrdenCreateRequest } from '../../types/Ordenes';
+import type { OrdenesTrabajoRequest, OrdenTrabajoList, OrdenTrabajoDetalleResponse,EditarOrdenCompletaRequest,CambiosTecnico, OrdenCreateRequest, OrdenDetalleTrabajo, ImportarExcelResponse, AuditarOrdenRequest, AuditarMasivoRequest, AuditarMasivoResponse, AuditoriaPagoRequest, AuditoriaPagoResponse } from '../../types/Ordenes';
 
+interface DataTraida{
+    listaOrdenes : OrdenTrabajoList[],
+    totalRegistros : number,
+    totalRegistrosPagina : number,
+    numeroPagina : number,
+    totalPaginasTotales : number
+}
 
-export const getOrdenes = async (params?: OrdenesTrabajoRequest): Promise<OrdenTrabajoList[]> => {
+export const getOrdenes = async (params?: OrdenesTrabajoRequest): Promise<DataTraida> => {
     const response = await api.get("/OrdenTrabajo/List/", { params });
-    console.log(response.data.listaOrdenes[0]);
-    return response.data.listaOrdenes;
+    return {
+                listaOrdenes : response.data.listaOrdenes,
+                totalRegistros : response.data.totalRegistros,
+                totalRegistrosPagina : response.data.totalRegistrosPagina,
+                numeroPagina : response.data.numeroPagina,
+                totalPaginasTotales : response.data.totalPaginasTotales
+    };
 };
 
 export const getOrdenById = async (id: number): Promise<OrdenTrabajoDetalleResponse> => {
 
     const data = await api.get<OrdenTrabajoDetalleResponse>(`/OrdenTrabajo/${id}`);
-    console.log(data.data);
+    console.log(data.data.detalles?.filter((f)=> f.nombreServicio));
+
     return data.data;
 };
 
@@ -56,4 +69,90 @@ export const editarByTecnico = async (id: number,ordenEdit : CambiosTecnico):Pro
 export const eliminarOrden = async(id:number) => {
     const response = await api.delete(`OrdenTrabajo/${id}/delete`);
     return response.status;
+};
+
+export const editaOrdenCompleta = async(ordenId:number,ordenTrabajo:EditarOrdenCompletaRequest) => {
+    const formData = new FormData();
+    if (ordenTrabajo.Sot !== undefined)formData.append("Sot",String(ordenTrabajo.Sot));
+    if (ordenTrabajo.Descripcion !== undefined) formData.append("Descripcion",String(ordenTrabajo.Descripcion));
+    formData.append("Estado",String(ordenTrabajo.Estado));
+    ordenTrabajo.DetallesEliminados.forEach(
+        id => {formData.append("DetallesEliminados", String(id))}
+    );
+    ordenTrabajo.DetallesEditados.forEach(
+        (detalle, i) => { 
+            formData.append(`DetallesEditados[${i}].DetalleId`,String(detalle.detalleId));
+            formData.append(`DetallesEditados[${i}].ServicioCodigo`, String(detalle.servicioId));
+            formData.append(`DetallesEditados[${i}].Cantidad`, String(detalle.cantidad));
+            formData.append(`DetallesEditados[${i}].Tipo`, String(detalle.tipo));
+        }
+    );
+    ordenTrabajo.DetallesNuevos.forEach(
+        (detalle, i) => { 
+            formData.append(`DetallesNuevos[${i}].ServicioId`,String(detalle.servicioId));
+            formData.append(`DetallesNuevos[${i}].cantidad`, String(detalle.cantidad));
+            formData.append(`DetallesNuevos[${i}].Tipo`, String(detalle.tipo));
+        }
+    );
+    ordenTrabajo.ArchivosEliminados.forEach(
+        (i)=> {
+            formData.append("ArchivosEliminados",String(i));
+        }
+    );
+    for (let [clave, valor] of formData.entries()) {
+    console.log(`${clave}:`, valor);
+    }
+    const response = await api.put<EditarOrdenCompletaRequest>(`OrdenTrabajo/${ordenId}/EditarOrdenCompleta`,formData);
+    console.log("enviado")
+    console.log(response.status)
+    return response.status;
+}
+
+// Edita los detalles existentes de una orden.
+// OJO: el back ELIMINA los detalles de la orden que no vengan en esta lista.
+export const editarDetallesOrden = async (ordenId: number, detalles: OrdenDetalleTrabajo[]) => {
+    const body = detalles.map((d) => ({
+        DetalleId: d.detalleId,
+        ServicioCodigo: d.servicioId,
+        Cantidad: d.cantidad,
+        Tipo: d.tipo,
+    }));
+    const response = await api.put(`OrdenTrabajo/${ordenId}/detalles-edit`, body);
+    return response.status;
+};
+
+// Agrega un detalle nuevo a la orden (el back calcula el precio y el total).
+export const agregarDetalleOrden = async (ordenId: number, detalle: OrdenDetalleTrabajo) => {
+    const response = await api.post(`OrdenTrabajo/${ordenId}/detalles`, {
+        ServicioId: detalle.servicioId,
+        Cantidad: detalle.cantidad,
+        Tipo: detalle.tipo,
+    });
+    return response.data;
+};
+
+// Sube el Excel procesado; el back lo lee (no lo guarda) y crea las SOT con sus detalles.
+export const importarExcelOrdenes = async (archivo: File): Promise<ImportarExcelResponse> => {
+    const formData = new FormData();
+    formData.append("archivo", archivo);
+    const response = await api.post<ImportarExcelResponse>("OrdenTrabajo/importar-excel", formData);
+    return response.data;
+};
+
+// Auditoría de la SOT: descuento o multa con su observación
+export const auditarOrden = async (ordenId: number, request: AuditarOrdenRequest): Promise<OrdenTrabajoDetalleResponse> => {
+    const { data } = await api.put<OrdenTrabajoDetalleResponse>(`OrdenTrabajo/${ordenId}/auditar`, request);
+    return data;
+};
+
+// Audita sin descuento las SOT pendientes; con confirmar = false solo devuelve el conteo
+export const auditarMasivo = async (request: AuditarMasivoRequest): Promise<AuditarMasivoResponse> => {
+    const { data } = await api.put<AuditarMasivoResponse>('OrdenTrabajo/auditar-masivo', request);
+    return data;
+};
+
+// Auditoría de almacén: Sí pago / No pago (No pago exige motivo)
+export const auditarPago = async (ordenId: number, request: AuditoriaPagoRequest): Promise<AuditoriaPagoResponse> => {
+    const { data } = await api.patch<AuditoriaPagoResponse>(`OrdenTrabajo/${ordenId}/auditoria-pago`, request);
+    return data;
 };

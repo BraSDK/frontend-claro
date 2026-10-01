@@ -1,18 +1,25 @@
 import { useState, useEffect,useCallback} from 'react';
-import {  getOrdenById,getOrdenBySot,getOrdenes,crearOrdenTrabajo, editarByTecnico,eliminarOrden } from '../../services/Ordenes/OrdenesTrabajo.service';
-import type { OrdenInicialRequest, OrdenTrabajo , OrdenTrabajoList, OrdenesTrabajoRequest,OrdenTrabajoDetalleResponse, CambiosTecnico  } from '../../types/Ordenes';
+import {  getOrdenById,editaOrdenCompleta,getOrdenes,crearOrdenTrabajo, editarByTecnico,eliminarOrden,getOrdenBySot } from '../../services/Ordenes/OrdenesTrabajo.service';
+import type { OrdenInicialRequest, DataExtra , EditarOrdenCompletaRequest,OrdenTrabajoList, OrdenesTrabajoRequest,OrdenTrabajoDetalleResponse, CambiosTecnico  } from '../../types/Ordenes';
 
 export function useOrdenTrabajo (params : OrdenesTrabajoRequest = {}){
     const [ordenSeleccionada, setOrdenSeleccionada] = useState<OrdenTrabajoDetalleResponse| null>(null);
     const [OrdenesT,setOrdenesT] = useState<OrdenTrabajoList[]>([]);
     const [isLoading,setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [page,setPage]= useState<DataExtra | null>(null);
     
     const TraerOrdenes = useCallback(async () => {
         try {
             setIsLoading(true);
-            const ordenTrabajolist = await getOrdenes(params);
-            setOrdenesT(ordenTrabajolist);
+            const data = await getOrdenes(params); //data la data que trae consigo una lista de interfaz
+            setOrdenesT(data.listaOrdenes);
+            setPage({
+                totalRegistros : data.totalRegistros,
+                totalRegistrosPagina : data.totalRegistrosPagina,
+                numeroPagina : data.numeroPagina,
+                totalPaginasTotales : data.totalPaginasTotales
+            })
         } catch (err: any) {
             setError(err.response?.data?.message ?? "Error al cargar órdenes");
         } finally {
@@ -30,7 +37,8 @@ export function useOrdenTrabajo (params : OrdenesTrabajoRequest = {}){
             setIsLoading(true);
             const ordenTrabajo = await getOrdenById(id);
             console.log(ordenTrabajo.ordenId);
-            setOrdenSeleccionada(ordenTrabajo);
+            // Ya estaria demás => setOrdenSeleccionada(ordenTrabajo);
+            return ordenTrabajo;
         }catch (err : any){
             setError(err);
         }finally{
@@ -82,6 +90,32 @@ export function useOrdenTrabajo (params : OrdenesTrabajoRequest = {}){
         }
 
     }
+    const EditarOrdenCompleta = async (ordenId:number,ordenTrabajo:EditarOrdenCompletaRequest) => {
 
-    return {OrdenesT, isLoading, error,ordenSeleccionada, refetch: TraerOrdenes, TraerPorId, CrearOrden, EditarOrden, EliminarOrden};
+        try{
+            setIsLoading(true);
+            await editaOrdenCompleta(ordenId,ordenTrabajo);
+
+        }catch(err : any){
+            setError(err.response?.data?.message ?? "Error al editar la orden");
+            throw err;
+        }finally{
+            setIsLoading(false);
+        }
+
+    }
+    const TraerBySot = async (sot:number) => {
+        try{
+            setIsLoading(true);
+            const ordenTrabajo = await getOrdenBySot(sot);
+            return ordenTrabajo;
+        }catch (err: any){
+            setError(err.response?.data?.message ?? "Rolando Kbro")
+            throw err;
+        }finally{
+            setIsLoading(false);
+        }
+    }
+
+    return {OrdenesT, isLoading, error,ordenSeleccionada,page, refetch: TraerOrdenes,TraerBySot, TraerPorId, CrearOrden, EditarOrden, EliminarOrden,EditarOrdenCompleta};
 }

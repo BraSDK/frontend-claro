@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X } from 'lucide-react';
 import type { OrdenTrabajoDetalleResponse, CambiosTecnico } from '../../types/Ordenes';
 import { useAuth } from '../../hooks/useAuth';
+
 interface ImagenExistente {
   tipo: 'existente';
   ArchivoId: number;
@@ -87,10 +88,7 @@ export const EditarOrdenByTecnico = ({onCancel,onSubmit,initialData}:Propiedades
 
         onSubmit(initialData.ordenId,cambios);
     }
-
-
-
-
+    
     return( 
       <form  onSubmit={handleSubmit} className="w-full space-y-5" method='POST'>
         <div>

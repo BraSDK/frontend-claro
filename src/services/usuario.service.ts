@@ -30,3 +30,4 @@ export const deleteUsuario = async (id: number): Promise<any> => {
   const response = await api.delete(`/User/${id}`);
   return response.data;
 };
+

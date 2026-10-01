@@ -7,7 +7,9 @@ interface JwtPayload {
   role: string;
   exp: number;
 }
+
 function obtenerUsuarioDelToken(): { usuarioId: number; rol: string } | null {
+  
   const token = localStorage.getItem('jwt_token');
   if (!token) return null;
 
@@ -32,7 +34,8 @@ export const useAuth = () => {
             localStorage.setItem('jwt_token', data.token);
             return data;
         } catch (err: any ) {
-            setError(err.message);
+            // el back responde { error: "Credenciales incorrectas." }; si no hay respuesta, es problema de conexión
+            setError(err.response?.data?.error ?? (err.response ? 'No se pudo iniciar sesión' : 'No hay conexión con el servidor'));
             throw err;
         } finally {
             setIsLoading(false);

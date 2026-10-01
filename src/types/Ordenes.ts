@@ -1,10 +1,34 @@
+import type { CategoriaServicio } from "./servicio";
+
 export type EstadoOrden = 0 | 1 | 2 ;
 /*
     0 = Ingresado
     1 = Procesado
     2 = Liquidado
 */
+export const TipoServicio = {
+    COSTO : 0,
+    ADICIONAL : 1,
+    DROP150 : 2,
+    DROP200 : 3,
+    DROP300 : 4
+} as const;
+/*
+    COSTO = 0,
+    DETALLE = 1,
+    DROP150 = 2,
+    DROP200 = 3,
+    DROP300 = 4
+*/
 
+//para data extra
+export interface DataExtra {
+    //data que viene con la lista de trabajo
+        totalRegistros : number,
+        totalRegistrosPagina : number,
+        numeroPagina : number,
+        totalPaginasTotales : number
+}
 
 //Para creacion de OT
 export interface OrdenCreateRequest //para crear  por parte del tecnico
@@ -17,19 +41,43 @@ export interface OrdenCreateRequest //para crear  por parte del tecnico
     Imagenes : File[]
 }
 
+//Editar orden completa request
+export interface EditarOrdenCompletaRequest{
+    Sot : number,          
+    Descripcion : string,
+    Estado :number,     
+    DetallesNuevos : OrdenDetalleTrabajo[],
+    DetallesEditados : OrdenDetalleTrabajo[],   
+    DetallesEliminados : number[],       
+    ArchivosEliminados : number[]
 
+}
 export interface OrdenTrabajoList{
     ordenId : number,
     sot : number,
     descripcion : string,
-    estado : EstadoOrden
+    estado : EstadoOrden,
+    fecha? : string,
+    usuarioId? : number,
+    nombreUsuario?:string,
+    precioTotal? : number | null,
+    montoAPagar? : number,
+    auditada? : boolean,
+    cantidadImagenes? : number,
+    estadoPago? : EstadoPago,
+    motivoNoPago? : string | null
 }
 
 export interface OrdenesTrabajoRequest{
     pagina?: number;
-    cantidadPorPagina?: number;
-    fecha?: Date,
-    
+    canPagina?: number;
+    // filtros (opcionales)
+    buscar?: string;        // SOT o parte de ella
+    estado?: EstadoOrden;
+    auditada?: boolean;     // true = auditadas, false = sin auditar
+    tecnicoId?: number;     // Usuario.Id; para un técnico el back ignora este filtro
+    desde?: string;         // yyyy-mm-dd
+    hasta?: string;         // yyyy-mm-dd
 }
 
 export interface OrdenTrabajoListResponse{
@@ -47,8 +95,36 @@ export interface OrdenTrabajoDetalleResponse{
             usuarioId?:number,
             estado : number,
             precioTotal? :number,
+            fecha? : string,
+            nombreUsuario? : string,
+            // auditoría (el técnico no la recibe)
+            descuento? : number,
+            sinPago? : boolean,
+            observacionAuditoria? : string | null,
+            fechaAuditoria? : string | null,
+            auditada? : boolean,
+            montoAPagar? : number,
+            estadoPago? : EstadoPago,
+            motivoNoPago? : string | null,
+            observacionPago? : string | null,
             detalles? : OrdenDetalleTrabajo[],
             imagenes : ImagenesResponse[]
+}
+
+export interface AuditarOrdenRequest {
+    descuento: number,
+    sinPago: boolean,
+    observacion: string,
+    estado?: EstadoOrden
+}
+
+export interface OrdenDetalleVista{
+            OrdenId : number,
+            sot : number,
+            descripcion : string,
+            precioTotal? :number,
+            usuarioId?:number,
+            detalles? : OrdenDetalleTrabajo[]
 }
 
 export interface OrdenTrabajo{
@@ -64,13 +140,16 @@ export interface OrdenTrabajo{
 
 
 export interface OrdenDetalleTrabajo{
-  
-    DetalleTrabajoId: number,
-    ServicioCodigo : number,
-    Cantidad : number,
-    PrecioTotal :number,
-    OrdenTrabajoId : number
-    Tipo:number
+    categoriaServicio? : string,
+    detalleId?: number,
+    servicioId? : number,
+    nombreServicio?: String,
+    precioServicio?: number,
+    cantidad : number,
+    precioTotal? :number,
+    ordenTrabajoId? : number
+    tipo?:number
+
 }
 
 export interface OrdenInicialRequest 
@@ -110,3 +189,66 @@ export interface Imagenes
     url : string
 }
 
+
+
+// Resultado de la carga masiva de SOTs desde Excel
+export interface ErrorFilaImportacion {
+    fila: number,
+    sot?: number,
+    mensaje: string
+}
+
+export interface ImportarExcelResponse {
+    ordenesCreadas: number,
+    ordenesActualizadas: number,
+    serviciosCreados: string[],
+    errores: ErrorFilaImportacion[]
+}
+
+// Auditoría masiva sin descuento: ordenIds = seleccionadas; sin ordenIds = todas las del filtro
+export interface AuditarMasivoRequest {
+    ordenIds?: number[],
+    filtros?: OrdenesTrabajoRequest,
+    confirmar: boolean
+}
+
+export interface AuditarMasivoResponse {
+    auditadas: number,      // auditadas (o que se auditarían si confirmar = false)
+    yaAuditadas: number,
+    sinImagen: number
+}
+
+// Estado de pago de la SOT (coincide con el enum EstadoPago del back)
+export const EstadoPago = {
+    Pendiente: 0,
+    SiPago: 1,
+    NoPago: 2,
+} as const;
+export type EstadoPago = typeof EstadoPago[keyof typeof EstadoPago];
+
+export const MOTIVOS_NO_PAGO = [
+    'Sin fotos',
+    'SOT incorrecta en pizarra',
+    'Foto de otro dispositivo',
+    'Niveles fuera de rango',
+    'Cálculo negativo (dB)',
+    'Código de solución erróneo',
+    'No liquidado en SGA',
+    'Volverá a campo',
+    'Otro',
+] as const;
+
+export interface AuditoriaPagoRequest {
+    estadoPago: EstadoPago,
+    motivoNoPago?: string | null,
+    observacionPago?: string | null
+}
+
+export interface AuditoriaPagoResponse {
+    ordenId: number,
+    estadoPago: EstadoPago,
+    motivoNoPago?: string | null,
+    observacionPago?: string | null,
+    fechaAuditoria?: string | null,
+    montoAPagar: number
+}
