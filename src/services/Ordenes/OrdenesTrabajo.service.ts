@@ -1,5 +1,5 @@
 import { api } from '../../api/api';
-import type { OrdenesTrabajoRequest, OrdenTrabajoList, OrdenTrabajoDetalleResponse,EditarOrdenCompletaRequest,CambiosTecnico, OrdenCreateRequest, OrdenDetalleTrabajo, ImportarExcelResponse, AuditarOrdenRequest, AuditarMasivoRequest, AuditarMasivoResponse, AuditoriaPagoRequest, AuditoriaPagoResponse } from '../../types/Ordenes';
+import type { OrdenesTrabajoRequest, OrdenTrabajoList, OrdenTrabajoDetalleResponse,EditarOrdenCompletaRequest,CambiosTecnico, OrdenCreateRequest, OrdenDetalleTrabajo, ImportarExcelResponse, AuditarOrdenRequest, AuditarMasivoRequest, AuditarMasivoResponse, EdicionRapidaRequest, AuditoriaPagoRequest, AuditoriaPagoResponse } from '../../types/Ordenes';
 
 interface DataTraida{
     listaOrdenes : OrdenTrabajoList[],
@@ -23,7 +23,6 @@ export const getOrdenes = async (params?: OrdenesTrabajoRequest): Promise<DataTr
 export const getOrdenById = async (id: number): Promise<OrdenTrabajoDetalleResponse> => {
 
     const data = await api.get<OrdenTrabajoDetalleResponse>(`/OrdenTrabajo/${id}`);
-    console.log(data.data.detalles?.filter((f)=> f.nombreServicio));
 
     return data.data;
 };
@@ -82,14 +81,16 @@ export const editaOrdenCompleta = async(ordenId:number,ordenTrabajo:EditarOrdenC
     ordenTrabajo.DetallesEditados.forEach(
         (detalle, i) => { 
             formData.append(`DetallesEditados[${i}].DetalleId`,String(detalle.detalleId));
-            formData.append(`DetallesEditados[${i}].ServicioCodigo`, String(detalle.servicioId));
+            formData.append(`DetallesEditados[${i}].Concepto`, detalle.concepto ?? "");
+            formData.append(`DetallesEditados[${i}].PrecioUnitario`, String(detalle.precioUnitario ?? 0));
             formData.append(`DetallesEditados[${i}].Cantidad`, String(detalle.cantidad));
             formData.append(`DetallesEditados[${i}].Tipo`, String(detalle.tipo));
         }
     );
     ordenTrabajo.DetallesNuevos.forEach(
         (detalle, i) => { 
-            formData.append(`DetallesNuevos[${i}].ServicioId`,String(detalle.servicioId));
+            formData.append(`DetallesNuevos[${i}].Concepto`, detalle.concepto ?? "");
+            formData.append(`DetallesNuevos[${i}].PrecioUnitario`, String(detalle.precioUnitario ?? 0));
             formData.append(`DetallesNuevos[${i}].cantidad`, String(detalle.cantidad));
             formData.append(`DetallesNuevos[${i}].Tipo`, String(detalle.tipo));
         }
@@ -113,7 +114,8 @@ export const editaOrdenCompleta = async(ordenId:number,ordenTrabajo:EditarOrdenC
 export const editarDetallesOrden = async (ordenId: number, detalles: OrdenDetalleTrabajo[]) => {
     const body = detalles.map((d) => ({
         DetalleId: d.detalleId,
-        ServicioCodigo: d.servicioId,
+        Concepto: d.concepto,
+        PrecioUnitario: d.precioUnitario,
         Cantidad: d.cantidad,
         Tipo: d.tipo,
     }));
@@ -121,10 +123,11 @@ export const editarDetallesOrden = async (ordenId: number, detalles: OrdenDetall
     return response.status;
 };
 
-// Agrega un detalle nuevo a la orden (el back calcula el precio y el total).
+// Agrega un detalle nuevo a la orden (el back calcula el total = precio unitario × cantidad).
 export const agregarDetalleOrden = async (ordenId: number, detalle: OrdenDetalleTrabajo) => {
     const response = await api.post(`OrdenTrabajo/${ordenId}/detalles`, {
-        ServicioId: detalle.servicioId,
+        Concepto: detalle.concepto,
+        PrecioUnitario: detalle.precioUnitario,
         Cantidad: detalle.cantidad,
         Tipo: detalle.tipo,
     });
@@ -154,5 +157,11 @@ export const auditarMasivo = async (request: AuditarMasivoRequest): Promise<Audi
 // Auditoría de almacén: Sí pago / No pago (No pago exige motivo)
 export const auditarPago = async (ordenId: number, request: AuditoriaPagoRequest): Promise<AuditoriaPagoResponse> => {
     const { data } = await api.patch<AuditoriaPagoResponse>(`OrdenTrabajo/${ordenId}/auditoria-pago`, request);
+    return data;
+};
+
+// Edita un campo de la SOT desde la tabla y devuelve la fila actualizada
+export const edicionRapida = async (ordenId: number, cambio: EdicionRapidaRequest): Promise<OrdenTrabajoList> => {
+    const { data } = await api.patch<OrdenTrabajoList>(`OrdenTrabajo/${ordenId}/edicion-rapida`, cambio);
     return data;
 };

@@ -13,13 +13,13 @@ interface CardProps {
 
 export function Card({ title, subtitle, icon, actions, children }: CardProps) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="rounded-card bg-surface px-4 py-4 shadow-card md:px-6">
       <header className="mb-4 flex items-start justify-between">
         <div className="flex gap-3">
           {icon}
           <div>
-            <h2 className="text-lg font-semibold text-slate-800">{title}</h2>
-            {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+            <h2 className="text-[17px] font-bold text-ink">{title}</h2>
+            {subtitle && <p className="text-sm text-label">{subtitle}</p>}
           </div>
         </div>
         {actions}

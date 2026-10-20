@@ -32,7 +32,8 @@ export const FormDetalleServicio = ({onSubmit,formId} : FormProps) => {
     const PrecioDetalleTotal = (Cantidad || 0) * PrecioUnitario;
     
     useEffect(() => {
-        setValue("nombreServicio",ServicioSeleccionado?.nombre); //guardamos el nombre del servicio seleccionado
+        setValue("concepto", ServicioSeleccionado?.nombre); // el detalle guarda el nombre del servicio elegido
+        setValue("precioUnitario", PrecioUnitario);           // y su precio, copiado del catálogo
         setValue("precioServicio", PrecioUnitario);
         setValue("precioTotal", PrecioDetalleTotal);
     }, [setValue, PrecioUnitario, PrecioDetalleTotal,ServicioSeleccionado]);

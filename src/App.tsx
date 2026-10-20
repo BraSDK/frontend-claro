@@ -1,12 +1,11 @@
 // src/App.tsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/Auth/Login';
-import { MainLayout } from './components/Layout/MainLayout';
+import { AppLayout } from './components/Layout/AppLayout';
 import { ServiciosPage } from './pages/ServiciosPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { OrdenesPage } from './pages/OrdenesPage/OrdenesPage';
 import { OrdenesCrearPage } from './pages/OrdenesPage/OrdenesCrearPage';
-import './App.css'
 import { OrdenEditarByTecnico} from './pages/OrdenesPage/OrdenEditarByTecnico';
 import { EditarOrdenPage } from './pages/OrdenesPage/EditarOrdenPage';
 import { EditarDetallesPage } from './pages/OrdenesPage/EditarDetallesPage';
@@ -26,7 +25,7 @@ function App() {
         <Route path="/login" element={<Login />} />
 
         {/* Rutas Privadas */}
-        <Route element={<MainLayout />}>
+        <Route element={<AppLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/configuracion" element={<ConfiguracionPage />} />
           <Route path="/conciliacion" element={<ConciliacionPage />} />

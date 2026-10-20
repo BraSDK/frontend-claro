@@ -236,7 +236,7 @@ export const DashboardPage = () => {
                     {!r || r.porServicio.length === 0 ? <SinDatos /> : (
                         <ul className="space-y-3.5">
                             {r.porServicio.map((s) => (
-                                <li key={s.codigo}>
+                                <li key={s.nombre}>
                                     <div className="mb-1.5 flex items-baseline justify-between gap-3">
                                         <p className="truncate text-sm text-gray-700" title={s.nombre}>{s.nombre}</p>
                                         <p className="shrink-0 text-sm font-semibold text-gray-900">

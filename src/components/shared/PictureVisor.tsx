@@ -1,7 +1,5 @@
 
 import type {ImagenesResponse} from "../../types/Ordenes";
-import { Card } from "../../components/Cards/Card"
-import { Image } from "lucide-react";
 import { useState} from "react";
 interface  VisorProps {
    imgs : ImagenesResponse[];

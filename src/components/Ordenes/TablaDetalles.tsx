@@ -29,7 +29,7 @@ export const TablaDetalles = ({detalles , onDelete} : TablaDetallesProps) => {
                             return (
                                 
                                 <tr key={index} className="hover:bg-gray-50">
-                                    <td className="px-4 py-3 flex gap-4 items-center text-blue-600"> <Wrench size={30}/>{detalle.nombreServicio}</td>
+                                    <td className="px-4 py-3 flex gap-4 items-center text-blue-600"> <Wrench size={30}/>{detalle.concepto}</td>
                                     <td className="px-4 py-3 text-center"> {detalle.cantidad} </td>
                                     <td className="px-4 py-3 text-center"> {detalle.tipo == 0 ? detalle.precioTotal: "-"}</td>
                                     <td className="px-4 py-3 text-center"> {detalle.tipo == 1 ? detalle.precioTotal: "-"}</td>

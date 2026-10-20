@@ -2,7 +2,7 @@ import type { EstadoOrden } from "./Ordenes";
 
 export interface EstadoResumen { estado: EstadoOrden; cantidad: number; monto: number; }
 export interface TecnicoResumen { usuarioId: number; nombre: string; cantidad: number; monto: number; }
-export interface ServicioResumen { codigo: number; nombre: string; cantidad: number; monto: number; }
+export interface ServicioResumen { nombre: string; cantidad: number; monto: number; }
 export interface TipoDetalleResumen { tipo: number; cantidad: number; monto: number; }
 
 export interface UltimaSot {

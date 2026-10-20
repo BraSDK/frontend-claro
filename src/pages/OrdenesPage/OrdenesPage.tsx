@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { WorkflowIcon, FileSpreadsheet, Search, X, ClipboardList, Wallet, Clock, CheckCircle2, ClipboardCheck } from 'lucide-react';
+import { FileSpreadsheet, ClipboardList, Wallet, Clock, CheckCircle2, ClipboardCheck, Plus } from 'lucide-react';
+import { FilterBar } from '../../components/ui/FilterBar';
+import { Campo, Entrada, Selector, RangoFechas, Boton } from '../../components/ui/Controles';
+import { DataTable, AccionTabla } from '../../components/ui/DataTable';
 import { useOrdenTrabajo } from '../../hooks/ordenes/useOrden';
 import { OrdenesTable } from '../../components/Ordenes/OrdenesList';
 import { StatCard } from '../../components/Cards/StatsCard';
@@ -16,7 +19,6 @@ import { auditarMasivo } from '../../services/Ordenes/OrdenesTrabajo.service';
 
 const TAMANO_PAGINA = 15;
 
-const claseInput = "h-10 rounded-lg border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none transition-all hover:border-gray-300 focus:border-red-400 focus:ring-4 focus:ring-red-500/10";
 
 export const OrdenesPage = () => {
     const navigate = useNavigate();
@@ -82,6 +84,9 @@ export const OrdenesPage = () => {
 
     const cambiarFiltro = <T,>(setter: (v: T) => void) => (valor: T) => { setter(valor); setPagina(1); };
 
+    // "Buscar" aplica el texto en el momento, sin esperar el retardo de 400 ms
+    const aplicarBusqueda = () => { setBuscar(textoBusqueda.trim()); setPagina(1); };
+
     const hayFiltros = !!(textoBusqueda || estado !== '' || tecnicoId !== '' || auditada || desde || hasta);
     const limpiarFiltros = () => {
         setTextoBusqueda(''); setBuscar(''); setEstado(''); setTecnicoId(''); setAuditada(''); setDesde(''); setHasta(''); setPagina(1);
@@ -142,39 +147,54 @@ export const OrdenesPage = () => {
     const mesActual = resumen ? `${NOMBRES_MES[resumen.mes - 1]} ${resumen.anio}` : '';
 
     return (
-        <div className="flex flex-col gap-6">
-            {/* Cabecera */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-red-600">
-                        <WorkflowIcon size={26} />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Órdenes de trabajo</h1>
-                        <p className="mt-1 text-sm text-gray-500">Registra, importa y da seguimiento a las SOTs.</p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    {!esTecnico && (
-                        <button
-                            type="button"
-                            onClick={() => setImportarAbierto(true)}
-                            className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50"
-                        >
-                            <FileSpreadsheet size={16} />
-                            Importar Excel
-                        </button>
-                    )}
-                    <button
-                        type="button"
-                        onClick={() => navigate('/ordenesCrear')}
-                        className="flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-medium text-white shadow-md transition-colors hover:bg-red-700"
+        <div className="flex flex-col gap-5">
+            {/* Filtros */}
+            <FilterBar onBuscar={aplicarBusqueda} onLimpiar={limpiarFiltros} hayFiltros={hayFiltros}>
+                <Campo label="SOT">
+                    <Entrada
+                        inputMode="numeric"
+                        value={textoBusqueda}
+                        onChange={(e) => setTextoBusqueda(e.target.value)}
+                        placeholder="Ingrese el número de SOT"
+                    />
+                </Campo>
+                <Campo label="Estado">
+                    <Selector
+                        value={estado}
+                        onChange={(e) => cambiarFiltro(setEstado)(e.target.value === '' ? '' : Number(e.target.value) as EstadoOrden)}
                     >
-                        + Nueva orden
-                    </button>
-                </div>
-            </div>
+                        <option value="">Todos</option>
+                        {Object.entries(ESTADOS_ORDEN).map(([valor, info]) => (
+                            <option key={valor} value={valor}>{info.label}</option>
+                        ))}
+                    </Selector>
+                </Campo>
+                {!esTecnico && (
+                    <Campo label="Técnico">
+                        <Selector
+                            value={tecnicoId}
+                            onChange={(e) => cambiarFiltro(setTecnicoId)(e.target.value === '' ? '' : Number(e.target.value))}
+                        >
+                            <option value="">Todos</option>
+                            {tecnicos.map((t) => (
+                                <option key={t.usuarioId} value={t.usuarioId}>{t.nombre}</option>
+                            ))}
+                        </Selector>
+                    </Campo>
+                )}
+                {!esTecnico && (
+                    <Campo label="Auditoría">
+                        <Selector value={auditada} onChange={(e) => cambiarFiltro(setAuditada)(e.target.value as '' | 'si' | 'no')}>
+                            <option value="">Todas</option>
+                            <option value="no">Sin auditar</option>
+                            <option value="si">Auditadas</option>
+                        </Selector>
+                    </Campo>
+                )}
+                <Campo label="Fecha de registro">
+                    <RangoFechas desde={desde} hasta={hasta} onDesde={cambiarFiltro(setDesde)} onHasta={cambiarFiltro(setHasta)} />
+                </Campo>
+            </FilterBar>
 
             {/* Tarjetas del mes actual */}
             <div className={`grid grid-cols-1 gap-4 sm:grid-cols-2 ${esTecnico ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
@@ -183,6 +203,7 @@ export const OrdenesPage = () => {
                     icon={ClipboardList}
                     value={resumen?.totalSots ?? '-'}
                     trend={resumen ? tendencia(resumen.totalSots, resumen.totalSotsMesAnterior) : undefined}
+                    iconClassName="bg-danger-soft text-primary"
                 />
                 {!esTecnico && (
                     <StatCard
@@ -190,131 +211,70 @@ export const OrdenesPage = () => {
                         icon={Wallet}
                         value={resumen ? formatoSoles(resumen.montoTotal) : '-'}
                         trend={resumen ? tendencia(resumen.montoTotal, resumen.montoTotalMesAnterior) : undefined}
-                        iconClassName="bg-green-50 text-green-600"
+                        iconClassName="bg-success-soft text-success"
                     />
                 )}
                 <StatCard
                     title="Ingresadas (pendientes)"
                     icon={Clock}
                     value={resumen ? cantidadEstado(0) : '-'}
-                    iconClassName="bg-amber-50 text-amber-600"
+                    iconClassName="bg-info-soft text-info"
                 />
                 <StatCard
                     title="Liquidadas"
                     icon={CheckCircle2}
                     value={resumen ? cantidadEstado(2) : '-'}
-                    iconClassName="bg-blue-50 text-blue-600"
+                    iconClassName="bg-success-soft text-success"
                 />
             </div>
 
-            {/* Tabla con filtros */}
-            <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
-                <div className="flex flex-wrap items-end gap-3 border-b border-gray-100 px-6 py-4">
-                    <div className="relative min-w-52 flex-1">
-                        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                            type="text"
-                            inputMode="numeric"
-                            value={textoBusqueda}
-                            onChange={(e) => setTextoBusqueda(e.target.value)}
-                            placeholder="Buscar por SOT..."
-                            className={`${claseInput} w-full pl-9`}
-                        />
-                    </div>
+            {mensajeAuditoria && (
+                <p className={`rounded-control border px-4 py-2.5 text-sm ${mensajeAuditoria.tipo === 'ok' ? 'border-success/30 bg-success-soft text-success' : 'border-danger/30 bg-danger-soft text-danger'}`}>
+                    {mensajeAuditoria.texto}
+                </p>
+            )}
 
-                    <select
-                        value={estado}
-                        onChange={(e) => cambiarFiltro(setEstado)(e.target.value === '' ? '' : Number(e.target.value) as EstadoOrden)}
-                        className={claseInput}
-                    >
-                        <option value="">Todos los estados</option>
-                        {Object.entries(ESTADOS_ORDEN).map(([valor, info]) => (
-                            <option key={valor} value={valor}>{info.label}</option>
-                        ))}
-                    </select>
-
-                    {!esTecnico && (
-                        <select
-                            value={tecnicoId}
-                            onChange={(e) => cambiarFiltro(setTecnicoId)(e.target.value === '' ? '' : Number(e.target.value))}
-                            className={`${claseInput} max-w-56`}
-                        >
-                            <option value="">Todos los técnicos</option>
-                            {tecnicos.map((t) => (
-                                <option key={t.usuarioId} value={t.usuarioId}>{t.nombre}</option>
-                            ))}
-                        </select>
-                    )}
-
-                    {!esTecnico && (
-                        <select
-                            value={auditada}
-                            onChange={(e) => cambiarFiltro(setAuditada)(e.target.value as '' | 'si' | 'no')}
-                            className={claseInput}
-                        >
-                            <option value="">Auditadas y sin auditar</option>
-                            <option value="no">Sin auditar</option>
-                            <option value="si">Auditadas</option>
-                        </select>
-                    )}
-
-                    <label className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                        Desde
-                        <input type="date" value={desde} max={hasta || undefined} onChange={(e) => cambiarFiltro(setDesde)(e.target.value)} className={claseInput} />
-                    </label>
-                    <label className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                        Hasta
-                        <input type="date" value={hasta} min={desde || undefined} onChange={(e) => cambiarFiltro(setHasta)(e.target.value)} className={claseInput} />
-                    </label>
-
-                    {hayFiltros && (
-                        <button
-                            type="button"
-                            onClick={limpiarFiltros}
-                            className="flex h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-                        >
-                            <X size={16} /> Limpiar
-                        </button>
-                    )}
-                </div>
-
-                {/* Auditoría masiva (solo admin y almacén) */}
-                {!esTecnico && (
-                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 bg-gray-50/60 px-6 py-3">
-                        <p className="text-sm text-gray-500">
-                            {seleccion.size > 0
-                                ? <><span className="font-semibold text-gray-800">{seleccion.size}</span> {seleccion.size === 1 ? 'SOT seleccionada' : 'SOT seleccionadas'}</>
-                                : 'Audita una por una las que tienen penalidad o multa; el resto, en bloque.'}
-                        </p>
-                        <div className="flex items-center gap-2">
-                            {seleccion.size > 0 && (
-                                <button
-                                    type="button"
-                                    onClick={() => auditarSinDescuento([...seleccion])}
-                                    disabled={auditando}
-                                    className="flex h-9 items-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-red-700 disabled:opacity-60"
-                                >
-                                    <ClipboardCheck size={16} /> Auditar seleccionadas
-                                </button>
-                            )}
-                            <button
-                                type="button"
+            {/* Listado */}
+            <DataTable
+                titulo="Listado de órdenes de trabajo"
+                cantidad={page?.totalRegistros ?? 0}
+                acciones={
+                    <>
+                        {!esTecnico && seleccion.size > 0 && (
+                            <AccionTabla icono={<ClipboardCheck size={16} />} onClick={() => auditarSinDescuento([...seleccion])} disabled={auditando}>
+                                Auditar seleccionadas ({seleccion.size})
+                            </AccionTabla>
+                        )}
+                        {!esTecnico && (
+                            <AccionTabla
+                                icono={<ClipboardCheck size={16} />}
                                 onClick={() => auditarSinDescuento()}
                                 disabled={auditando}
                                 title="Audita sin descuento todas las SOT pendientes que cumplen los filtros (todas las páginas)"
-                                className="flex h-9 items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 disabled:opacity-60"
                             >
-                                <ClipboardCheck size={16} /> {auditando ? 'Auditando...' : 'Auditar todo sin descuento'}
-                            </button>
-                        </div>
-                    </div>
-                )}
-                {mensajeAuditoria && (
-                    <p className={`mx-6 mt-3 rounded-lg border px-4 py-2.5 text-sm ${mensajeAuditoria.tipo === 'ok' ? 'border-green-200 bg-green-50 text-green-700' : 'border-red-200 bg-red-50 text-red-700'}`}>
-                        {mensajeAuditoria.texto}
-                    </p>
-                )}
-
+                                {auditando ? 'Auditando...' : 'Auditar todo sin descuento'}
+                            </AccionTabla>
+                        )}
+                        {!esTecnico && (
+                            <AccionTabla icono={<FileSpreadsheet size={16} />} onClick={() => setImportarAbierto(true)}>
+                                Importar Excel
+                            </AccionTabla>
+                        )}
+                        <Boton icono={<Plus size={16} />} onClick={() => navigate('/ordenesCrear')} className="ml-1">
+                            Nueva orden
+                        </Boton>
+                    </>
+                }
+                pie={
+                    <BarPaginancion
+                        onHandle={setPagina}
+                        numeroPagina={page?.numeroPagina ?? pagina}
+                        totalRegistros={page?.totalRegistros ?? 0}
+                        totalRegistrosPagina={page?.totalRegistrosPagina ?? 0}
+                        totalPaginasTotales={page?.totalPaginasTotales ?? 1}
+                    />
+                }
+            >
                 <OrdenesTable
                     ordenes={OrdenesT}
                     isLoading={isLoading}
@@ -323,16 +283,10 @@ export const OrdenesPage = () => {
                     onSeleccionar={alternarSeleccion}
                     onSeleccionarTodas={(ids) => setSeleccion(new Set(ids))}
                     onActualizado={() => { refetch(); cargarResumen(); }}
+                    tecnicos={tecnicos}
+                    onFilaEditada={cargarResumen}
                 />
-
-                <BarPaginancion
-                    onHandle={setPagina}
-                    numeroPagina={page?.numeroPagina ?? pagina}
-                    totalRegistros={page?.totalRegistros ?? 0}
-                    totalRegistrosPagina={page?.totalRegistrosPagina ?? 0}
-                    totalPaginasTotales={page?.totalPaginasTotales ?? 1}
-                />
-            </div>
+            </DataTable>
 
             <ImportarExcelModal
                 isOpen={importarAbierto}

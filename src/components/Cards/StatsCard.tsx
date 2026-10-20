@@ -20,22 +20,22 @@ export function StatCard({
   iconClassName,
 }: StatCardProps) {
   return (
-    <div className="flex min-h-[104px] items-center gap-4 rounded-2xl border border-slate-100 bg-white p-5 shadow-[0_2px_12px_rgba(15,23,42,0.05)]">
+    <div className="flex min-h-[92px] items-center gap-4 rounded-card bg-surface p-4 shadow-card">
       
       {/* Icono */}
       <div
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${iconClassName ?? "bg-slate-100 text-slate-600"}`}
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${iconClassName ?? "bg-hover text-label"}`}
       >
         <Icon className="h-6 w-6" strokeWidth={2} />
       </div>
 
       {/* Información */}
       <div className="min-w-0">
-        <p className="text-sm font-medium text-slate-500">
+        <p className="text-sm text-label">
           {title}
         </p>
 
-        <p className="mt-0.5 text-2xl font-bold tracking-tight text-slate-900">
+        <p className="mt-0.5 text-2xl font-bold tracking-tight text-ink">
           {value}
         </p>
 
@@ -44,14 +44,14 @@ export function StatCard({
             <span
               className={
                 trend.direction === "up"
-                  ? "text-xs font-semibold text-emerald-500"
-                  : "text-xs font-semibold text-red-500"
+                  ? "text-xs font-semibold text-success"
+                  : "text-xs font-semibold text-danger"
               }
             >
               {trend.direction === "up" ? "↑" : "↓"} {trend.value}
             </span>
 
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-muted">
               {trend.label ?? "vs. mes anterior"}
             </span>
           </div>

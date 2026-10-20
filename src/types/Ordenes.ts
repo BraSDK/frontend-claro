@@ -65,8 +65,23 @@ export interface OrdenTrabajoList{
     auditada? : boolean,
     cantidadImagenes? : number,
     estadoPago? : EstadoPago,
-    motivoNoPago? : string | null
+    motivoNoPago? : string | null,
+    // montos por tipo de línea (editables desde la tabla)
+    costo? : number,
+    adicional? : number,
+    drop150? : number,
+    drop200? : number,
+    drop300? : number
 }
+// Edición desde la tabla de Órdenes: solo el campo que cambió
+export interface EdicionRapidaRequest {
+    estado?: EstadoOrden,
+    descripcion?: string,
+    usuarioId?: number,
+    tipoMonto?: number,      // TipoDetalle: 0 costo, 1 adicional, 2 drop 150, 3 drop 200, 4 drop 300
+    monto?: number           // 0 = quitar esa línea
+}
+
 
 export interface OrdenesTrabajoRequest{
     pagina?: number;
@@ -142,9 +157,10 @@ export interface OrdenTrabajo{
 export interface OrdenDetalleTrabajo{
     categoriaServicio? : string,
     detalleId?: number,
-    servicioId? : number,
-    nombreServicio?: String,
-    precioServicio?: number,
+    concepto? : string,          // "FTTH01 - 1PLAY INTERNET", "ADICIONAL", "DROP 220"
+    precioUnitario? : number,
+    servicioId? : number,        // solo para el formulario: el servicio elegido del catálogo
+    precioServicio?: number,     // solo para el formulario: precio del servicio elegido
     cantidad : number,
     precioTotal? :number,
     ordenTrabajoId? : number
