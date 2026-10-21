@@ -62,7 +62,7 @@ export const AppLayout = () => {
     return (
         <div className="min-h-screen bg-page">
             {/* ===== Header ===== */}
-            <header className="sticky top-0 z-30 flex h-[58px] items-center justify-between gap-4 rounded-b-card bg-primary px-3 md:px-6 xl:px-[72px]">
+            <header className="sticky top-0 z-30 flex h-[58px] items-center justify-between gap-4  bg-primary px-3 md:px-6 xl:px-[72px]">
                 <div className="flex min-w-0 items-center gap-2">
                     <button type="button" onClick={atras} className={botonHeader} title="Atrás" aria-label="Atrás">
                         <ChevronLeft size={22} strokeWidth={1.75} />

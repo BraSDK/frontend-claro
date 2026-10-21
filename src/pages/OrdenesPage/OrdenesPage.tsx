@@ -196,7 +196,7 @@ export const OrdenesPage = () => {
                 </Campo>
             </FilterBar>
 
-            {/* Tarjetas del mes actual */}
+            {/* Tarjetas del mes actual 
             <div className={`grid grid-cols-1 gap-4 sm:grid-cols-2 ${esTecnico ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}`}>
                 <StatCard
                     title={`SOTs de ${mesActual || 'este mes'}`}
@@ -227,7 +227,7 @@ export const OrdenesPage = () => {
                     iconClassName="bg-success-soft text-success"
                 />
             </div>
-
+*/}
             {mensajeAuditoria && (
                 <p className={`rounded-control border px-4 py-2.5 text-sm ${mensajeAuditoria.tipo === 'ok' ? 'border-success/30 bg-success-soft text-success' : 'border-danger/30 bg-danger-soft text-danger'}`}>
                     {mensajeAuditoria.texto}
