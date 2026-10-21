@@ -12,6 +12,7 @@ export const MODULOS: Modulo[] = [
     { nombre: 'Valorización almacén', ruta: '/valorizacion', soloGestion: true },
     { nombre: 'Pagos Claro', ruta: '/pagos-claro', soloGestion: true },
     { nombre: 'Conciliación de pagos', ruta: '/conciliacion', soloGestion: true },
+    { nombre: 'Liquidacion', ruta: '/liquidacion', soloGestion: true },
     { nombre: 'Reportes', ruta: '/reportes', soloGestion: true },
     { nombre: 'Configuración', ruta: '/configuracion' },
     { nombre: 'Servicios', ruta: '/servicios', soloGestion: true, grupo: 'Administración' },

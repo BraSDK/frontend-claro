@@ -14,6 +14,7 @@ import { AuditarSotPage } from './pages/OrdenesPage/AuditarSotPage';
 import { ConciliacionPage } from './pages/ConciliacionPage';
 import { ProximamentePage } from './pages/ProximamentePage';
 import { ConfiguracionPage } from './pages/ConfiguracionPage';
+import { LiquidacionPage } from './pages/LiquidacionPage';
 function App() {
   return (
     <BrowserRouter>
@@ -29,6 +30,7 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/configuracion" element={<ConfiguracionPage />} />
           <Route path="/conciliacion" element={<ConciliacionPage />} />
+          <Route path="/liquidacion" element={<LiquidacionPage/>}/>
           <Route path="/valorizacion" element={<ProximamentePage titulo="Valorización almacén" descripcion="Aquí se verá la valorización de cada SOT por servicio, adicionales y drops. Mientras tanto, los montos están en Órdenes de trabajo y en la conciliación." atajo={{ texto: 'Ir a la conciliación', ruta: '/conciliacion' }} />} />
           <Route path="/pagos-claro" element={<ProximamentePage titulo="Pagos Claro" descripcion="Cuando tengan el reporte de pagos de Claro, aquí se importará y la conciliación lo usará en lugar de la auditoría." atajo={{ texto: 'Ir a la conciliación', ruta: '/conciliacion' }} />} />
           <Route path="/reportes" element={<ProximamentePage titulo="Reportes" descripcion="Reportes descargables por periodo, técnico y servicio. Por ahora puedes exportar las diferencias desde la conciliación y ver los totales en Inicio." atajo={{ texto: 'Ir a Inicio', ruta: '/dashboard' }} />} />
