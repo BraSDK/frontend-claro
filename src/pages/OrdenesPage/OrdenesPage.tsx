@@ -4,7 +4,7 @@ import { Images, Plus, RefreshCw } from 'lucide-react';
 import { FilterBar } from '../../components/ui/FilterBar';
 import { Campo, Entrada, RangoFechas, Boton } from '../../components/ui/Controles';
 import { DataTable, AccionTabla } from '../../components/ui/DataTable';
-import { OrdenesTable } from '../../components/Ordenes/OrdenesList';
+import { OrdenesTable } from '../../components/Ordenes/OrdenesTable';
 import { BarPaginancion } from '../../components/Paginacion/BarPaginacion';
 import { ModalData } from '../../components/shared/ModalData';
 import { PictureVisor } from '../../components/shared/PictureVisor';

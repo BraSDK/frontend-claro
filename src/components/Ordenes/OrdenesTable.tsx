@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { RevoGrid } from '@revolist/react-datagrid';
+import { temaClaro } from '@/theme/revogrid-theme';
+import type { ColumnRegular } from '@revolist/react-datagrid';
 import { useNavigate } from 'react-router-dom';
 import { Edit2, ImageIcon, Images, Inbox, Trash2, FileText } from 'lucide-react';
 import { MenuDinamico } from '../shared/MenuDinamico';
