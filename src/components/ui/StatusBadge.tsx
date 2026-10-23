@@ -1,14 +1,15 @@
-// Píldora de estado con fondo sólido.
+// Píldora de estado.
 // Para cambiar qué color lleva cada estado, edita solo MAPEO_ESTADOS.
 
 export type Tono = "success" | "warning" | "danger" | "info" | "neutral";
 
-const fondos: Record<Tono, string> = {
-    success: "bg-success",
-    warning: "bg-warning",
-    danger: "bg-danger",
-    info: "bg-info",
-    neutral: "bg-muted",
+// Píldora suave: fondo tenue del estado + texto y punto del color del estado (verde = positivo)
+const estilos: Record<Tono, { pildora: string; punto: string }> = {
+    success: { pildora: "bg-success-soft text-success", punto: "bg-success" },
+    warning: { pildora: "bg-warning-soft text-warning", punto: "bg-warning" },
+    danger: { pildora: "bg-danger-soft text-danger", punto: "bg-danger" },
+    info: { pildora: "bg-primary-soft text-primary", punto: "bg-primary" },
+    neutral: { pildora: "bg-page text-label", punto: "bg-muted" },
 };
 
 export const MAPEO_ESTADOS = {
@@ -17,6 +18,12 @@ export const MAPEO_ESTADOS = {
         0: { label: "Ingresado", tono: "info" },
         1: { label: "Procesado", tono: "warning" },
         2: { label: "Liquidado", tono: "success" },
+    },
+    // estado de la SOT en el sistema de Claro (EstadoClaro de la orden de trabajo)
+    campo: {
+        0: { label: "Completado", tono: "success" },
+        1: { label: "No completado", tono: "danger" },
+        2: { label: "En progreso", tono: "warning" },
     },
     // estado de pago de la SOT
     pago: {
@@ -34,7 +41,8 @@ export const MAPEO_ESTADOS = {
 } satisfies Record<string, Record<number, { label: string; tono: Tono }>>;
 
 export const StatusBadge = ({ tono, children }: { tono: Tono; children: React.ReactNode }) => (
-    <span className={`inline-flex items-center whitespace-nowrap h-5 rounded-badge px-2 text-[13px] font-bold leading-5 text-white ${fondos[tono]}`}>
+    <span className={`inline-flex h-6 items-center gap-1.5 whitespace-nowrap rounded-badge px-2.5 text-xs font-semibold ${estilos[tono].pildora}`}>
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-pill ${estilos[tono].punto}`} aria-hidden />
         {children}
     </span>
 );

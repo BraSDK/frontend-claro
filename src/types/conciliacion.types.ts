@@ -1,5 +1,11 @@
 // Categoría de cada SOT (coincide con el enum CategoriaConciliacion del back)
-import type { EstadoPago } from './Ordenes';
+// Estado de pago de la SOT (enum EstadoPago del back: Pendiente, SiPago, NoPagara)
+export const EstadoPago = {
+    Pendiente: 0,
+    SiPago: 1,
+    NoPago: 2,
+} as const;
+export type EstadoPago = typeof EstadoPago[keyof typeof EstadoPago];
 
 export const CategoriaConciliacion = {
     CUADRA: 0,

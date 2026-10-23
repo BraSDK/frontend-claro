@@ -69,14 +69,14 @@ export const ServiciosPage = () => {
           {/* Cabecera */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Gestión de Servicios</h1>
-              <p className="text-sm text-gray-500 mt-1">Administra el catálogo de servicios</p>
+              <h1 className="text-2xl font-bold text-ink">Gestión de Servicios</h1>
+              <p className="text-sm text-label mt-1">Administra el catálogo de servicios</p>
             </div>
             <div className="flex items-center gap-3">
               {/* Botón Filtros */}
               <button
                 onClick={openFilter}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border border-gray-300"
+                className="bg-page hover:bg-line text-ink px-4 py-2.5 rounded-pill text-sm font-medium transition-colors flex items-center gap-2 border border-line"
               >
                 <Filter size={16} />
                 Filtros
@@ -85,17 +85,17 @@ export const ServiciosPage = () => {
               {/* Botón Nuevo Servicio */}
               <button 
                 onClick={openForCreate}
-                className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md transition-colors flex items-center gap-2"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <span>+</span> Nuevo Servicio
               </button>
             </div>
           </div>
     
-          {error && <div className="p-4 bg-red-50 text-red-600 rounded-lg">{error}</div>}
+          {error && <div className="p-4 bg-danger-soft text-danger rounded-control">{error}</div>}
     
           {/* Tabla con datos filtrados mediante el Hook */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-surface rounded-card border border-line overflow-hidden">
             <ServiciosTable 
               servicios={serviciosFiltrados} 
               isLoading={isLoading} 

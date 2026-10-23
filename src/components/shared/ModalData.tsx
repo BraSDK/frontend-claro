@@ -1,67 +1,58 @@
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
-interface ModalDataProps{
+import { useEffect, type ReactNode } from "react";
+import { Boton } from "../ui/Controles";
+
+interface ModalDataProps {
     isOpen: boolean;
     onClose: () => void;
-    children? : ReactNode;
-    componente2? : ReactNode;
-    tittle : string;
-    subtitle? : string;
+    children?: ReactNode;
+    tittle: string;
+    subtitle?: string;
     icon?: ReactNode;
-
 }
-export const ModalData = ({isOpen,onClose,children,componente2,tittle,icon,subtitle}:ModalDataProps) => {
-    
+
+// Modal de consulta (solo lectura): cabecera con título, contenido y botón Cerrar. Esc también cierra.
+export const ModalData = ({ isOpen, onClose, children, tittle, icon, subtitle }: ModalDataProps) => {
+    useEffect(() => {
+        if (!isOpen) return;
+        const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+        document.addEventListener("keydown", tecla);
+        return () => document.removeEventListener("keydown", tecla);
+    }, [isOpen, onClose]);
+
     if (!isOpen) return null;
-    return(
-        
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-3xl overflow-hidden rounded-3xl bg-white shadow-xl">
-
-                {/* Encabezado */}
-                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-                    <div className="flex items-center gap-4">
-                        
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                            {icon}
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/30 p-4" onClick={onClose}>
+            <div
+                role="dialog"
+                aria-modal="true"
+                className="flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-card bg-surface shadow-menu"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <header className="flex items-center justify-between gap-3 border-b border-line px-6 py-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                        {icon && <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-pill bg-primary-soft text-primary">{icon}</span>}
+                        <div className="min-w-0">
+                            <h2 className="truncate text-lg font-semibold text-ink">{tittle}</h2>
+                            {subtitle && <p className="text-sm text-label">{subtitle}</p>}
                         </div>
-                        <div>
-                            <h1 className="text-lg font-semibold text-slate-900">
-                                {tittle} 
-                            </h1>
-                            {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
-
-                        </div>
-
                     </div>
                     <button
+                        type="button"
                         onClick={onClose}
-                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+                        aria-label="Cerrar"
+                        className="flex h-9 w-9 items-center justify-center rounded-pill text-label transition-colors hover:bg-hover hover:text-ink"
                     >
-                        <X size={20} />
+                        <X size={18} strokeWidth={1.75} />
                     </button>
-                </div>
+                </header>
 
-                {/* Contenido */}
-                <div className="px-6 py-5">
-                    <div className="py-3">
-                        {children}
-                        {componente2}
-                    </div>
-                </div>
+                <div className="overflow-y-auto px-6 py-5">{children}</div>
 
-                {/* Pie */}
-                <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-6 py-4">
-                    <button
-                        onClick={onClose}
-                        className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 transition-colors"
-                    >
-                        Cerrar
-                    </button>
-                </div>
-
+                <footer className="flex justify-end border-t border-line px-6 py-4">
+                    <Boton variante="secundario" onClick={onClose}>Cerrar</Boton>
+                </footer>
             </div>
         </div>
-
-    )
+    );
 };

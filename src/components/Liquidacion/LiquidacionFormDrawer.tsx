@@ -76,7 +76,7 @@ export const LiquidacionFormDrawer: React.FC<LiquidacionFormDrawerProps> = ({
             type="button" 
             onClick={onClose} 
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-ink bg-surface border border-line rounded-pill hover:bg-page transition-colors"
           >
             Cancelar
           </button>
@@ -95,7 +95,7 @@ export const LiquidacionFormDrawer: React.FC<LiquidacionFormDrawerProps> = ({
         
         {/* Sección de Datos Generales */}
         <section>
-          <h3 className="text-sm font-bold text-gray-800 mb-4 border-b pb-2">Datos Principales</h3>
+          <h3 className="text-sm font-bold text-ink mb-4 border-b pb-2">Datos Principales</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             <Campo label="Número SOT">
@@ -153,8 +153,8 @@ export const LiquidacionFormDrawer: React.FC<LiquidacionFormDrawerProps> = ({
 
         {/* Sección de Detalles (Aquí irá la tabla de conceptos luego) */}
         <section>
-          <h3 className="text-sm font-bold text-gray-800 mb-4 border-b pb-2">Detalles y Conceptos</h3>
-          <div className="p-8 text-center text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+          <h3 className="text-sm font-bold text-ink mb-4 border-b pb-2">Detalles y Conceptos</h3>
+          <div className="p-8 text-center text-label border-2 border-dashed border-line rounded-control">
             Aún no hay conceptos agregados a esta liquidación.
           </div>
         </section>

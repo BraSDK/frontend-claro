@@ -18,26 +18,26 @@ export const UsuariosTable = ({
   rolLogueado
 }: Props) => {
   if (isLoading) {
-    return <div className="p-8 text-center text-gray-500">Cargando datos...</div>;
+    return <div className="p-8 text-center text-label">Cargando datos...</div>;
   }
 
   const getRolBadgeClass = (rol: string) => {
     switch (rol) {
       case Rol.ADMIN:
-        return 'bg-purple-100 text-purple-700';
+        return 'bg-primary-soft text-primary';
       case Rol.TECNICO:
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-primary-soft text-primary';
       case Rol.ALMACEN:
-        return 'bg-amber-100 text-amber-700';
+        return 'bg-warning-soft text-warning';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-page text-ink';
     }
   };
 
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm">
-        <thead className="bg-gray-50 text-gray-600 font-semibold border-b border-gray-200">
+        <thead className="bg-page text-label font-semibold border-b border-line">
           <tr>
             <th className="px-6 py-4">ID</th>
             <th className="px-6 py-4">Nombre Completo</th>
@@ -47,22 +47,22 @@ export const UsuariosTable = ({
             <th className="px-6 py-4 text-right">Acciones</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-100">
+        <tbody className="divide-y divide-line">
           {usuarios.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+              <td colSpan={6} className="px-6 py-8 text-center text-label">
                 No hay usuarios registrados.
               </td>
             </tr>
           ) : (
             usuarios.map((usuario) => (
-              <tr key={usuario.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 text-gray-500">#{usuario.id}</td>
-                <td className="px-6 py-4 font-medium text-gray-900">{usuario.nombreCompleto}</td>
-                <td className="px-6 py-4 text-gray-600">{usuario.documentoIdentidad}</td>
-                <td className="px-6 py-4 text-gray-600">{usuario.email}</td>
+              <tr key={usuario.id} className="hover:bg-page transition-colors">
+                <td className="px-6 py-4 text-label">#{usuario.id}</td>
+                <td className="px-6 py-4 font-medium text-ink">{usuario.nombreCompleto}</td>
+                <td className="px-6 py-4 text-label">{usuario.documentoIdentidad}</td>
+                <td className="px-6 py-4 text-label">{usuario.email}</td>
                 <td className="px-6 py-4">
-                  <span className={`px-3 py-1 text-xs font-medium rounded-full ${getRolBadgeClass(usuario.rol)}`}>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-pill ${getRolBadgeClass(usuario.rol)}`}>
                     {usuario.rol}
                   </span>
                 </td>
@@ -72,7 +72,7 @@ export const UsuariosTable = ({
                       type="button"
                       title="Editar"
                       onClick={() => onEdit(usuario)}
-                      className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                      className="p-1.5 text-muted hover:text-primary hover:bg-primary-soft rounded transition-colors"
                     >
                       <Pencil size={18} />
                     </button>
@@ -81,7 +81,7 @@ export const UsuariosTable = ({
                         type="button"
                         title="Eliminar"
                         onClick={() => onDelete(usuario.id)}
-                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                        className="p-1.5 text-muted hover:text-danger hover:bg-danger-soft rounded transition-colors"
                       >
                         <Trash2 size={18} />
                       </button>

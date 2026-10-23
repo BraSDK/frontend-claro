@@ -7,29 +7,31 @@ interface ModalProps {
   children: React.ReactNode; // Aquí adentro inyectaremos cualquier formulario
 }
 
+// Modal de formulario: tarjeta blanca de 24px sobre velo Ink
 export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
-    // Fondo oscuro desenfocado (Backdrop)
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      
-      {/* Contenedor del Modal */}
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
-        
-        {/* Cabecera */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-          <button 
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/30 p-4" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-card bg-surface shadow-menu"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className="flex items-center justify-between border-b border-line px-6 py-4">
+          <h3 className="text-lg font-semibold text-ink">{title}</h3>
+          <button
+            type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
+            aria-label="Cerrar"
+            className="flex h-9 w-9 items-center justify-center rounded-pill text-label transition-colors hover:bg-hover hover:text-ink"
           >
-            <X size={20} />
+            <X size={18} strokeWidth={1.75} />
           </button>
-        </div>
+        </header>
 
-        {/* Cuerpo (Aquí entra el formulario) */}
-        <div className="p-6">
+        <div className="overflow-y-auto p-6">
           {children}
         </div>
       </div>

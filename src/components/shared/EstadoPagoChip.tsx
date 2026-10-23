@@ -1,10 +1,11 @@
-import { EstadoPago } from "../../types/Ordenes";
+import { EstadoPago } from "../../types/conciliacion.types";
+import { StatusBadge, type Tono } from "../ui/StatusBadge";
 
-// Nombre y colores de cada estado de pago: Pendiente (gris), Sí pago (verde), No pago (rojo)
-export const ESTADOS_PAGO: Record<EstadoPago, { label: string; className: string; punto: string }> = {
-    [EstadoPago.Pendiente]: { label: "Pendiente", className: "bg-slate-100 text-slate-600 ring-slate-500/15", punto: "bg-slate-400" },
-    [EstadoPago.SiPago]:    { label: "Sí pago",   className: "bg-green-50 text-green-700 ring-green-600/15",  punto: "bg-green-500" },
-    [EstadoPago.NoPago]:    { label: "No pago",   className: "bg-red-50 text-red-700 ring-red-600/15",        punto: "bg-red-500" },
+// Nombre y tono de cada estado de pago: Pendiente (neutro), Sí pago (verde), No pago (rojo)
+export const ESTADOS_PAGO: Record<EstadoPago, { label: string; tono: Tono }> = {
+    [EstadoPago.Pendiente]: { label: "Pendiente", tono: "neutral" },
+    [EstadoPago.SiPago]: { label: "Sí pago", tono: "success" },
+    [EstadoPago.NoPago]: { label: "No pago", tono: "danger" },
 };
 
 interface Props {
@@ -14,13 +15,10 @@ interface Props {
 
 export const EstadoPagoChip = ({ estado = EstadoPago.Pendiente, motivo }: Props) => {
     const info = ESTADOS_PAGO[estado] ?? ESTADOS_PAGO[EstadoPago.Pendiente];
+    const conMotivo = estado === EstadoPago.NoPago && !!motivo;
     return (
-        <span
-            title={estado === EstadoPago.NoPago && motivo ? `Motivo: ${motivo}` : undefined}
-            className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${info.className} ${estado === EstadoPago.NoPago && motivo ? "cursor-help" : ""}`}
-        >
-            <span className={`h-1.5 w-1.5 rounded-full ${info.punto}`} />
-            {info.label}
+        <span title={conMotivo ? `Motivo: ${motivo}` : undefined} className={conMotivo ? "cursor-help" : undefined}>
+            <StatusBadge tono={info.tono}>{info.label}</StatusBadge>
         </span>
     );
 };

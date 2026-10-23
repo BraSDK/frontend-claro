@@ -1,167 +1,65 @@
 import { api } from '../../api/api';
-import type { OrdenesTrabajoRequest, OrdenTrabajoList, OrdenTrabajoDetalleResponse,EditarOrdenCompletaRequest,CambiosTecnico, OrdenCreateRequest, OrdenDetalleTrabajo, ImportarExcelResponse, AuditarOrdenRequest, AuditarMasivoRequest, AuditarMasivoResponse, EdicionRapidaRequest, AuditoriaPagoRequest, AuditoriaPagoResponse } from '../../types/Ordenes';
+import type { PagedResponse } from '../../types/paginacion';
+import type { ArchivoOrden, CrearOrdenRequest, EdicionRapidaRequest, ListarOrdenesParams, OrdenTrabajo } from '../../types/Ordenes';
 
-interface DataTraida{
-    listaOrdenes : OrdenTrabajoList[],
-    totalRegistros : number,
-    totalRegistrosPagina : number,
-    numeroPagina : number,
-    totalPaginasTotales : number
-}
+// Un método por endpoint de OrdenTrabajoController (api/OrdenTrabajo). Entre paréntesis, los roles que acepta el back.
 
-export const getOrdenes = async (params?: OrdenesTrabajoRequest): Promise<DataTraida> => {
-    const response = await api.get("/OrdenTrabajo/List/", { params });
-    return {
-                listaOrdenes : response.data.listaOrdenes,
-                totalRegistros : response.data.totalRegistros,
-                totalRegistrosPagina : response.data.totalRegistrosPagina,
-                numeroPagina : response.data.numeroPagina,
-                totalPaginasTotales : response.data.totalPaginasTotales
-    };
-};
-
-export const getOrdenById = async (id: number): Promise<OrdenTrabajoDetalleResponse> => {
-
-    const data = await api.get<OrdenTrabajoDetalleResponse>(`/OrdenTrabajo/${id}`);
-
-    return data.data;
-};
-
-export const getOrdenBySot = async (sot: number): Promise<OrdenTrabajoDetalleResponse> => {
-    const response = await api.get<OrdenTrabajoDetalleResponse>(`/Ordenes/sot/${sot}`);
-    return response.data;
-};
-
-export const crearOrdenTrabajo = async (ordenTrabajo : OrdenCreateRequest ): Promise<OrdenTrabajoDetalleResponse> => {
-    const formData = new FormData();
-    formData.append("Sot", ordenTrabajo.Sot.toString());
-    formData.append("Descripcion", ordenTrabajo.Descripcion.toString());
-    formData.append("UsuarioId", String(ordenTrabajo.UsuarioId ?? 0));
-    formData.append("Estado",ordenTrabajo.Estado.toString());
-    ordenTrabajo.Imagenes.forEach((img) => {
-        formData.append("Imagenes", img);
-    });
-
-    const response = await api.post<OrdenTrabajoDetalleResponse>('OrdenTrabajo', formData);
-    return response.data;
-};
-
-export const editarByTecnico = async (id: number,ordenEdit : CambiosTecnico):Promise<string> => {
-    const formData = new FormData();
-    if (ordenEdit.Sot !== undefined)formData.append("Sot",String(ordenEdit.Sot));;
-    
-    if (ordenEdit.Descripcion !== undefined)formData.append("Descripcion",ordenEdit.Descripcion);
-    formData.append("UsuarioId", String(ordenEdit.UsuarioId));
-    ordenEdit.ArchivosEliminados.forEach((archivoId) => {
-        formData.append("ArchivosEliminados", String(archivoId));
-    });
-    ordenEdit.ArchivosNuevos.forEach((archivo) => {
-        formData.append("ArchivosNuevos", archivo); // debe coincidir con el nombre del parámetro en el controller
-    });
-
-    for (let [clave, valor] of formData.entries()) {
-    console.log(`${clave}:`, valor);
-    }
-    const response = await api.put<OrdenTrabajoDetalleResponse>(`OrdenTrabajo/${id}/tecnico`, formData);
-    return "response.data";;
-};
-export const eliminarOrden = async(id:number) => {
-    const response = await api.delete(`OrdenTrabajo/${id}/delete`);
-    return response.status;
-};
-
-export const editaOrdenCompleta = async(ordenId:number,ordenTrabajo:EditarOrdenCompletaRequest) => {
-    const formData = new FormData();
-    if (ordenTrabajo.Sot !== undefined)formData.append("Sot",String(ordenTrabajo.Sot));
-    if (ordenTrabajo.Descripcion !== undefined) formData.append("Descripcion",String(ordenTrabajo.Descripcion));
-    formData.append("Estado",String(ordenTrabajo.Estado));
-    ordenTrabajo.DetallesEliminados.forEach(
-        id => {formData.append("DetallesEliminados", String(id))}
-    );
-    ordenTrabajo.DetallesEditados.forEach(
-        (detalle, i) => { 
-            formData.append(`DetallesEditados[${i}].DetalleId`,String(detalle.detalleId));
-            formData.append(`DetallesEditados[${i}].Concepto`, detalle.concepto ?? "");
-            formData.append(`DetallesEditados[${i}].PrecioUnitario`, String(detalle.precioUnitario ?? 0));
-            formData.append(`DetallesEditados[${i}].Cantidad`, String(detalle.cantidad));
-            formData.append(`DetallesEditados[${i}].Tipo`, String(detalle.tipo));
-        }
-    );
-    ordenTrabajo.DetallesNuevos.forEach(
-        (detalle, i) => { 
-            formData.append(`DetallesNuevos[${i}].Concepto`, detalle.concepto ?? "");
-            formData.append(`DetallesNuevos[${i}].PrecioUnitario`, String(detalle.precioUnitario ?? 0));
-            formData.append(`DetallesNuevos[${i}].cantidad`, String(detalle.cantidad));
-            formData.append(`DetallesNuevos[${i}].Tipo`, String(detalle.tipo));
-        }
-    );
-    ordenTrabajo.ArchivosEliminados.forEach(
-        (i)=> {
-            formData.append("ArchivosEliminados",String(i));
-        }
-    );
-    for (let [clave, valor] of formData.entries()) {
-    console.log(`${clave}:`, valor);
-    }
-    const response = await api.put<EditarOrdenCompletaRequest>(`OrdenTrabajo/${ordenId}/EditarOrdenCompleta`,formData);
-    console.log("enviado")
-    console.log(response.status)
-    return response.status;
-}
-
-// Edita los detalles existentes de una orden.
-// OJO: el back ELIMINA los detalles de la orden que no vengan en esta lista.
-export const editarDetallesOrden = async (ordenId: number, detalles: OrdenDetalleTrabajo[]) => {
-    const body = detalles.map((d) => ({
-        DetalleId: d.detalleId,
-        Concepto: d.concepto,
-        PrecioUnitario: d.precioUnitario,
-        Cantidad: d.cantidad,
-        Tipo: d.tipo,
-    }));
-    const response = await api.put(`OrdenTrabajo/${ordenId}/detalles-edit`, body);
-    return response.status;
-};
-
-// Agrega un detalle nuevo a la orden (el back calcula el total = precio unitario × cantidad).
-export const agregarDetalleOrden = async (ordenId: number, detalle: OrdenDetalleTrabajo) => {
-    const response = await api.post(`OrdenTrabajo/${ordenId}/detalles`, {
-        Concepto: detalle.concepto,
-        PrecioUnitario: detalle.precioUnitario,
-        Cantidad: detalle.cantidad,
-        Tipo: detalle.tipo,
-    });
-    return response.data;
-};
-
-// Sube el Excel procesado; el back lo lee (no lo guarda) y crea las SOT con sus detalles.
-export const importarExcelOrdenes = async (archivo: File): Promise<ImportarExcelResponse> => {
-    const formData = new FormData();
-    formData.append("archivo", archivo);
-    const response = await api.post<ImportarExcelResponse>("OrdenTrabajo/importar-excel", formData);
-    return response.data;
-};
-
-// Auditoría de la SOT: descuento o multa con su observación
-export const auditarOrden = async (ordenId: number, request: AuditarOrdenRequest): Promise<OrdenTrabajoDetalleResponse> => {
-    const { data } = await api.put<OrdenTrabajoDetalleResponse>(`OrdenTrabajo/${ordenId}/auditar`, request);
+// GET List (todos; un técnico solo recibe las suyas)
+export const listarOrdenes = async (params: ListarOrdenesParams = {}): Promise<PagedResponse<OrdenTrabajo>> => {
+    const { data } = await api.get<PagedResponse<OrdenTrabajo>>('OrdenTrabajo/List', { params });
     return data;
 };
 
-// Audita sin descuento las SOT pendientes; con confirmar = false solo devuelve el conteo
-export const auditarMasivo = async (request: AuditarMasivoRequest): Promise<AuditarMasivoResponse> => {
-    const { data } = await api.put<AuditarMasivoResponse>('OrdenTrabajo/auditar-masivo', request);
+// El back no tiene "obtener por id": se busca por SOT (es única) en el listado
+export const obtenerOrdenPorSot = async (sot: number): Promise<OrdenTrabajo | null> => {
+    const { listaGenerica } = await listarOrdenes({ buscar: String(sot), canPagina: 50 });
+    return listaGenerica.find((o) => o.sot === sot) ?? null;
+};
+
+// POST (ADMIN, TECNICO) multipart: campos de la orden + "imagenes"
+export const crearOrden = async (orden: CrearOrdenRequest): Promise<OrdenTrabajo> => {
+    const formData = new FormData();
+    formData.append('Sot', String(orden.sot));
+    formData.append('DocTecnico', orden.docTecnico);
+    formData.append('TrabajoRealizado', orden.trabajoRealizado);
+    formData.append('EstadoCampo', String(orden.estadoCampo));
+    formData.append('UsuarioId', String(orden.usuarioId));
+    orden.imagenes.forEach((img) => formData.append('imagenes', img));
+    const { data } = await api.post<OrdenTrabajo>('OrdenTrabajo', formData);
     return data;
 };
 
-// Auditoría de almacén: Sí pago / No pago (No pago exige motivo)
-export const auditarPago = async (ordenId: number, request: AuditoriaPagoRequest): Promise<AuditoriaPagoResponse> => {
-    const { data } = await api.patch<AuditoriaPagoResponse>(`OrdenTrabajo/${ordenId}/auditoria-pago`, request);
+// PATCH {id}/edicion-rapida (ADMIN, ALMACEN): devuelve la orden actualizada
+export const edicionRapida = async (ordenId: number, cambio: EdicionRapidaRequest): Promise<OrdenTrabajo> => {
+    const { data } = await api.patch<OrdenTrabajo>(`OrdenTrabajo/${ordenId}/edicion-rapida`, cambio);
     return data;
 };
 
-// Edita un campo de la SOT desde la tabla y devuelve la fila actualizada
-export const edicionRapida = async (ordenId: number, cambio: EdicionRapidaRequest): Promise<OrdenTrabajoList> => {
-    const { data } = await api.patch<OrdenTrabajoList>(`OrdenTrabajo/${ordenId}/edicion-rapida`, cambio);
+// DELETE {id}/delete (cualquier usuario autenticado): borra la orden y sus imágenes
+export const eliminarOrden = async (ordenId: number): Promise<void> => {
+    await api.delete(`OrdenTrabajo/${ordenId}/delete`);
+};
+
+// POST {id}/archivos (ADMIN, TECNICO): devuelve todas las imágenes de la orden
+export const agregarArchivos = async (ordenId: number, archivos: File[]): Promise<ArchivoOrden[]> => {
+    const formData = new FormData();
+    archivos.forEach((a) => formData.append('archivos', a));
+    const { data } = await api.post<ArchivoOrden[]>(`OrdenTrabajo/${ordenId}/archivos`, formData);
     return data;
+};
+
+// DELETE {id}/archivos/{archivoId} (ADMIN, TECNICO)
+export const eliminarArchivo = async (ordenId: number, archivoId: number): Promise<void> => {
+    await api.delete(`OrdenTrabajo/${ordenId}/archivos/${archivoId}`);
+};
+
+// URL pública de una imagen (el back sirve los archivos desde la raíz del servidor)
+export const urlArchivo = (archivo: ArchivoOrden) => archivo.url || `${import.meta.env.VITE_API_URL2}${archivo.src}`;
+
+// El back responde { error } en 400/404 y { mensaje } en 500
+export const mensajeError = (err: unknown, porDefecto: string): string => {
+    const e = err as { response?: { status?: number; data?: { error?: string; mensaje?: string } } };
+    if (!e?.response) return 'No hay conexión con el servidor.';
+    if (e.response.status === 403) return 'No tienes permisos para esta acción.';
+    return e.response.data?.error ?? e.response.data?.mensaje ?? porDefecto;
 };

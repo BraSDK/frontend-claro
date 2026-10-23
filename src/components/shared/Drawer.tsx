@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { X } from 'lucide-react';
 
 interface DrawerProps {
   isOpen: boolean;
@@ -9,42 +10,41 @@ interface DrawerProps {
   widthClass?: string; // Permite cambiar el ancho (ej: 'w-96' para filtros, 'w-[600px]' para formularios)
 }
 
+// Panel lateral derecho: superficie blanca sobre velo, cabecera con título y cierre, pie opcional para acciones
 export const Drawer = ({ isOpen, onClose, title, children, footer, widthClass = "w-96" }: DrawerProps) => {
   return (
     <>
-      <div 
-        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
-          isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
-        }`}
+      <div
+        className={`fixed inset-0 z-40 bg-ink/30 transition-opacity duration-300 ${isOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}
         onClick={onClose}
-      ></div>
+      />
 
-      <div 
-        className={`fixed top-0 right-0 h-full ${widthClass} max-w-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+      <aside
+        className={`fixed right-0 top-0 z-50 flex h-full max-w-full ${widthClass} transform flex-col rounded-l-card bg-surface shadow-menu transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        aria-hidden={!isOpen}
       >
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-          <button 
+        <header className="flex items-center justify-between border-b border-line px-6 py-4">
+          <h2 className="text-lg font-semibold text-ink">{title}</h2>
+          <button
+            type="button"
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+            aria-label="Cerrar"
+            className="flex h-9 w-9 items-center justify-center rounded-pill text-label transition-colors hover:bg-hover hover:text-ink"
           >
-            ✕
+            <X size={18} strokeWidth={1.75} />
           </button>
-        </div>
+        </header>
 
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="flex-1 overflow-y-auto p-6">
           {children}
         </div>
 
-        {/* Solo renderiza el footer si se envía como prop */}
         {footer && (
-          <div className="p-5 border-t border-gray-200 bg-gray-50">
+          <footer className="border-t border-line px-6 py-4">
             {footer}
-          </div>
+          </footer>
         )}
-      </div>
+      </aside>
     </>
   );
 };

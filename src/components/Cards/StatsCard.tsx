@@ -20,18 +20,18 @@ export function StatCard({
   iconClassName,
 }: StatCardProps) {
   return (
-    <div className="flex min-h-[92px] items-center gap-4 rounded-card bg-surface p-4 shadow-card">
+    <div className="flex min-h-[92px] items-center gap-4 rounded-card bg-surface p-5">
       
       {/* Icono */}
       <div
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${iconClassName ?? "bg-hover text-label"}`}
+        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-pill ${iconClassName ?? "bg-primary-soft text-primary"}`}
       >
-        <Icon className="h-6 w-6" strokeWidth={2} />
+        <Icon className="h-[22px] w-[22px]" strokeWidth={1.75} />
       </div>
 
       {/* Información */}
       <div className="min-w-0">
-        <p className="text-sm text-label">
+        <p className="text-sm font-medium text-label">
           {title}
         </p>
 
@@ -51,7 +51,7 @@ export function StatCard({
               {trend.direction === "up" ? "↑" : "↓"} {trend.value}
             </span>
 
-            <span className="text-[11px] text-muted">
+            <span className="text-xs text-label">
               {trend.label ?? "vs. mes anterior"}
             </span>
           </div>

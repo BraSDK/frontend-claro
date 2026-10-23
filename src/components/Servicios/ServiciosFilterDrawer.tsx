@@ -50,20 +50,20 @@ export const ServiciosFilterDrawer = ({
       <div className="flex flex-col gap-5">
         {/* Filtro por Nombre */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+          <label className="block text-sm font-medium text-ink mb-1">Nombre</label>
           <input
             type="text"
             name="nombre"
             value={filters.nombre}
             onChange={handleChange}
             placeholder="Buscar por nombre..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full px-3 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-danger"
           />
         </div>
 
         {/* Filtro por Rango de Precio */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+          <label className="block text-sm font-medium text-ink mb-1">Precio</label>
           <div className="flex gap-2">
             <input
               type="number"
@@ -71,7 +71,7 @@ export const ServiciosFilterDrawer = ({
               value={filters.precioMin}
               onChange={handleChange}
               placeholder="Mín."
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-1/2 px-3 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-danger"
             />
             <input
               type="number"
@@ -79,19 +79,19 @@ export const ServiciosFilterDrawer = ({
               value={filters.precioMax}
               onChange={handleChange}
               placeholder="Máx."
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-1/2 px-3 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-danger"
             />
           </div>
         </div>
 
         {/* Filtro por Estado (Valores fijos) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+          <label className="block text-sm font-medium text-ink mb-1">Estado</label>
           <select
             name="estado"
             value={filters.estado}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="w-full px-3 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-danger"
           >
             <option value="">Todos los estados</option>
             <option value="HFC">HFC</option>
@@ -105,13 +105,13 @@ export const ServiciosFilterDrawer = ({
       <div className="mt-8 flex gap-3">
         <button
           onClick={handleReset}
-          className="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg font-medium transition-colors text-sm"
+          className="w-1/2 inline-flex h-10 items-center justify-center gap-2 rounded-pill border border-line bg-surface px-5 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           Limpiar
         </button>
         <button
           onClick={handleApply}
-          className="w-1/2 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-medium transition-colors text-sm"
+          className="w-1/2 inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Aplicar Filtros
         </button>

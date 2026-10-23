@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de Animales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap">
+<style>
+  /* Layout: una sola columna centrada — encabezado, formulario tipo tarjeta, tabla, franja verde al pie */
+  :root {
+    --green: #58cc02;
+    --green-dark: #46a302;
+    --green-soft: #d7ffb8;
+    --leaf: #a5ed6e;
+    --blue: #1cb0f6;
+    --blue-dark: #1899d6;
+    --red: #ff4b4b;
+    --red-soft: #ffdfe0;
+    --yellow: #ffc800;
+    --yellow-soft: #fff4cc;
+    --paper: #ffffff;
+    --ink: #4b4b4b;
+    --pencil: #777777;
+    --faded: #afafaf;
+    --line: #e5e5e5;
+    --row-alt: #f7f7f7;
+
+    --font-display: 'Nunito', ui-rounded, 'Segoe UI', system-ui, sans-serif;
+    --font-body: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 17px;
+    line-height: 1.4;
+  }
+
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+
+  /* Barra superior */
+  .topbar { border-bottom: 2px solid var(--line); }
+  .topbar .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; padding-block: 14px;
+  }
+  .logo {
+    font-family: var(--font-display); font-weight: 900; font-size: 30px;
+    color: var(--green); letter-spacing: -0.02em; display: flex; align-items: center; gap: 10px;
+  }
+  .logo svg { width: 38px; height: 38px; }
+  .pill {
+    font-weight: 700; font-size: 15px; text-transform: uppercase; letter-spacing: 0.053em;
+    color: var(--pencil); border: 2px solid var(--faded); border-radius: var(--radius);
+    padding: 8px 16px;
+  }
+
+  /* Encabezado */
+  header.hero .wrap { padding-block: 40px 24px; display: grid; gap: 8px; }
+  h1 {
+    font-family: var(--font-display); font-weight: 900; font-size: clamp(36px, 6vw, 56px);
+    color: var(--green); letter-spacing: -0.02em; line-height: 1.1; margin: 0; text-wrap: balance;
+  }
+  .lead { color: var(--pencil); margin: 0; max-width: 60ch; }
+
+  /* Estadísticas */
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+  .stat {
+    border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 16px;
+    padding: 14px 16px; display: grid; gap: 2px;
+  }
+  .stat b { font-size: 32px; font-weight: 900; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.053em; color: var(--pencil); }
+  .stat.g b { color: var(--green); }
+  .stat.b b { color: var(--blue); }
+  .stat.y b { color: #e0a800; }
+  .stat.r b { color: var(--red); }
+
+  /* Tarjeta formulario */
+  main .wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; padding-block: 24px 64px; }
+  .card { border: 2px solid var(--line); border-radius: 16px; padding: 24px; }
+  .card h2 { margin: 0 0 16px; font-size: 24px; font-weight: 800; color: var(--ink); }
+  form.grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  .field { display: grid; gap: 6px; min-width: 0; }
+  .field label {
+    font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.053em; color: var(--pencil);
+  }
+  .field.span2 { grid-column: span 2; }
+  input, select {
+    font: inherit; font-weight: 700; color: var(--ink); width: 100%;
+    background: #f7f7f7; border: 2px solid var(--line); border-radius: var(--radius);
+    padding: 10px 12px; outline: none; transition: border-color .15s;
+  }
+  input:focus, select:focus { border-color: var(--blue); background: var(--paper); }
+  input.invalid, select.invalid { border-color: var(--red); background: var(--red-soft); }
+  .err { color: var(--red); font-size: 13px; font-weight: 700; min-height: 1em; }
+
+  .actions { grid-column: 1 / -1; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+  /* Botones estilo sticker */
+  .btn {
+    font: inherit; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.053em;
+    border-radius: var(--radius); padding: 12px 20px; cursor: pointer; border: 2px solid transparent;
+    border-bottom-width: 4px; transition: transform .05s, filter .15s;
+  }
+  .btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+  .btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .btn-green { background: var(--green); color: #fff; border-color: var(--green-dark); }
+  .btn-green:hover { filter: brightness(1.05); }
+  .btn-ghost { background: var(--paper); color: var(--blue); border-color: var(--line); }
+  .btn-ghost:hover { background: #f7f7f7; }
+  .btn-red { background: var(--red); color: #fff; border-color: #d33131; }
+  .btn-sm { font-size: 13px; padding: 6px 10px; border-bottom-width: 3px; }
+  .icon-btn {
+    font: inherit; cursor: pointer; background: var(--paper); border: 2px solid var(--line);
+    border-bottom-width: 3px; border-radius: 10px; width: 36px; height: 36px; display: inline-grid; place-items: center;
+    color: var(--pencil);
+  }
+  .icon-btn:hover { color: var(--blue); border-color: var(--blue); }
+  .icon-btn.del:hover { color: var(--red); border-color: var(--red); }
+  .icon-btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  /* Barra de herramientas de la tabla */
+  .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+  .toolbar h2 { margin: 0 auto 0 0; }
+  .search { position: relative; min-width: 0; flex: 1 1 220px; max-width: 320px; }
+  .search input { padding-left: 38px; }
+  .search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--faded); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font: inherit; font-size: 14px; font-weight: 800; cursor: pointer;
+    border: 2px solid var(--line); border-bottom-width: 3px; border-radius: 999px;
+    background: var(--paper); color: var(--pencil); padding: 6px 14px;
+  }
+  .chip[aria-pressed="true"] { background: var(--green-soft); border-color: var(--green); color: var(--green-dark); }
+
+  /* Tabla */
+  .table-wrap { overflow-x: auto; border: 2px solid var(--line); border-radius: 16px; }
+  table { width: 100%; border-collapse: collapse; min-width: 860px; font-size: 15px; }
+  thead th {
+    text-align: left; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.053em;
+    color: var(--pencil); background: #f7f7f7; padding: 12px 14px; border-bottom: 2px solid var(--line);
+    white-space: nowrap; user-select: none;
+  }
+  thead th.sortable { cursor: pointer; }
+  thead th.sortable:hover { color: var(--blue); }
+  thead th .arrow { display: inline-block; width: 1em; color: var(--blue); }
+  tbody td { padding: 10px 14px; border-bottom: 2px solid var(--line); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr:hover td { background: #fafff5; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; }
+  th.num { text-align: right; }
+  .animal { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--ink); }
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none;
+    font-size: 20px; border: 2px solid var(--line); background: var(--paper);
+  }
+  .muted { color: var(--pencil); font-size: 13px; font-weight: 700; }
+  .badge {
+    display: inline-block; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.053em;
+    padding: 4px 10px; border-radius: 999px; border: 2px solid; white-space: nowrap;
+  }
+  .badge.sano { color: var(--green-dark); border-color: var(--green); background: var(--green-soft); }
+  .badge.tratamiento { color: #b38600; border-color: var(--yellow); background: var(--yellow-soft); }
+  .badge.critico { color: #d33131; border-color: var(--red); background: var(--red-soft); }
+  .badge.adoptado { color: var(--blue-dark); border-color: var(--blue); background: #ddf4ff; }
+  td.acts { white-space: nowrap; text-align: right; }
+  td.acts .icon-btn + .icon-btn { margin-left: 6px; }
+
+  /* Edición en línea */
+  tr.editing td { background: #f0faff !important; }
+  tr.editing input, tr.editing select { padding: 6px 8px; font-size: 14px; }
+
+  /* Estado vacío */
+  .empty { padding: 48px 16px; text-align: center; color: var(--pencil); display: grid; gap: 8px; justify-items: center; }
+  .empty b { font-size: 19px; color: var(--ink); }
+
+  /* Confirmación en página */
+  .confirm-row td { background: var(--red-soft) !important; }
+  .confirm-box { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; font-weight: 800; color: #d33131; }
+
+  /* Toast */
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, calc(100% + 48px)); visibility: hidden;
+    background: var(--green); color: #fff; font-weight: 800; padding: 12px 20px; border-radius: var(--radius);
+    border-bottom: 4px solid var(--green-dark); transition: transform .25s ease; z-index: 20; max-width: calc(100% - 32px);
+  }
+  .toast.show { transform: translate(-50%, 0); visibility: visible; }
+
+  /* Pie */
+  footer { background: var(--green); color: #fff; }
+  footer .wrap { padding-block: 40px; display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; }
+  footer b { font-size: 24px; font-weight: 900; }
+  footer span { color: var(--green-soft); font-weight: 700; }
+
+  @media (max-width: 860px) {
+    form.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 480px) {
+    form.grid { grid-template-columns: 1fr; }
+    .field.span2 { grid-column: auto; }
+    .search { max-width: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="logo">
+      <svg viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="22" r="16" fill="#58cc02"/>
+        <circle cx="14" cy="19" r="6" fill="#fff"/><circle cx="26" cy="19" r="6" fill="#fff"/>
+        <circle cx="15" cy="19" r="3" fill="#4b4b4b"/><circle cx="25" cy="19" r="3" fill="#4b4b4b"/>
+        <path d="M17 26 L20 30 L23 26 Z" fill="#ffc800"/>
+        <path d="M8 10 L13 14 M32 10 L27 14" stroke="#58cc02" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      zoolingo
+    </div>
+    <span class="pill">Refugio · Registro</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <h1>registra a tus animales.</h1>
+    <p class="lead">Agrega cada animal que ingresa al refugio, busca por nombre o especie, ordena las columnas y edita los datos directamente en la tabla. Los datos se guardan en este navegador.</p>
+    <div class="stats" id="stats"></div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <section class="card" aria-labelledby="form-title">
+      <h2 id="form-title">Nuevo animal</h2>
+      <form class="grid" id="form" novalidate>
+        <div class="field">
+          <label for="f-nombre">Nombre</label>
+          <input id="f-nombre" name="nombre" placeholder="Ej. Luna" maxlength="40">
+          <span class="err" data-for="nombre"></span>
+        </div>
+        <div class="field">
+          <label for="f-especie">Especie</label>
+          <select id="f-especie" name="especie"></select>
+          <span class="err" data-for="especie"></span>
+        </div>
+        <div class="field">
+          <label for="f-raza">Raza</label>
+          <input id="f-raza" name="raza" placeholder="Ej. Mestizo" maxlength="40">
+          <span class="err" data-for="raza"></span>
+        </div>
+        <div class="field">
+          <label for="f-sexo">Sexo</label>
+          <select id="f-sexo" name="sexo">
+            <option value="Hembra">Hembra</option>
+            <option value="Macho">Macho</option>
+          </select>
+          <span class="err" data-for="sexo"></span>
+        </div>
+        <div class="field">
+          <label for="f-edad">Edad (años)</label>
+          <input id="f-edad" name="edad" type="number" min="0" max="80" step="0.5" placeholder="0">
+          <span class="err" data-for="edad"></span>
+        </div>
+        <div class="field">
+          <label for="f-peso">Peso (kg)</label>
+          <input id="f-peso" name="peso" type="number" min="0" max="2000" step="0.1" placeholder="0.0">
+          <span class="err" data-for="peso"></span>
+        </div>
+        <div class="field">
+          <label for="f-estado">Estado</label>
+          <select id="f-estado" name="estado"></select>
+          <span class="err" data-for="estado"></span>
+        </div>
+        <div class="field">
+          <label for="f-ingreso">Fecha de ingreso</label>
+          <input id="f-ingreso" name="ingreso" type="date">
+          <span class="err" data-for="ingreso"></span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-green" type="submit">Registrar animal</button>
+          <button class="btn btn-ghost" type="reset">Limpiar</button>
+        </div>
+      </form>
+    </section>
+
+    <section aria-labelledby="table-title">
+      <div class="toolbar">
+        <h2 id="table-title" style="font-size:24px;font-weight:800">Animales registrados</h2>
+        <div class="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <input id="q" type="search" placeholder="Buscar nombre, raza…" aria-label="Buscar">
+        </div>
+      </div>
+      <div class="chips" id="chips" style="margin-bottom:16px"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable" data-key="nombre">Animal <span class="arrow"></span></th>
+              <th class="sortable" data-key="raza">Raza <span class="arrow"></span></th>
+              <th class="sortable" data-key="sexo">Sexo <span class="arrow"></span></th>
+              <th class="sortable num" data-key="edad">Edad <span class="arrow"></span></th>
+              <th class="sortable num" data-key="peso">Peso <span class="arrow"></span></th>
+              <th class="sortable" data-key="estado">Estado <span class="arrow"></span></th>
+              <th class="sortable" data-key="ingreso">Ingreso <span class="arrow"></span></th>
+              <th style="text-align:right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <b>zoolingo</b>
+    <span id="foot-count"></span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  const STORAGE_KEY = 'registro-animales-v1';
+
+  const ESPECIES = {
+    Perro:   '🐶',
+    Gato:    '🐱',
+    Conejo:  '🐰',
+    Ave:     '🐦',
+    Tortuga: '🐢',
+    Hámster: '🐹',
+    Caballo: '🐴',
+    Otro:    '🐾'
+  };
+  const ESTADOS = {
+    sano:        'Sano',
+    tratamiento: 'En tratamiento',
+    critico:     'Crítico',
+    adoptado:    'Adoptado'
+  };
+
+  const EJEMPLOS = [
+    { nombre: 'Luna',    especie: 'Perro',   raza: 'Labrador',        sexo: 'Hembra', edad: 3,   peso: 27.5, estado: 'sano',        ingreso: '2026-08-14' },
+    { nombre: 'Michi',   especie: 'Gato',    raza: 'Siamés',          sexo: 'Macho',  edad: 2,   peso: 4.2,  estado: 'adoptado',    ingreso: '2026-06-02' },
+    { nombre: 'Rocky',   especie: 'Perro',   raza: 'Mestizo',         sexo: 'Macho',  edad: 7,   peso: 18,   estado: 'tratamiento', ingreso: '2026-09-21' },
+    { nombre: 'Copito',  especie: 'Conejo',  raza: 'Belier',          sexo: 'Hembra', edad: 1,   peso: 1.8,  estado: 'sano',        ingreso: '2026-10-03' },
+    { nombre: 'Kiwi',    especie: 'Ave',     raza: 'Periquito',       sexo: 'Macho',  edad: 0.5, peso: 0.04, estado: 'sano',        ingreso: '2026-10-11' },
+    { nombre: 'Manuelita', especie: 'Tortuga', raza: 'Tortuga terrestre', sexo: 'Hembra', edad: 25, peso: 3.1, estado: 'critico', ingreso: '2026-10-18' }
+  ];
+
+  const hoy = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { /* almacenamiento no disponible */ }
+    return EJEMPLOS.map(a => ({ id: uid(), ...a }));
+  }
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(animales)); } catch (e) { /* ignorar */ }
+  }
+
+  let animales = load();
+  let filtroEspecie = 'Todas';
+  let busqueda = '';
+  let orden = { key: 'ingreso', dir: 'desc' };
+  let editandoId = null;
+  let confirmandoId = null;
+
+  const $ = s => document.querySelector(s);
+  const tbody = $('#tbody');
+  const form = $('#form');
+
+  // Llenar selects
+  const optEspecies = Object.entries(ESPECIES).map(([k, e]) => `<option value="${k}">${e} ${k}</option>`).join('');
+  const optEstados = Object.entries(ESTADOS).map(([k, v]) => `<option value="${k}">${v}</option>`).join('');
+  $('#f-especie').innerHTML = optEspecies;
+  $('#f-estado').innerHTML = optEstados;
+  $('#f-ingreso').value = hoy();
+
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmtFecha = iso => {
+    if (!iso) return '—';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  };
+  const fmtNum = (n, dec) => Number(n).toLocaleString('es', { minimumFractionDigits: 0, maximumFractionDigits: dec });
+
+  function validar(d) {
+    const errs = {};
+    if (!d.nombre.trim()) errs.nombre = 'Escribe un nombre.';
+    if (!d.raza.trim()) errs.raza = 'Escribe la raza o "Mestizo".';
+    if (d.edad === '' || isNaN(d.edad) || d.edad < 0 || d.edad > 80) errs.edad = 'Edad entre 0 y 80.';
+    if (d.peso === '' || isNaN(d.peso) || d.peso <= 0 || d.peso > 2000) errs.peso = 'Peso mayor a 0.';
+    if (!d.ingreso) errs.ingreso = 'Elige una fecha.';
+    else if (d.ingreso > hoy()) errs.ingreso = 'La fecha no puede ser futura.';
+    return errs;
+  }
+
+  function leerForm() {
+    const fd = new FormData(form);
+    const d = Object.fromEntries(fd.entries());
+    d.edad = d.edad === '' ? '' : Number(d.edad);
+    d.peso = d.peso === '' ? '' : Number(d.peso);
+    return d;
+  }
+
+  function mostrarErrores(errs) {
+    form.querySelectorAll('.err').forEach(el => { el.textContent = errs[el.dataset.for] || ''; });
+    form.querySelectorAll('input, select').forEach(el => el.classList.toggle('invalid', !!errs[el.name]));
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const d = leerForm();
+    const errs = validar(d);
+    mostrarErrores(errs);
+    if (Object.keys(errs).length) {
+      form.querySelector('.invalid')?.focus();
+      return;
+    }
+    d.nombre = d.nombre.trim(); d.raza = d.raza.trim();
+    animales.unshift({ id: uid(), ...d });
+    save();
+    form.reset();
+    $('#f-ingreso').value = hoy();
+    render();
+    toast(`¡${d.nombre} fue registrado!`);
+    $('#f-nombre').focus();
+  });
+  form.addEventListener('reset', () => setTimeout(() => mostrarErrores({}), 0));
+
+  $('#q').addEventListener('input', e => { busqueda = e.target.value.toLowerCase().trim(); render(); });
+
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.tabIndex = 0;
+    const go = () => {
+      const k = th.dataset.key;
+      orden = orden.key === k ? { key: k, dir: orden.dir === 'asc' ? 'desc' : 'asc' } : { key: k, dir: 'asc' };
+      render();
+    };
+    th.addEventListener('click', go);
+    th.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+
+  function filtrados() {
+    let list = animales.filter(a =>
+      (filtroEspecie === 'Todas' || a.especie === filtroEspecie) &&
+      (!busqueda || [a.nombre, a.raza, a.especie, ESTADOS[a.estado]].join(' ').toLowerCase().includes(busqueda))
+    );
+    const { key, dir } = orden;
+    const m = dir === 'asc' ? 1 : -1;
+    list.sort((x, y) => {
+      const a = x[key], b = y[key];
+      if (typeof a === 'number' && typeof b === 'number') return (a - b) * m;
+      return String(a).localeCompare(String(b), 'es') * m;
+    });
+    return list;
+  }
+
+  function renderStats() {
+    const c = estado => animales.filter(a => a.estado === estado).length;
+    $('#stats').innerHTML = `
+      <div class="stat g"><b>${animales.length}</b><span>Registrados</span></div>
+      <div class="stat b"><b>${c('adoptado')}</b><span>Adoptados</span></div>
+      <div class="stat y"><b>${c('tratamiento')}</b><span>En tratamiento</span></div>
+      <div class="stat r"><b>${c('critico')}</b><span>Críticos</span></div>`;
+    $('#foot-count').textContent = `${animales.length} animales en el refugio`;
+  }
+
+  function renderChips() {
+    const presentes = ['Todas', ...Object.keys(ESPECIES).filter(k => animales.some(a => a.especie === k))];
+    if (!presentes.includes(filtroEspecie)) filtroEspecie = 'Todas';
+    $('#chips').innerHTML = presentes.map(k => {
+      const n = k === 'Todas' ? animales.length : animales.filter(a => a.especie === k).length;
+      const ico = k === 'Todas' ? '' : ESPECIES[k] + ' ';
+      return `<button type="button" class="chip" data-esp="${k}" aria-pressed="${k === filtroEspecie}">${ico}${k} · ${n}</button>`;
+    }).join('');
+  }
+  $('#chips').addEventListener('click', e => {
+    const b = e.target.closest('.chip');
+    if (!b) return;
+    filtroEspecie = b.dataset.esp;
+    render();
+  });
+
+  const ICON_EDIT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+  const ICON_DEL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>';
+
+  function filaNormal(a) {
+    if (confirmandoId === a.id) {
+      return `<tr class="confirm-row" data-id="${a.id}"><td colspan="8">
+        <div class="confirm-box">¿Eliminar a ${esc(a.nombre)} del registro?
+          <button class="btn btn-ghost btn-sm" data-act="cancel-del">Cancelar</button>
+          <button class="btn btn-red btn-sm" data-act="confirm-del">Eliminar</button>
+        </div></td></tr>`;
+    }
+    return `<tr data-id="${a.id}">
+      <td><div class="animal"><span class="avatar" aria-hidden="true">${ESPECIES[a.especie] || '🐾'}</span>
+        <div>${esc(a.nombre)}<div class="muted">${esc(a.especie)}</div></div></div></td>
+      <td>${esc(a.raza)}</td>
+      <td>${esc(a.sexo)}</td>
+      <td class="num">${fmtNum(a.edad, 1)} ${a.edad === 1 ? 'año' : 'años'}</td>
+      <td class="num">${fmtNum(a.peso, 2)} kg</td>
+      <td><span class="badge ${a.estado}">${ESTADOS[a.estado]}</span></td>
+      <td>${fmtFecha(a.ingreso)}</td>
+      <td class="acts">
+        <button class="icon-btn" data-act="edit" aria-label="Editar ${esc(a.nombre)}" title="Editar">${ICON_EDIT}</button>
+        <button class="icon-btn del" data-act="del" aria-label="Eliminar ${esc(a.nombre)}" title="Eliminar">${ICON_DEL}</button>
+      </td></tr>`;
+  }
+
+  function filaEdicion(a) {
+    const sel = (opts, val) => opts.replace(`value="${val}"`, `value="${val}" selected`);
+    return `<tr class="editing" data-id="${a.id}">
+      <td><div style="display:grid;gap:6px">
+        <input id="e-nombre" value="${esc(a.nombre)}" aria-label="Nombre" maxlength="40">
+        <select id="e-especie" aria-label="Especie">${sel(optEspecies, a.especie)}</select></div></td>
+      <td><input id="e-raza" value="${esc(a.raza)}" aria-label="Raza" maxlength="40"></td>
+      <td><select id="e-sexo" aria-label="Sexo">${sel('<option value="Hembra">Hembra</option><option value="Macho">Macho</option>', a.sexo)}</select></td>
+      <td><input id="e-edad" type="number" min="0" max="80" step="0.5" value="${a.edad}" aria-label="Edad" style="width:80px"></td>
+      <td><input id="e-peso" type="number" min="0" step="0.1" value="${a.peso}" aria-label="Peso" style="width:90px"></td>
+      <td><select id="e-estado" aria-label="Estado">${sel(optEstados, a.estado)}</select></td>
+      <td><input id="e-ingreso" type="date" value="${a.ingreso}" aria-label="Fecha de ingreso"></td>
+      <td class="acts">
+        <button class="btn btn-ghost btn-sm" data-act="cancel-edit">Cancelar</button>
+        <button class="btn btn-green btn-sm" data-act="save-edit">Guardar</button>
+      </td></tr>`;
+  }
+
+  function render() {
+    renderStats();
+    renderChips();
+    document.querySelectorAll('th.sortable').forEach(th => {
+      const on = th.dataset.key === orden.key;
+      th.querySelector('.arrow').textContent = on ? (orden.dir === 'asc' ? '▲' : '▼') : '';
+      th.setAttribute('aria-sort', on ? (orden.dir === 'asc' ? 'ascending' : 'descending') : 'none');
+    });
+    const list = filtrados();
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="8"><div class="empty">
+        <span style="font-size:40px">🦉</span>
+        <b>${animales.length ? 'Ningún animal coincide con la búsqueda' : 'Aún no hay animales registrados'}</b>
+        <span>${animales.length ? 'Prueba otro término o quita el filtro de especie.' : 'Usa el formulario de arriba para registrar el primero.'}</span>
+      </div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = list.map(a => a.id === editandoId ? filaEdicion(a) : filaNormal(a)).join('');
+  }
+
+  tbody.addEventListener('click', e => {
+    const btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    const id = btn.closest('tr').dataset.id;
+    const a = animales.find(x => x.id === id);
+    switch (btn.dataset.act) {
+      case 'edit':
+        editandoId = id; confirmandoId = null; render();
+        $('#e-nombre')?.focus();
+        break;
+      case 'cancel-edit':
+        editandoId = null; render();
+        break;
+      case 'save-edit': {
+        const d = {
+          nombre: $('#e-nombre').value, especie: $('#e-especie').value, raza: $('#e-raza').value,
+          sexo: $('#e-sexo').value, edad: $('#e-edad').value === '' ? '' : Number($('#e-edad').value),
+          peso: $('#e-peso').value === '' ? '' : Number($('#e-peso').value),
+          estado: $('#e-estado').value, ingreso: $('#e-ingreso').value
+        };
+        const errs = validar(d);
+        const map = { nombre: 'e-nombre', raza: 'e-raza', edad: 'e-edad', peso: 'e-peso', ingreso: 'e-ingreso' };
+        Object.values(map).forEach(i => document.getElementById(i).classList.remove('invalid'));
+        if (Object.keys(errs).length) {
+          Object.keys(errs).forEach(k => document.getElementById(map[k]).classList.add('invalid'));
+          toast(Object.values(errs)[0], true);
+          return;
+        }
+        Object.assign(a, d, { nombre: d.nombre.trim(), raza: d.raza.trim() });
+        editandoId = null; save(); render();
+        toast(`Datos de ${a.nombre} actualizados`);
+        break;
+      }
+      case 'del':
+        confirmandoId = id; editandoId = null; render();
+        break;
+      case 'cancel-del':
+        confirmandoId = null; render();
+        break;
+      case 'confirm-del':
+        animales = animales.filter(x => x.id !== id);
+        confirmandoId = null; save(); render();
+        toast(`${a.nombre} fue eliminado`);
+        break;
+    }
+  });
+
+  tbody.addEventListener('keydown', e => {
+    if (!editandoId) return;
+    if (e.key === 'Enter' && e.target.matches('input')) tbody.querySelector('[data-act="save-edit"]').click();
+    if (e.key === 'Escape') { editandoId = null; render(); }
+  });
+
+  let toastTimer;
+  function toast(msg, error) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.style.background = error ? 'var(--red)' : '';
+    t.style.borderBottomColor = error ? '#d33131' : '';
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

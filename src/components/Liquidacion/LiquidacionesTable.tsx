@@ -26,11 +26,11 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
     onDelete 
 }) => {
     if (isLoading) {
-        return <div className="p-8 text-center text-gray-500">Cargando liquidaciones...</div>;
+        return <div className="p-8 text-center text-label">Cargando liquidaciones...</div>;
     }
 
     if (liquidaciones.length === 0) {
-        return <div className="p-8 text-center text-gray-500">No se encontraron liquidaciones para los filtros aplicados.</div>;
+        return <div className="p-8 text-center text-label">No se encontraron liquidaciones para los filtros aplicados.</div>;
     }
 
     return (
@@ -54,7 +54,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
                             <td className={claseTd}>{row.sot}</td>
                             <td className={claseTd}>{row.nombreSubTipoOrden}</td>
                             <td className={claseTd}>
-                                {row.nombreTecnico || <span className="text-gray-400">Sin asignar</span>}
+                                {row.nombreTecnico || <span className="text-muted">Sin asignar</span>}
                             </td>
                             <td className={claseTd}>
                                 {new Date(row.fechaProgramacion).toLocaleDateString()}
@@ -63,21 +63,21 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
                                 {row.precioTotalEditable ? `S/ ${row.precioTotalEditable.toFixed(2)}` : '-'}
                             </td>
                             <td className={claseTd}>
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-soft text-primary">
                                     {row.estadoSistema}
                                 </span>
                             </td>
                             <td className={claseTd}>
                                 <div className="flex items-center justify-center gap-2">
                                     <button 
-                                        className="text-gray-500 hover:text-blue-600 transition-colors"
+                                        className="text-label hover:text-primary transition-colors"
                                         title="Editar liquidación"
                                         onClick={() => onEdit && onEdit(row)}
                                     >
                                         <Edit size={16} />
                                     </button>
                                     <button 
-                                        className="text-gray-500 hover:text-red-600 transition-colors"
+                                        className="text-label hover:text-danger transition-colors"
                                         title="Eliminar liquidación"
                                         onClick={() => onDelete && onDelete(row.sot)}
                                     >

@@ -24,35 +24,35 @@ export const ServicioForm = ({ initialData, onSubmit, onCancel }: ServicioFormPr
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Servicio</label>
+        <label className="block text-sm font-medium text-ink mb-1">Nombre del Servicio</label>
         <input
           type="text"
           required
           value={formData.nombre}
           onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+          className="w-full px-4 py-2 border border-line rounded-control focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
           placeholder="Ej. Internet Fibra 100MB"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
+        <label className="block text-sm font-medium text-ink mb-1">Precio</label>
         <input
           type="number"
           step="0.01"
           required
           value={formData.precio}
           onChange={(e) => setFormData({ ...formData, precio: parseFloat(e.target.value) })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+          className="w-full px-4 py-2 border border-line rounded-control focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+        <label className="block text-sm font-medium text-ink mb-1">Categoría</label>
         <select
           value={formData.categoria}
           onChange={(e) => setFormData({ ...formData, categoria: e.target.value as CategoriaServicio })}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm bg-white"
+          className="w-full px-4 py-2 border border-line rounded-control focus:ring-2 focus:ring-primary focus:border-transparent text-sm bg-surface"
         >
           <option value="HFC">HFC</option>
           <option value="FTH">FTH</option>
@@ -61,17 +61,17 @@ export const ServicioForm = ({ initialData, onSubmit, onCancel }: ServicioFormPr
       </div>
 
       {/* Botones de Acción */}
-      <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">
+      <div className="flex justify-end gap-3 pt-4 border-t border-line mt-6">
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-pill border border-line bg-surface px-5 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           type="submit"
-          className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {initialData ? 'Guardar Cambios' : 'Registrar Servicio'}
         </button>

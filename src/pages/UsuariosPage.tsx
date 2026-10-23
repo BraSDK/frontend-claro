@@ -80,8 +80,8 @@ export const UsuariosPage = () => {
       {/* Cabecera */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-ink">Gestión de Usuarios</h1>
+          <p className="text-sm text-label mt-1">
             Administra los roles, identidades y accesos del personal
           </p>
         </div>
@@ -90,7 +90,7 @@ export const UsuariosPage = () => {
           <button
             type="button"
             onClick={openFilter}
-            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border border-gray-300"
+            className="bg-page hover:bg-line text-ink px-4 py-2.5 rounded-pill text-sm font-medium transition-colors flex items-center gap-2 border border-line"
           >
             <Filter size={16} />
             Filtros
@@ -101,7 +101,7 @@ export const UsuariosPage = () => {
             <button
               type="button"
               onClick={openForCreate}
-              className="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md transition-colors flex items-center gap-2"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <UserPlus size={16} />
               Nuevo Usuario
@@ -112,13 +112,13 @@ export const UsuariosPage = () => {
 
       {/* Alerta de error */}
       {error && (
-        <div className="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200 text-sm">
+        <div className="p-4 bg-danger-soft text-danger rounded-control border border-danger/30 text-sm">
           {error}
         </div>
       )}
 
       {/* Contenedor de la Tabla con datos filtrados */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-surface rounded-card border border-line overflow-hidden">
         <UsuariosTable
           usuarios={usuariosFiltrados}
           isLoading={isLoading}

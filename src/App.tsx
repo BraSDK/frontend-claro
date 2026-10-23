@@ -6,11 +6,8 @@ import { ServiciosPage } from './pages/ServiciosPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { OrdenesPage } from './pages/OrdenesPage/OrdenesPage';
 import { OrdenesCrearPage } from './pages/OrdenesPage/OrdenesCrearPage';
-import { OrdenEditarByTecnico} from './pages/OrdenesPage/OrdenEditarByTecnico';
-import { EditarOrdenPage } from './pages/OrdenesPage/EditarOrdenPage';
-import { EditarDetallesPage } from './pages/OrdenesPage/EditarDetallesPage';
+import { OrdenEditarPage } from './pages/OrdenesPage/OrdenEditarPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { AuditarSotPage } from './pages/OrdenesPage/AuditarSotPage';
 import { ConciliacionPage } from './pages/ConciliacionPage';
 import { ProximamentePage } from './pages/ProximamentePage';
 import { ConfiguracionPage } from './pages/ConfiguracionPage';
@@ -36,11 +33,8 @@ function App() {
           <Route path="/reportes" element={<ProximamentePage titulo="Reportes" descripcion="Reportes descargables por periodo, técnico y servicio. Por ahora puedes exportar las diferencias desde la conciliación y ver los totales en Inicio." atajo={{ texto: 'Ir a Inicio', ruta: '/dashboard' }} />} />
           <Route path="/servicios" element={<ServiciosPage />} />
           <Route path="/ordenes" element={<OrdenesPage />} />
-          <Route path="/ordenesCrear" element={<OrdenesCrearPage />} />
-          <Route path="/ordenes/:id/editar" element={<OrdenEditarByTecnico/>} />
-          <Route path="/ordenes/:id/editarCompleto" element={<EditarOrdenPage  />} />
-          <Route path="/ordenes/:id/detalles" element={<EditarDetallesPage />} />
-          <Route path="/ordenes/:id/auditar" element={<AuditarSotPage />} />
+          <Route path="/ordenes/nueva" element={<OrdenesCrearPage />} />
+          <Route path="/ordenes/:sot/editar" element={<OrdenEditarPage />} />
           <Route path="/usuarios" element={<UsuariosPage />} />
 
         </Route>

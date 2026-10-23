@@ -14,22 +14,22 @@ import { formatoFecha, formatoSoles, iniciales, NOMBRES_MES, variacion } from '.
 
 // nombre y color de cada tipo de detalle (coincide con el enum TipoDetalle del back)
 const TIPOS_DETALLE: Record<number, { label: string; color: string }> = {
-    0: { label: 'Servicio principal', color: 'bg-red-500' },
-    1: { label: 'Adicional (decos / repetidores)', color: 'bg-amber-400' },
-    2: { label: 'Drop 150', color: 'bg-blue-400' },
-    3: { label: 'Drop 220', color: 'bg-blue-600' },
-    4: { label: 'Drop 300', color: 'bg-indigo-600' },
+    0: { label: 'Servicio principal', color: 'bg-primary' },
+    1: { label: 'Adicional (decos / repetidores)', color: 'bg-primary-light' },
+    2: { label: 'Drop 150', color: 'bg-primary/55' },
+    3: { label: 'Drop 220', color: 'bg-primary-light/45' },
+    4: { label: 'Drop 300', color: 'bg-line-fixed' },
 };
 
 // barra horizontal simple: porcentaje respecto al mayor valor de la lista
-const Barra = ({ porcentaje, color = 'bg-red-500' }: { porcentaje: number; color?: string }) => (
-    <div className="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-        <div className={`h-full rounded-full ${color} transition-all duration-500`} style={{ width: `${Math.max(porcentaje, 2)}%` }} />
+const Barra = ({ porcentaje, color = 'bg-primary' }: { porcentaje: number; color?: string }) => (
+    <div className="h-2 w-full overflow-hidden rounded-pill bg-page">
+        <div className={`h-full rounded-pill ${color} transition-all duration-500`} style={{ width: `${Math.max(porcentaje, 2)}%` }} />
     </div>
 );
 
 const SinDatos = ({ texto = 'Sin datos en este mes' }: { texto?: string }) => (
-    <p className="py-8 text-center text-sm text-gray-400">{texto}</p>
+    <p className="py-8 text-center text-sm text-muted">{texto}</p>
 );
 
 export const DashboardPage = () => {
@@ -76,29 +76,29 @@ export const DashboardPage = () => {
             {/* Cabecera con selector de mes */}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-primary-soft text-primary">
                         <LayoutDashboard size={26} />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <h1 className="text-2xl font-bold text-ink">Dashboard</h1>
+                        <p className="mt-1 text-sm text-label">
                             {esTecnico ? 'Resumen de tus SOTs del mes.' : 'Producción del mes por técnico y tipo de servicio.'}
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1 rounded-xl border border-gray-200 bg-white p-1 shadow-sm">
-                    <button type="button" onClick={() => moverMes(-1)} className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100" title="Mes anterior">
+                <div className="flex items-center gap-1 rounded-mid border border-line bg-surface p-1 ">
+                    <button type="button" onClick={() => moverMes(-1)} className="rounded-control p-2 text-label transition-colors hover:bg-page" title="Mes anterior">
                         <ChevronLeft size={18} />
                     </button>
-                    <span className="min-w-36 text-center text-sm font-semibold text-gray-800">
+                    <span className="min-w-36 text-center text-sm font-semibold text-ink">
                         {NOMBRES_MES[mes - 1]} {anio}
                     </span>
                     <button
                         type="button"
                         onClick={() => moverMes(1)}
                         disabled={esMesActual}
-                        className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-30"
+                        className="rounded-control p-2 text-label transition-colors hover:bg-page disabled:cursor-not-allowed disabled:opacity-30"
                         title="Mes siguiente"
                     >
                         <ChevronRight size={18} />
@@ -106,7 +106,7 @@ export const DashboardPage = () => {
                 </div>
             </div>
 
-            {error && <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">{error}</p>}
+            {error && <p className="rounded-control border border-danger/30 bg-danger-soft px-4 py-2.5 text-sm text-danger">{error}</p>}
 
             {/* Totales del mes */}
             <div className={`grid grid-cols-1 gap-4 sm:grid-cols-2 ${esTecnico ? 'lg:grid-cols-2' : 'lg:grid-cols-4'}`}>
@@ -115,7 +115,7 @@ export const DashboardPage = () => {
                     icon={ClipboardList}
                     value={r?.totalSots ?? '-'}
                     trend={r ? tendencia(r.totalSots, r.totalSotsMesAnterior) : undefined}
-                    iconClassName="bg-red-50 text-red-600"
+                    iconClassName="bg-primary-soft text-primary"
                 />
                 {!esTecnico && (
                     <>
@@ -124,7 +124,7 @@ export const DashboardPage = () => {
                             icon={Wallet}
                             value={r ? formatoSoles(r.montoTotal) : '-'}
                             trend={r ? tendencia(r.montoTotal, r.montoTotalMesAnterior) : undefined}
-                            iconClassName="bg-green-50 text-green-600"
+                            iconClassName="bg-success-soft text-success"
                         />
                         <StatCard
                             title="Claro paga (tras auditoría)"
@@ -133,7 +133,7 @@ export const DashboardPage = () => {
                             trend={r && r.montoTotal > r.montoAPagar
                                 ? { value: formatoSoles(r.montoTotal - r.montoAPagar), direction: 'down', label: 'en descuentos y multas' }
                                 : undefined}
-                            iconClassName="bg-blue-50 text-blue-600"
+                            iconClassName="bg-primary-soft text-primary"
                         />
                     </>
                 )}
@@ -141,7 +141,7 @@ export const DashboardPage = () => {
                     title={esTecnico ? 'Liquidadas' : 'Auditadas'}
                     icon={CheckCircle2}
                     value={r ? `${esTecnico ? liquidadas : r.sotsAuditadas} / ${r.totalSots}` : '-'}
-                    iconClassName="bg-amber-50 text-amber-600"
+                    iconClassName="bg-warning-soft text-warning"
                 />
             </div>
 
@@ -150,7 +150,7 @@ export const DashboardPage = () => {
                 <button
                     type="button"
                     onClick={() => navigate('/ordenes')}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 text-left text-sm text-amber-800 transition-colors hover:bg-amber-100"
+                    className="flex items-center justify-between gap-3 rounded-mid border border-warning/30 bg-warning-soft px-5 py-3 text-left text-sm text-warning transition-colors hover:bg-warning-soft"
                 >
                     <span className="flex items-center gap-2">
                         <ImageOff size={18} />
@@ -164,11 +164,11 @@ export const DashboardPage = () => {
             <Card title="SOTs por estado" subtitle="Cómo avanza el trabajo del mes">
                 {!r || r.totalSots === 0 ? <SinDatos /> : (
                     <>
-                        <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-100">
+                        <div className="flex h-3 w-full overflow-hidden rounded-pill bg-page">
                             {r.porEstado.map((e) => (
                                 <div
                                     key={e.estado}
-                                    className={ESTADOS_ORDEN[e.estado]?.barra ?? 'bg-gray-400'}
+                                    className={ESTADOS_ORDEN[e.estado]?.barra ?? 'bg-ink'}
                                     style={{ width: `${(e.cantidad / r.totalSots) * 100}%` }}
                                     title={`${ESTADOS_ORDEN[e.estado]?.label}: ${e.cantidad}`}
                                 />
@@ -178,14 +178,14 @@ export const DashboardPage = () => {
                             {Object.entries(ESTADOS_ORDEN).map(([valor, info]) => {
                                 const dato = r.porEstado.find((e) => e.estado === Number(valor));
                                 return (
-                                    <div key={valor} className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50/60 px-4 py-3">
+                                    <div key={valor} className="flex items-center justify-between rounded-control border border-line bg-page/60 px-4 py-3">
                                         <div className="flex items-center gap-2">
-                                            <span className={`h-2.5 w-2.5 rounded-full ${info.barra}`} />
-                                            <span className="text-sm font-medium text-gray-600">{info.label}</span>
+                                            <span className={`h-2.5 w-2.5 rounded-pill ${info.barra}`} />
+                                            <span className="text-sm font-medium text-label">{info.label}</span>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-lg font-bold text-gray-900">{dato?.cantidad ?? 0}</p>
-                                            {!esTecnico && <p className="text-xs text-gray-400">{formatoSoles(dato?.monto)}</p>}
+                                            <p className="text-lg font-bold text-ink">{dato?.cantidad ?? 0}</p>
+                                            {!esTecnico && <p className="text-xs text-muted">{formatoSoles(dato?.monto)}</p>}
                                         </div>
                                     </div>
                                 );
@@ -201,23 +201,23 @@ export const DashboardPage = () => {
                     <Card
                         title="Producción por técnico"
                         subtitle="Ordenado por monto"
-                        icon={<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-red-50 text-red-600"><Users size={20} /></div>}
+                        icon={<div className="flex h-10 w-10 items-center justify-center rounded-pill bg-primary-soft text-primary"><Users size={20} strokeWidth={1.75} /></div>}
                     >
                         {!r || r.porTecnico.length === 0 ? <SinDatos /> : (
                             <ul className="space-y-4">
                                 {r.porTecnico.map((t, i) => (
                                     <li key={t.usuarioId} className="flex items-center gap-3">
-                                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${i === 0 ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'}`}>
+                                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-pill text-xs font-bold ${i === 0 ? 'bg-brand text-on-primary' : 'bg-page text-label'}`}>
                                             {iniciales(t.nombre)}
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <div className="mb-1.5 flex items-baseline justify-between gap-2">
-                                                <p className="truncate text-sm font-medium text-gray-800" title={t.nombre}>{t.nombre}</p>
-                                                <p className="shrink-0 text-sm font-semibold text-gray-900">{formatoSoles(t.monto)}</p>
+                                                <p className="truncate text-sm font-medium text-ink" title={t.nombre}>{t.nombre}</p>
+                                                <p className="shrink-0 text-sm font-semibold text-ink">{formatoSoles(t.monto)}</p>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <Barra porcentaje={(t.monto / maxTecnico) * 100} color={i === 0 ? 'bg-red-500' : 'bg-red-300'} />
-                                                <span className="shrink-0 text-xs text-gray-400">{t.cantidad} SOTs</span>
+                                                <Barra porcentaje={(t.monto / maxTecnico) * 100} color={i === 0 ? 'bg-primary' : 'bg-primary-light/50'} />
+                                                <span className="shrink-0 text-xs text-muted">{t.cantidad} SOTs</span>
                                             </div>
                                         </div>
                                     </li>
@@ -231,20 +231,20 @@ export const DashboardPage = () => {
                 <Card
                     title="Servicios más realizados"
                     subtitle="Servicio principal de cada SOT"
-                    icon={<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600"><Wrench size={20} /></div>}
+                    icon={<div className="flex h-10 w-10 items-center justify-center rounded-pill bg-primary-soft text-primary"><Wrench size={20} /></div>}
                 >
                     {!r || r.porServicio.length === 0 ? <SinDatos /> : (
                         <ul className="space-y-3.5">
                             {r.porServicio.map((s) => (
                                 <li key={s.nombre}>
                                     <div className="mb-1.5 flex items-baseline justify-between gap-3">
-                                        <p className="truncate text-sm text-gray-700" title={s.nombre}>{s.nombre}</p>
-                                        <p className="shrink-0 text-sm font-semibold text-gray-900">
+                                        <p className="truncate text-sm text-ink" title={s.nombre}>{s.nombre}</p>
+                                        <p className="shrink-0 text-sm font-semibold text-ink">
                                             {s.cantidad}
-                                            {!esTecnico && <span className="ml-2 text-xs font-normal text-gray-400">{formatoSoles(s.monto)}</span>}
+                                            {!esTecnico && <span className="ml-2 text-xs font-normal text-muted">{formatoSoles(s.monto)}</span>}
                                         </p>
                                     </div>
-                                    <Barra porcentaje={(s.cantidad / maxServicio) * 100} color="bg-blue-500" />
+                                    <Barra porcentaje={(s.cantidad / maxServicio) * 100} color="bg-primary" />
                                 </li>
                             ))}
                         </ul>
@@ -256,30 +256,30 @@ export const DashboardPage = () => {
                     <Card
                         title="Composición del monto"
                         subtitle="Servicio principal, adicionales y drops"
-                        icon={<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600"><Layers size={20} /></div>}
+                        icon={<div className="flex h-10 w-10 items-center justify-center rounded-pill bg-primary-soft text-primary"><Layers size={20} /></div>}
                     >
                         {!r || totalTipos === 0 ? <SinDatos /> : (
                             <>
-                                <div className="flex h-3 w-full overflow-hidden rounded-full bg-gray-100">
+                                <div className="flex h-3 w-full overflow-hidden rounded-pill bg-page">
                                     {r.porTipoDetalle.map((t) => (
                                         <div
                                             key={t.tipo}
-                                            className={TIPOS_DETALLE[t.tipo]?.color ?? 'bg-gray-400'}
+                                            className={TIPOS_DETALLE[t.tipo]?.color ?? 'bg-ink'}
                                             style={{ width: `${(t.monto / totalTipos) * 100}%` }}
                                         />
                                     ))}
                                 </div>
-                                <ul className="mt-4 divide-y divide-gray-100">
+                                <ul className="mt-4 divide-y divide-line">
                                     {r.porTipoDetalle.map((t) => (
                                         <li key={t.tipo} className="flex items-center justify-between py-2.5 text-sm">
                                             <div className="flex items-center gap-2">
-                                                <span className={`h-2.5 w-2.5 rounded-full ${TIPOS_DETALLE[t.tipo]?.color ?? 'bg-gray-400'}`} />
-                                                <span className="text-gray-700">{TIPOS_DETALLE[t.tipo]?.label ?? `Tipo ${t.tipo}`}</span>
-                                                <span className="text-xs text-gray-400">× {t.cantidad}</span>
+                                                <span className={`h-2.5 w-2.5 rounded-pill ${TIPOS_DETALLE[t.tipo]?.color ?? 'bg-ink'}`} />
+                                                <span className="text-ink">{TIPOS_DETALLE[t.tipo]?.label ?? `Tipo ${t.tipo}`}</span>
+                                                <span className="text-xs text-muted">× {t.cantidad}</span>
                                             </div>
                                             <div className="text-right">
-                                                <span className="font-semibold text-gray-900">{formatoSoles(t.monto)}</span>
-                                                <span className="ml-2 text-xs text-gray-400">{((t.monto / totalTipos) * 100).toFixed(0)}%</span>
+                                                <span className="font-semibold text-ink">{formatoSoles(t.monto)}</span>
+                                                <span className="ml-2 text-xs text-muted">{((t.monto / totalTipos) * 100).toFixed(0)}%</span>
                                             </div>
                                         </li>
                                     ))}
@@ -293,34 +293,34 @@ export const DashboardPage = () => {
                 <Card
                     title="Últimas SOTs"
                     subtitle="Las más recientes registradas"
-                    icon={<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 text-gray-600"><Clock size={20} /></div>}
+                    icon={<div className="flex h-10 w-10 items-center justify-center rounded-control bg-page text-label"><Clock size={20} /></div>}
                     actions={
                         <button
                             type="button"
                             onClick={() => navigate('/ordenes')}
-                            className="flex items-center gap-1 text-sm font-medium text-red-600 hover:text-red-700"
+                            className="flex items-center gap-1 rounded-pill px-2 py-1 text-sm font-medium text-primary transition-colors hover:bg-primary-soft"
                         >
                             Ver todas <ArrowRight size={16} />
                         </button>
                     }
                 >
                     {!r || r.ultimasSots.length === 0 ? <SinDatos texto="Aún no hay SOTs registradas" /> : (
-                        <ul className="divide-y divide-gray-100">
+                        <ul className="divide-y divide-line">
                             {r.ultimasSots.map((o) => (
                                 <li key={o.ordenId}>
                                     <button
                                         type="button"
-                                        onClick={() => navigate(`/ordenes/${o.ordenId}/editarCompleto`)}
-                                        className="flex w-full items-center justify-between gap-3 rounded-lg px-2 py-3 text-left transition-colors hover:bg-gray-50"
+                                        onClick={() => navigate(`/ordenes/${o.sot}/editar`)}
+                                        className="flex w-full items-center justify-between gap-3 rounded-control px-2 py-3 text-left transition-colors hover:bg-page"
                                     >
                                         <div className="min-w-0">
-                                            <p className="text-sm font-semibold text-gray-900">SOT {o.sot}</p>
-                                            <p className="truncate text-xs text-gray-400">
+                                            <p className="text-sm font-semibold text-ink">SOT {o.sot}</p>
+                                            <p className="truncate text-xs text-muted">
                                                 {formatoFecha(o.fecha)}{!esTecnico && ` · ${o.nombreUsuario}`}
                                             </p>
                                         </div>
                                         <div className="flex shrink-0 items-center gap-3">
-                                            {!esTecnico && <span className="text-sm font-medium text-gray-700">{formatoSoles(o.precioTotal)}</span>}
+                                            {!esTecnico && <span className="text-sm font-medium text-ink">{formatoSoles(o.precioTotal)}</span>}
                                             <EstadoBadge estado={o.estado} />
                                         </div>
                                     </button>

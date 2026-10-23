@@ -1,93 +1,115 @@
 @import "tailwindcss";
 
 /* =========================================================
-   Design tokens front_claro: el ÚNICO lugar con colores, radios y tipografía.
+   Design tokens: sistema FeedHive ("lavanda + un acento azul violeta")
+   con los colores de estado propios del sistema (verde = positivo).
+   Es el ÚNICO lugar con colores, radios, tipografía y sombras.
    Tailwind v4 genera las clases a partir de estas variables:
-   --color-primary -> bg-primary / text-primary / border-primary ...
-   --radius-control -> rounded-control ...
+   --color-primary -> bg-primary / text-primary ...   --radius-card -> rounded-card ...
    ========================================================= */
 @theme {
-  /* Marca (solo barra superior, botones primarios y asterisco de obligatorio) */
-  --color-primary: #EE1C2E;
-  --color-primary-hover: #C8101F;
-  --color-primary-active: #A50D19;
-  --color-on-primary: #FFFFFF;
+  /* Marca: acento azul violeta. Es puntuación, no pintura (< 5% de la pantalla) */
+  --color-primary: #4457ff;                                        /* Brand Violet */
+  --color-primary-light: #7583fd;                                  /* Brand Violet Light (fin del degradado) */
+  --color-primary-hover: color-mix(in srgb, #4457ff 88%, #181c31);
+  --color-primary-active: color-mix(in srgb, #4457ff 76%, #181c31);
+  --color-primary-soft: #dbeafe;                                   /* Soft Blue Wash: selección, resaltado */
+  --color-on-primary: #ffffff;
 
-  /* Fondos */
-  --color-page: #F5F6F7;          /* fondo general */
-  --color-filters: #FAFAFA;       /* panel de filtros */
-  --color-surface: #FFFFFF;       /* tarjetas e inputs */
-  --color-input-disabled: #F7F7F7;
-  --color-hover: #F2F4F6;         /* hover de fila / acciones ghost */
-  --color-selected: #EBF5FE;      /* fila seleccionada */
+  /* Superficies */
+  --color-page: #f3f5ff;            /* Lavender Canvas: fondo de toda la app */
+  --color-surface: #ffffff;         /* Card White: tarjetas, barra superior, modales, inputs */
+  --color-filters: #ffffff;         /* panel de filtros = tarjeta */
+  --color-input-disabled: #f3f5ff;
+  --color-hover: #f3f5ff;           /* hover de fila y de acciones ghost */
+  --color-selected: #dbeafe;        /* fila seleccionada */
 
-  /* Bordes */
-  --color-line: #D9D9D9;          /* divisores */
-  --color-line-soft: #E5E5E5;     /* grilla de la tabla */
-  --color-line-strong: #D0D0D0;   /* borde inferior del encabezado de tabla */
-  --color-line-input: #BFC5CC;    /* borde de inputs */
-  --color-line-fixed: #8C8C8C;    /* separador de columnas fijas */
-  --color-focus: #1D2D3E;         /* foco de celda */
+  /* Bordes (todos Border Mist: líneas finas) */
+  --color-line: #e5e7eb;
+  --color-line-soft: #e5e7eb;
+  --color-line-strong: #e5e7eb;
+  --color-line-input: #e5e7eb;
+  --color-line-fixed: #c7c8e2;      /* Shadow Violet: separa las columnas fijas de la tabla */
+  --color-focus: #4457ff;
 
   /* Texto */
-  --color-ink: #1D2D3E;           /* texto principal y encabezados */
-  --color-ink-cell: #32363A;      /* texto de celdas */
-  --color-label: #556B82;         /* labels de filtros */
-  --color-placeholder: #6A6D70;
-  --color-muted: #8A8F96;         /* texto deshabilitado / secundario */
-  --color-required: #AA0808;
+  --color-ink: #181c31;             /* Ink: texto principal (nunca #000) */
+  --color-ink-cell: #181c31;
+  --color-label: #757693;           /* Muted Iris: texto secundario, ayudas, links */
+  --color-placeholder: #757693;
+  --color-muted: #6b7280;           /* Hover Iris: metadatos, deshabilitado */
+  --color-required: #BB0000;
 
-  /* Estados */
+  /* Estados del sistema (se conservan: verde = positivo). Solo en badges, avisos y validaciones */
   --color-success: #188918;
   --color-warning: #E76500;
   --color-danger: #BB0000;
-  --color-info: #0064D9;
-  /* fondos suaves derivados de los estados (avisos, íconos de KPI) */
+  --color-info: #4457ff;            /* informativo = acento de marca */
   --color-success-soft: color-mix(in srgb, #188918 10%, white);
   --color-warning-soft: color-mix(in srgb, #E76500 10%, white);
   --color-danger-soft: color-mix(in srgb, #BB0000 8%, white);
-  --color-info-soft: color-mix(in srgb, #0064D9 8%, white);
+  --color-info-soft: #dbeafe;
 
-  /* Avatar del header */
-  --color-avatar: #D1EFFF;
-  --color-avatar-ink: #0064D9;
+  /* Avatar */
+  --color-avatar: #dbeafe;
+  --color-avatar-ink: #4457ff;
 
-  /* Tipografía */
-  --font-sans: "72", "72full", "Segoe UI", Arial, Helvetica, sans-serif;
+  /* Tipografía: Thicccboi si está instalada; DM Sans es el sustituto (se carga en index.html) */
+  --font-sans: "Thicccboi", "DM Sans", ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
 
   /* Radios */
-  --radius-control: 4px;
-  --radius-badge: 10px;
-  --radius-card: 8px;
+  --radius-control: 8px;            /* inputs y selects */
+  --radius-pill: 9999px;            /* botones, tags, badges, íconos */
+  --radius-badge: 9999px;
+  --radius-image: 12px;
+  --radius-mid: 15px;               /* contenedor de tabla, menús */
+  --radius-card: 24px;              /* tarjetas y modales */
 
-  /* Sombras (sobrias: solo tarjetas y menús desplegables) */
-  --shadow-card: 0 0 0 1px rgb(0 0 0 / 0.04), 0 1px 2px rgb(0 0 0 / 0.05);
-  --shadow-menu: 0 8px 24px rgb(0 0 0 / 0.14);
+  /* Sombras: el sistema es plano. Solo los elementos flotantes (menús, modales) proyectan sombra, siempre violeta */
+  --shadow-card: none;
+  --shadow-menu: 0 12px 32px rgb(32 36 138 / 0.14);
+  --shadow-hero: -19px 5px 60px 4px rgb(32 36 138 / 0.25);
+}
+
+/* Único degradado de marca: para la acción principal de cada pantalla y un acento de texto */
+@utility bg-brand {
+  background-image: linear-gradient(to right, #4457ff, #7583fd);
+}
+@utility text-brand {
+  background-image: linear-gradient(to right, #4457ff, #7583fd);
+  background-clip: text;
+  color: transparent;
+}
+
+/* Segundo y último degradado permitido: lavado lavanda de bajo contraste para paneles destacados */
+@utility bg-lavanda {
+  background-image: linear-gradient(to top, #f8f9ff, #dee7ff);
 }
 
 @layer base {
-  /* 14px en body (no en html): así los rem de Tailwind siguen en 16px y no se achica todo el espaciado */
+  /* 15px en body (no en html): los rem de Tailwind siguen en 16px. Las tablas usan 14px */
   body {
     margin: 0;
-    font-size: 14px;
+    font-size: 15px;
+    line-height: 1.56;
     background-color: var(--color-page);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* placeholders en itálica gris en todos los controles */
   input::placeholder,
   textarea::placeholder {
     color: var(--color-placeholder);
-    font-style: italic;
+    opacity: 1;
   }
 
-  /* scrollbar delgada gris */
+  /* scrollbar delgada */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #C1C5CA transparent;
+    scrollbar-color: #c7c8e2 transparent;
   }
   ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-thumb { background: #C1C5CA; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb { background: #c7c8e2; border-radius: 9999px; }
   ::-webkit-scrollbar-track { background: transparent; }
 }

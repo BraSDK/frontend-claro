@@ -1,4 +1,5 @@
-import type { EstadoOrden } from "./Ordenes";
+// Estado de la SOT en este sistema (enum Estados del back: 0 INGRESADA, 1 LIQUIDADO, 2 VALIDADO)
+export type EstadoOrden = 0 | 1 | 2;
 
 export interface EstadoResumen { estado: EstadoOrden; cantidad: number; monto: number; }
 export interface TecnicoResumen { usuarioId: number; nombre: string; cantidad: number; monto: number; }

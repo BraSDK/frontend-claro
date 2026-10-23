@@ -4,20 +4,20 @@ import { usePerfil } from '../hooks/usePerfil';
 import { actualizarMiPerfil, cambiarPassword } from '../services/auth.service';
 import { iniciales, NOMBRES_ROL } from '../utils/formato';
 
-const claseCampo = "h-11 w-full rounded-lg border border-slate-200 px-3.5 text-sm text-slate-700 outline-none transition-all";
-const claseLectura = `${claseCampo} bg-slate-50`;
-const claseEditable = `${claseCampo} bg-white hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10`;
+const claseCampo = "h-11 w-full rounded-control border border-line px-3.5 text-sm text-ink outline-none transition-all";
+const claseLectura = `${claseCampo} bg-page`;
+const claseEditable = `${claseCampo} bg-surface hover:border-line focus:border-primary focus:ring-4 focus:ring-primary/10`;
 
 const formatoLargo = (iso?: string) =>
     iso ? new Date(iso).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
 
 // Tarjeta con el mismo estilo que la imagen de referencia
 const Seccion = ({ icono, titulo, acciones, children }: { icono: React.ReactNode; titulo: string; acciones?: React.ReactNode; children: React.ReactNode }) => (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="rounded-card border border-line bg-surface p-6 ">
         <header className="mb-5 flex items-center justify-between">
-            <div className="flex items-center gap-3 text-slate-700">
+            <div className="flex items-center gap-3 text-ink">
                 {icono}
-                <h2 className="text-base font-semibold text-slate-900">{titulo}</h2>
+                <h2 className="text-base font-semibold text-ink">{titulo}</h2>
             </div>
             {acciones}
         </header>
@@ -27,10 +27,10 @@ const Seccion = ({ icono, titulo, acciones, children }: { icono: React.ReactNode
 
 const Dato = ({ icono, etiqueta, valor }: { icono: React.ReactNode; etiqueta: string; valor: string }) => (
     <div className="flex items-start gap-3">
-        <span className="mt-0.5 text-slate-500">{icono}</span>
+        <span className="mt-0.5 text-label">{icono}</span>
         <div>
-            <p className="text-xs text-slate-500">{etiqueta}</p>
-            <p className="text-sm font-medium text-slate-800">{valor}</p>
+            <p className="text-xs text-label">{etiqueta}</p>
+            <p className="text-sm font-medium text-ink">{valor}</p>
         </div>
     </div>
 );
@@ -95,7 +95,7 @@ export const ConfiguracionPage = () => {
     };
 
     const Mensaje = ({ m }: { m: { tipo: 'ok' | 'error'; texto: string } | null }) => !m ? null : (
-        <p className={`mt-4 flex items-center gap-2 rounded-lg border px-4 py-2.5 text-sm ${m.tipo === 'ok' ? 'border-green-200 bg-green-50 text-green-700' : 'border-red-200 bg-red-50 text-red-700'}`}>
+        <p className={`mt-4 flex items-center gap-2 rounded-control border px-4 py-2.5 text-sm ${m.tipo === 'ok' ? 'border-success/30 bg-success-soft text-success' : 'border-danger/30 bg-danger-soft text-danger'}`}>
             {m.tipo === 'ok' && <CheckCircle2 size={16} />} {m.texto}
         </p>
     );
@@ -106,33 +106,33 @@ export const ConfiguracionPage = () => {
         <div className="flex flex-col gap-6">
             {/* Título */}
             <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-100 text-indigo-500">
+                <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-primary-soft text-primary">
                     <User size={24} />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Perfil</h1>
-                    <p className="mt-1 text-sm text-slate-500">Gestiona tu información personal y mantén tu perfil actualizado.</p>
+                    <h1 className="text-2xl font-bold text-ink">Perfil</h1>
+                    <p className="mt-1 text-sm text-label">Gestiona tu información personal y mantén tu perfil actualizado.</p>
                 </div>
             </div>
 
-            {error && <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">{error}</p>}
+            {error && <p className="rounded-control border border-danger/30 bg-danger-soft px-4 py-2.5 text-sm text-danger">{error}</p>}
 
             {/* Tarjeta principal */}
-            <section className="flex flex-col gap-6 rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50/80 via-blue-50/50 to-white p-8 md:flex-row md:items-center">
+            <section className="flex flex-col gap-6 rounded-card border border-primary/40 bg-gradient-to-br from-primary/80 via-primary/50 to-white p-8 md:flex-row md:items-center">
                 <div className="flex flex-1 items-center gap-6">
-                    <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-indigo-400 text-3xl font-semibold text-white shadow-lg shadow-indigo-400/30">
+                    <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-pill bg-brand text-3xl font-semibold text-on-primary">
                         {cargando && !perfil ? '' : iniciales(perfil?.nombreCompleto || perfil?.email)}
                     </div>
                     <div className="min-w-0">
-                        <h2 className="truncate text-xl font-bold text-slate-900">{perfil?.nombreCompleto || (cargando ? 'Cargando...' : 'Sin nombre')}</h2>
-                        <p className="truncate text-sm text-slate-500">{perfil?.email}</p>
-                        <span className="mt-2 inline-flex items-center rounded-md bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                        <h2 className="truncate text-xl font-bold text-ink">{perfil?.nombreCompleto || (cargando ? 'Cargando...' : 'Sin nombre')}</h2>
+                        <p className="truncate text-sm text-label">{perfil?.email}</p>
+                        <span className="mt-2 inline-flex items-center rounded-pill bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success">
                             Activo
                         </span>
                     </div>
                 </div>
 
-                <div className="hidden h-24 w-px bg-indigo-100 md:block" />
+                <div className="hidden h-24 w-px bg-primary-soft md:block" />
 
                 <div className="flex flex-col gap-4 md:w-64">
                     <Dato icono={<ShieldCheck size={18} />} etiqueta="Rol" valor={rol} />
@@ -150,7 +150,7 @@ export const ConfiguracionPage = () => {
                         type="button"
                         onClick={() => { setEditando(true); setMensajePerfil(null); }}
                         disabled={!perfil}
-                        className="flex items-center gap-2 rounded-lg border border-blue-200 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-control border border-primary/40 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary-soft disabled:opacity-50"
                     >
                         <Pencil size={16} /> Editar
                     </button>
@@ -158,7 +158,7 @@ export const ConfiguracionPage = () => {
             >
                 <form onSubmit={guardarPerfil}>
                     <div className="grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
-                        <label className="flex flex-col gap-1.5 text-sm text-slate-600">
+                        <label className="flex flex-col gap-1.5 text-sm text-label">
                             Nombre completo
                             <input
                                 value={form.nombreCompleto}
@@ -168,7 +168,7 @@ export const ConfiguracionPage = () => {
                                 className={editando ? claseEditable : claseLectura}
                             />
                         </label>
-                        <label className="flex flex-col gap-1.5 text-sm text-slate-600">
+                        <label className="flex flex-col gap-1.5 text-sm text-label">
                             DNI
                             <input
                                 value={form.documentoIdentidad}
@@ -178,7 +178,7 @@ export const ConfiguracionPage = () => {
                                 className={editando ? claseEditable : claseLectura}
                             />
                         </label>
-                        <label className="flex flex-col gap-1.5 text-sm text-slate-600">
+                        <label className="flex flex-col gap-1.5 text-sm text-label">
                             Correo electrónico
                             <input
                                 type="email"
@@ -189,9 +189,9 @@ export const ConfiguracionPage = () => {
                                 className={editando ? claseEditable : claseLectura}
                             />
                         </label>
-                        <label className="flex flex-col gap-1.5 text-sm text-slate-600">
+                        <label className="flex flex-col gap-1.5 text-sm text-label">
                             Cargo
-                            <input value={rol} readOnly className={`${claseLectura} cursor-not-allowed text-slate-500`} title="Solo un administrador puede cambiar el rol" />
+                            <input value={rol} readOnly className={`${claseLectura} cursor-not-allowed text-label`} title="Solo un administrador puede cambiar el rol" />
                         </label>
                     </div>
 
@@ -201,14 +201,14 @@ export const ConfiguracionPage = () => {
                                 type="button"
                                 onClick={cancelarEdicion}
                                 disabled={guardando}
-                                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
+                                className="flex items-center gap-2 rounded-pill border border-line bg-surface px-4 py-2.5 text-sm font-medium text-label transition-colors hover:bg-page"
                             >
                                 <X size={16} /> Cancelar
                             </button>
                             <button
                                 type="submit"
                                 disabled={guardando}
-                                className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-60"
+                                className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <Save size={16} /> {guardando ? 'Guardando...' : 'Guardar cambios'}
                             </button>
@@ -226,21 +226,21 @@ export const ConfiguracionPage = () => {
                     <button
                         type="button"
                         onClick={() => setVerPass((v) => !v)}
-                        className="flex items-center gap-1.5 text-sm text-slate-500 hover:text-slate-700"
+                        className="flex items-center gap-1.5 text-sm text-label hover:text-ink"
                     >
                         {verPass ? <EyeOff size={16} /> : <Eye size={16} />} {verPass ? 'Ocultar' : 'Mostrar'}
                     </button>
                 }
             >
                 <form onSubmit={guardarPassword}>
-                    <p className="mb-4 text-sm text-slate-500">Usa al menos 8 caracteres. Después de cambiarla, úsala en tu próximo inicio de sesión.</p>
+                    <p className="mb-4 text-sm text-label">Usa al menos 8 caracteres. Después de cambiarla, úsala en tu próximo inicio de sesión.</p>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                         {([
                             ['actual', 'Contraseña actual', 'current-password'],
                             ['nueva', 'Nueva contraseña', 'new-password'],
                             ['confirmar', 'Confirmar nueva contraseña', 'new-password'],
                         ] as const).map(([campo, etiqueta, auto]) => (
-                            <label key={campo} className="flex flex-col gap-1.5 text-sm text-slate-600">
+                            <label key={campo} className="flex flex-col gap-1.5 text-sm text-label">
                                 {etiqueta}
                                 <input
                                     type={verPass ? 'text' : 'password'}
@@ -257,7 +257,7 @@ export const ConfiguracionPage = () => {
                         <button
                             type="submit"
                             disabled={cambiandoPass}
-                            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 disabled:opacity-60"
+                            className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-primary-soft px-5 text-sm font-semibold text-primary transition-colors hover:bg-primary-soft/70 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                             <KeyRound size={16} /> {cambiandoPass ? 'Cambiando...' : 'Cambiar contraseña'}
                         </button>

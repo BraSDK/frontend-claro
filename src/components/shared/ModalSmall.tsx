@@ -1,72 +1,39 @@
-import { X , Save } from 'lucide-react';
+import { X } from 'lucide-react';
 import type { ReactNode } from "react";
+import { Boton } from '../ui/Controles';
+
 interface ModalSmallProps {
   isOpen: boolean;
   onClose: () => void;
   formId?: string;
   submitLabel?: string;
   title: string;
-  children?: ReactNode; // Aquí adentro inyectaremos cualquier formulario por ahora no lo usaremos
+  children?: ReactNode;
 }
 
-export const ModalSmall = ({isOpen,onClose,title,children,formId,submitLabel} : ModalSmallProps) => {
+// Tarjeta de formulario corto con Cancelar / Enviar en el pie (el formulario se asocia por formId)
+export const ModalSmall = ({ isOpen, onClose, title, children, formId, submitLabel }: ModalSmallProps) => {
     if (!isOpen) return null;
-    return(
-            <div className="bg-white rounded-2xl shadow-[0_20px_50px_rgba(15,23,42,0.16)] w-full max-w-md overflow-hidden flex flex-col border border-slate-200">
+    return (
+        <div className="flex w-full max-w-md flex-col overflow-hidden rounded-card bg-surface shadow-menu">
+            <header className="flex items-center justify-between border-b border-line px-6 py-4">
+                <h3 className="text-lg font-semibold text-ink">{title}</h3>
+                <button
+                    type="button"
+                    onClick={onClose}
+                    aria-label="Cerrar"
+                    className="flex h-9 w-9 items-center justify-center rounded-pill text-label transition-colors hover:bg-hover hover:text-ink"
+                >
+                    <X size={18} strokeWidth={1.75} />
+                </button>
+            </header>
 
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-white">
-                    <h3 className="text-base font-semibold tracking-tight text-slate-900">
-                        {title.toUpperCase()}
-                    </h3>
+            <div className="p-6">{children}</div>
 
-                    <button
-                        onClick={onClose}
-                        className="text-slate-400 hover:text-slate-700 transition-all p-1.5 rounded-lg hover:bg-slate-100"
-                    >
-                        <X size={19} />
-                    </button>
-                </div>
-
-                {/* Contenido */}
-                <div className="p-6 bg-white">
-                    {children}
-                </div>
-
-                {/* Footer */}
-                <div className="flex justify-end items-center gap-3 px-6 py-4 border-t border-slate-100 bg-slate-50/60">
-
-                    <button
-                        onClick={onClose}
-                        className="
-                            text-sm font-medium
-                            text-slate-600
-                            px-4 py-2.5
-                            rounded-lg
-                            border border-slate-200
-                            bg-white
-                            hover:bg-slate-50
-                            hover:border-slate-300
-                            transition-all
-                        "
-                    >
-                        Cancelar
-                    </button>
-
-                    {formId && (
-                    <button
-                        type="submit"
-                        form={formId}
-                        className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                    >
-                        {submitLabel}
-                    </button>
-                    )}
-
-                </div>
-
-            </div>
-        )
-       
-
+            <footer className="flex items-center justify-end gap-2 border-t border-line px-6 py-4">
+                <Boton variante="secundario" onClick={onClose}>Cancelar</Boton>
+                {formId && <Boton type="submit" form={formId}>{submitLabel}</Boton>}
+            </footer>
+        </div>
+    );
 };

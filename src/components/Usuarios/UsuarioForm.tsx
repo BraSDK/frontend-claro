@@ -109,14 +109,14 @@ export const UsuarioForm = ({
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {errorLocal && (
-        <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">
+        <div className="p-3 bg-danger-soft text-danger rounded-control text-sm border border-danger/30">
           {errorLocal}
         </div>
       )}
 
       {/* Nombre Completo */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="nombreCompleto" className="text-sm font-medium text-gray-700">
+        <label htmlFor="nombreCompleto" className="text-sm font-medium text-ink">
           Nombre Completo
         </label>
         <input
@@ -127,13 +127,13 @@ export const UsuarioForm = ({
           value={formData.nombreCompleto}
           onChange={handleChange}
           placeholder="Ej. Juan Pérez"
-          className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
       </div>
 
       {/* Documento de Identidad */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="documentoIdentidad" className="text-sm font-medium text-gray-700">
+        <label htmlFor="documentoIdentidad" className="text-sm font-medium text-ink">
           Documento de Identidad
         </label>
         <input
@@ -144,13 +144,13 @@ export const UsuarioForm = ({
           value={formData.documentoIdentidad}
           onChange={handleChange}
           placeholder="DNI o Cédula"
-          className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
       </div>
 
       {/* Email */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="email" className="text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="text-sm font-medium text-ink">
           Correo Electrónico
         </label>
         <input
@@ -161,14 +161,14 @@ export const UsuarioForm = ({
           value={formData.email}
           onChange={handleChange}
           placeholder="usuario@claro.com"
-          className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
         />
       </div>
 
       {/* Contraseña (Solo en creación) */}
       {!isEditing && (
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="password" className="text-sm font-medium text-gray-700">
+          <label htmlFor="password" className="text-sm font-medium text-ink">
             Contraseña
           </label>
           <input
@@ -179,14 +179,14 @@ export const UsuarioForm = ({
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••"
-            className="w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
         </div>
       )}
 
       {/* Rol */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="rol" className="text-sm font-medium text-gray-700">
+        <label htmlFor="rol" className="text-sm font-medium text-ink">
           Rol en el Sistema
         </label>
         <select
@@ -195,8 +195,8 @@ export const UsuarioForm = ({
           disabled={!canChangeRole}
           value={formData.rol}
           onChange={handleChange}
-          className={`w-full px-3.5 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
-            !canChangeRole ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-white'
+          className={`w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+            !canChangeRole ? 'bg-page text-label cursor-not-allowed' : 'bg-surface'
           }`}
         >
           {Object.values(Rol).map((rolOption) => (
@@ -206,26 +206,26 @@ export const UsuarioForm = ({
           ))}
         </select>
         {!canChangeRole && (
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-muted">
             Solo un administrador puede modificar este campo.
           </span>
         )}
       </div>
 
       {/* Acciones */}
-      <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
+      <div className="flex items-center justify-end gap-3 mt-4 pt-4 border-t border-line">
         <button
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-pill border border-line bg-surface px-5 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors shadow-sm disabled:opacity-50"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? 'Guardando...' : isEditing ? 'Guardar Cambios' : 'Registrar Usuario'}
         </button>

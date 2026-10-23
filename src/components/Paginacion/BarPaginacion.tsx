@@ -6,7 +6,7 @@ interface props  {
         numeroPagina : number,
         totalPaginasTotales : number,
         onHandle : (numPag : number ) => void,
-        acento? : 'red' | 'blue'   // color de la página activa
+        acento? : 'red' | 'blue'   // obsoleto: la página activa siempre usa el acento suave
 }
 
 // Devuelve las páginas a mostrar con "..." cuando son muchas: 1 … 4 5 6 … 12
@@ -22,13 +22,13 @@ const paginasVisibles = (actual: number, total: number): (number | "...")[] => {
     return paginas;
 };
 
-export const BarPaginancion = ({totalPaginasTotales,numeroPagina,totalRegistrosPagina = 0,totalRegistros,onHandle,acento = 'red'} : props) => {
+export const BarPaginancion = ({totalPaginasTotales,numeroPagina,totalRegistrosPagina = 0,totalRegistros,onHandle} : props) => {
     const total = Math.max(1, totalPaginasTotales);
     const ir = (p: number) => { if (p >= 1 && p <= total && p !== numeroPagina) onHandle(p); };
 
     return(
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line-soft pt-3">
-                <p className="text-xs text-label">
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-label">
                     Mostrando <span className="font-medium text-ink">{totalRegistrosPagina}</span> de{" "}
                     <span className="font-medium text-ink">{totalRegistros}</span> {totalRegistros === 1 ? "orden" : "órdenes"}
                 </p>
@@ -38,7 +38,7 @@ export const BarPaginancion = ({totalPaginasTotales,numeroPagina,totalRegistrosP
                         type="button"
                         onClick={() => ir(numeroPagina - 1)}
                         disabled={numeroPagina <= 1}
-                        className="flex h-8 w-8 items-center justify-center rounded-control text-label transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-40"
+                        className="flex h-9 w-9 items-center justify-center rounded-pill text-label transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-40"
                         title="Anterior"
                     >
                         <ChevronLeft size={16} />
@@ -52,8 +52,8 @@ export const BarPaginancion = ({totalPaginasTotales,numeroPagina,totalRegistrosP
                                 key={p}
                                 type="button"
                                 onClick={() => ir(p)}
-                                className={`flex h-8 min-w-8 items-center justify-center rounded-control px-2 text-xs font-semibold transition-colors ${
-                                    p === numeroPagina ? `${acento === "blue" ? "bg-info" : "bg-primary"} text-on-primary` : "text-label hover:bg-hover"
+                                className={`flex h-9 min-w-9 items-center justify-center rounded-pill px-3 text-sm font-semibold transition-colors ${
+                                    p === numeroPagina ? "bg-primary-soft text-primary" : "text-label hover:bg-hover"
                                 }`}
                             >
                                 {p}
@@ -65,7 +65,7 @@ export const BarPaginancion = ({totalPaginasTotales,numeroPagina,totalRegistrosP
                         type="button"
                         onClick={() => ir(numeroPagina + 1)}
                         disabled={numeroPagina >= total}
-                        className="flex h-8 w-8 items-center justify-center rounded-control text-label transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-40"
+                        className="flex h-9 w-9 items-center justify-center rounded-pill text-label transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-40"
                         title="Siguiente"
                     >
                         <ChevronRight size={16} />

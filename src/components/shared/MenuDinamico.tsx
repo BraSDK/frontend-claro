@@ -76,9 +76,9 @@ export const MenuDinamico = ({opciones, icono, title = "Más opciones"}:MenuDina
                 type="button"
                 title={title}
                 onClick={() => (abierto ? cerrar() : abrir())}
-                className={`rounded p-1.5 transition-colors hover:bg-slate-100 hover:text-slate-700 ${abierto ? "bg-slate-100 text-slate-700" : "text-gray-400"}`}
+                className={`flex h-8 w-8 items-center justify-center rounded-pill transition-colors hover:bg-hover hover:text-ink ${abierto ? "bg-hover text-ink" : "text-label"}`}
             >
-                {icono ?? <MoreVertical size={18} />}
+                {icono ?? <MoreVertical size={18} strokeWidth={1.75} />}
             </button>
 
             {/* 4. createPortal dibuja el menú directamente en <body>, fuera de la tabla.
@@ -88,7 +88,7 @@ export const MenuDinamico = ({opciones, icono, title = "Más opciones"}:MenuDina
                 <div
                     ref={menuRef}
                     style={posicion}
-                    className="fixed z-50 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 text-left shadow-xl"
+                    className="fixed z-50 w-52 overflow-hidden rounded-mid border border-line bg-surface p-1.5 text-left shadow-menu"
                 >
                     {opciones.map((opcion, index) => (
                         <button
@@ -96,10 +96,10 @@ export const MenuDinamico = ({opciones, icono, title = "Más opciones"}:MenuDina
                             type="button"
                             // 6. Ejecuta la acción y cierra el menú
                             onClick={() => { opcion.accion(); cerrar(); }}
-                            className={`flex w-full items-center gap-2 px-4 py-2 text-sm transition-colors ${
+                            className={`flex w-full items-center gap-2.5 rounded-control px-3 py-2 text-sm transition-colors ${
                                 opcion.opcionAdviser
-                                    ? "text-red-600 hover:bg-red-50"
-                                    : "text-slate-700 hover:bg-slate-50"
+                                    ? "text-danger hover:bg-danger-soft"
+                                    : "text-ink hover:bg-hover"
                             }`}
                         >
                             {opcion.icono}

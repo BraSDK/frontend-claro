@@ -21,11 +21,8 @@ export const MODULOS: Modulo[] = [
 
 // Pantallas que no son un módulo del menú pero tienen su propio título
 const SUBPANTALLAS: { patron: RegExp; titulo: string }[] = [
-    { patron: /^\/ordenesCrear/, titulo: 'Nueva orden de trabajo' },
-    { patron: /^\/ordenes\/\d+\/editarCompleto/, titulo: 'Editar orden de trabajo' },
+    { patron: /^\/ordenes\/nueva/, titulo: 'Nueva orden de trabajo' },
     { patron: /^\/ordenes\/\d+\/editar/, titulo: 'Editar orden de trabajo' },
-    { patron: /^\/ordenes\/\d+\/detalles/, titulo: 'Detalles de la SOT' },
-    { patron: /^\/ordenes\/\d+\/auditar/, titulo: 'Auditar SOT' },
 ];
 
 export const tituloDeRuta = (ruta: string): string =>
@@ -34,4 +31,4 @@ export const tituloDeRuta = (ruta: string): string =>
     ?? 'SistemaClaro';
 
 export const moduloActivo = (ruta: string) =>
-    MODULOS.find((m) => ruta === m.ruta || ruta.startsWith(`${m.ruta}/`) || (m.ruta === '/ordenes' && ruta.startsWith('/ordenesCrear')));
+    MODULOS.find((m) => ruta === m.ruta || ruta.startsWith(`${m.ruta}/`));

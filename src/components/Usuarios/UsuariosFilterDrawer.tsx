@@ -48,7 +48,7 @@ import type { UsuarioFilterState } from '../../types/usuario.types';
         <div className="flex flex-col gap-5">
           {/* Filtro por Nombre Completo */}
           <div>
-            <label htmlFor="nombreCompleto" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="nombreCompleto" className="block text-sm font-medium text-ink mb-1">
               Nombre Completo
             </label>
             <input
@@ -58,13 +58,13 @@ import type { UsuarioFilterState } from '../../types/usuario.types';
               value={filters.nombreCompleto}
               onChange={handleChange}
               placeholder="Buscar por nombre..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full px-3 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-danger"
             />
           </div>
   
           {/* Filtro por Documento de Identidad */}
           <div>
-            <label htmlFor="documentoIdentidad" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="documentoIdentidad" className="block text-sm font-medium text-ink mb-1">
               Documento de Identidad
             </label>
             <input
@@ -74,13 +74,13 @@ import type { UsuarioFilterState } from '../../types/usuario.types';
               value={filters.documentoIdentidad}
               onChange={handleChange}
               placeholder="DNI o Cédula..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full px-3 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-danger"
             />
           </div>
   
           {/* Filtro por Rol */}
           <div>
-            <label htmlFor="rol" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="rol" className="block text-sm font-medium text-ink mb-1">
               Rol
             </label>
             <select
@@ -88,7 +88,7 @@ import type { UsuarioFilterState } from '../../types/usuario.types';
               name="rol"
               value={filters.rol}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full px-3 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-danger"
             >
               <option value="">Todos los roles</option>
               {Object.values(Rol).map((rolOption) => (
@@ -105,14 +105,14 @@ import type { UsuarioFilterState } from '../../types/usuario.types';
           <button
             type="button"
             onClick={handleReset}
-            className="w-1/2 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2.5 rounded-lg font-medium transition-colors text-sm"
+            className="w-1/2 inline-flex h-10 items-center justify-center gap-2 rounded-pill border border-line bg-surface px-5 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             Limpiar
           </button>
           <button
             type="button"
             onClick={handleApply}
-            className="w-1/2 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-lg font-medium transition-colors text-sm"
+            className="w-1/2 inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Aplicar Filtros
           </button>
