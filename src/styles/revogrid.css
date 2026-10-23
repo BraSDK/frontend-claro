@@ -1,0 +1,28 @@
+/* =========================================================
+   RevoGrid: override del tema por defecto
+   ========================================================= */
+   revo-grid {
+    --revo-header-bg: #f9fafb;
+    --revo-header-color: #4b5563;
+    --revo-header-font-weight: 600;
+  
+    --revo-border-color: #e5e7eb;
+    --revo-color: #111827;
+    --revo-bg: #ffffff;
+    --revo-row-hover-bg: #f9fafb;
+  
+    --revo-selection-border: transparent;
+    --revo-selection-bg: transparent;
+  }
+  
+  revo-grid revogr-header .header-content {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+  }
+  
+  revo-grid revogr-data .rgCell {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+  }

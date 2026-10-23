@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import "./styles/revogrid.css";  
 /* =========================================================
    Design tokens front_claro (portal tipo SAP Fiori con barra roja):
    el ÚNICO lugar con colores, radios y tipografía.
