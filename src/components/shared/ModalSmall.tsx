@@ -16,13 +16,13 @@ export const ModalSmall = ({ isOpen, onClose, title, children, formId, submitLab
     if (!isOpen) return null;
     return (
         <div className="flex w-full max-w-md flex-col overflow-hidden rounded-card bg-surface shadow-menu">
-            <header className="flex items-center justify-between border-b border-line px-6 py-4">
-                <h3 className="text-lg font-semibold text-ink">{title}</h3>
+            <header className="flex items-center justify-between border-b border-line-soft px-6 py-3">
+                <h3 className="text-[17px] font-bold text-ink">{title}</h3>
                 <button
                     type="button"
                     onClick={onClose}
                     aria-label="Cerrar"
-                    className="flex h-9 w-9 items-center justify-center rounded-pill text-label transition-colors hover:bg-hover hover:text-ink"
+                    className="flex h-8 w-8 items-center justify-center rounded-control text-ink transition-colors hover:bg-hover"
                 >
                     <X size={18} strokeWidth={1.75} />
                 </button>
@@ -30,7 +30,7 @@ export const ModalSmall = ({ isOpen, onClose, title, children, formId, submitLab
 
             <div className="p-6">{children}</div>
 
-            <footer className="flex items-center justify-end gap-2 border-t border-line px-6 py-4">
+            <footer className="flex items-center justify-end gap-2 border-t border-line-soft px-6 py-3">
                 <Boton variante="secundario" onClick={onClose}>Cancelar</Boton>
                 {formId && <Boton type="submit" form={formId}>{submitLabel}</Boton>}
             </footer>

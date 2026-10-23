@@ -24,9 +24,9 @@ export const UsuariosTable = ({
   const getRolBadgeClass = (rol: string) => {
     switch (rol) {
       case Rol.ADMIN:
-        return 'bg-primary-soft text-primary';
+        return 'bg-info-soft text-info';
       case Rol.TECNICO:
-        return 'bg-primary-soft text-primary';
+        return 'bg-info-soft text-info';
       case Rol.ALMACEN:
         return 'bg-warning-soft text-warning';
       default:
@@ -62,7 +62,7 @@ export const UsuariosTable = ({
                 <td className="px-6 py-4 text-label">{usuario.documentoIdentidad}</td>
                 <td className="px-6 py-4 text-label">{usuario.email}</td>
                 <td className="px-6 py-4">
-                  <span className={`px-3 py-1 text-xs font-medium rounded-pill ${getRolBadgeClass(usuario.rol)}`}>
+                  <span className={`px-3 py-1 text-xs font-medium rounded-badge ${getRolBadgeClass(usuario.rol)}`}>
                     {usuario.rol}
                   </span>
                 </td>
@@ -72,7 +72,7 @@ export const UsuariosTable = ({
                       type="button"
                       title="Editar"
                       onClick={() => onEdit(usuario)}
-                      className="p-1.5 text-muted hover:text-primary hover:bg-primary-soft rounded transition-colors"
+                      className="p-1.5 text-muted hover:text-info hover:bg-info-soft rounded transition-colors"
                     >
                       <Pencil size={18} />
                     </button>

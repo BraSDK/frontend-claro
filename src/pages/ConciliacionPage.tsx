@@ -18,7 +18,7 @@ import { formatoDiferencia, formatoFechaCorta, formatoFechaHora, formatoSoles, N
 
 const TAMANO_PAGINA = 10;
 
-const claseSelect = "h-10 w-full rounded-control border border-line bg-surface px-3 text-sm text-ink outline-none transition-all hover:border-line focus:border-primary focus:ring-4 focus:ring-primary/10";
+const claseSelect = "h-10 w-full rounded-control border border-line bg-surface px-3 text-sm text-ink outline-none transition-all hover:border-line focus:border-info focus:ring-4 focus:ring-info/10";
 
 // últimos 12 meses para el selector de periodo
 const periodos = (() => {
@@ -33,7 +33,7 @@ const Kpi = ({ icono, fondo, titulo, valor, valorClase = 'text-ink', detalle }: 
     icono: React.ReactNode; fondo: string; titulo: string; valor: string; valorClase?: string; detalle?: string;
 }) => (
     <div className="flex items-center gap-4 rounded-card border border-line/70 bg-surface p-5 shadow-menu">
-        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-pill ${fondo}`}>{icono}</div>
+        <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${fondo}`}>{icono}</div>
         <div className="min-w-0">
             <p className="text-sm text-label">{titulo}</p>
             <p className={`mt-0.5 text-2xl font-bold tracking-tight ${valorClase}`}>{valor}</p>
@@ -142,7 +142,7 @@ export const ConciliacionPage = () => {
         <div className={`flex flex-col gap-5 ${filaAbierta ? 'xl:pr-[380px]' : ''} transition-[padding]`}>
             {/* Título */}
             <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-primary-soft text-primary">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-info-soft text-info">
                     <RefreshCw size={22} />
                 </div>
                 <div>
@@ -170,7 +170,7 @@ export const ConciliacionPage = () => {
                 <button
                     type="button"
                     onClick={() => filtro(setCategoria)(CategoriaConciliacion.POR_AUDITAR)}
-                    className="flex h-10 items-center gap-2 rounded-pill bg-primary-soft px-4 text-sm font-medium text-primary transition-colors hover:bg-primary-soft"
+                    className="flex h-10 items-center gap-2 rounded-control bg-info-soft px-4 text-sm font-medium text-info transition-colors hover:bg-info-soft"
                 >
                     <ClipboardCheck size={16} /> Ver pendientes de auditar ({datos?.porAuditar ?? 0})
                 </button>
@@ -188,7 +188,7 @@ export const ConciliacionPage = () => {
                         onClick={exportar}
                         disabled={exportando || !datos}
                         title="Excel con las SOT en Diferencia, No pagada y Por auditar"
-                        className="flex h-10 items-center gap-2 rounded-pill border border-primary/40 bg-surface px-4 text-sm font-medium text-primary transition-colors hover:bg-primary-soft disabled:opacity-60"
+                        className="flex h-10 items-center gap-2 rounded-control border border-info/40 bg-surface px-4 text-sm font-medium text-info transition-colors hover:bg-info-soft disabled:opacity-60"
                     >
                         <Download size={16} /> {exportando ? 'Exportando...' : 'Exportar diferencias'}
                     </button>
@@ -199,7 +199,7 @@ export const ConciliacionPage = () => {
 
             {/* KPIs */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                <Kpi icono={<Database size={22} className="text-primary" />} fondo="bg-primary-soft" titulo="Total valorizado (Almacén)" valor={formatoSoles(datos?.totalValorizado)} />
+                <Kpi icono={<Database size={22} className="text-info" />} fondo="bg-info-soft" titulo="Total valorizado (Almacén)" valor={formatoSoles(datos?.totalValorizado)} />
                 <Kpi icono={<Wallet size={22} className="text-success" />} fondo="bg-success-soft" titulo="Total a pagar (auditado)" valor={formatoSoles(datos?.totalPagado)} />
                 <Kpi
                     icono={<MinusCircle size={22} className="text-danger" />} fondo="bg-danger-soft" titulo="Diferencia total"
@@ -208,7 +208,7 @@ export const ConciliacionPage = () => {
                     detalle="Descuentos y multas de la auditoría"
                 />
                 <Kpi
-                    icono={<ListChecks size={22} className="text-primary" />} fondo="bg-primary-soft" titulo="SOT evaluadas"
+                    icono={<ListChecks size={22} className="text-info" />} fondo="bg-info-soft" titulo="SOT evaluadas"
                     valor={`${datos?.sotEvaluadas ?? 0}`}
                     detalle={datos ? `de ${datos.totalSots} SOT del periodo` : undefined}
                 />
@@ -223,7 +223,7 @@ export const ConciliacionPage = () => {
                             key={t.estadoPago}
                             type="button"
                             onClick={() => filtro(setEstadoPago)(activo ? '' : String(t.estadoPago))}
-                            className={`flex items-center justify-between rounded-mid border bg-surface px-4 py-3 text-left transition-colors ${activo ? 'border-primary ring-2 ring-primary/15' : 'border-line/70 hover:bg-page'}`}
+                            className={`flex items-center justify-between rounded-card border bg-surface px-4 py-3 text-left transition-colors ${activo ? 'border-info ring-2 ring-info/15' : 'border-line/70 hover:bg-page'}`}
                             title={`Filtrar por ${ESTADOS_PAGO[t.estadoPago].label}`}
                         >
                             <div className="flex flex-col items-start gap-1">
@@ -247,11 +247,11 @@ export const ConciliacionPage = () => {
                                 key={p.label}
                                 type="button"
                                 onClick={() => filtro(setCategoria)(p.valor)}
-                                className={`flex h-9 items-center gap-2 rounded-pill px-4 text-sm font-medium transition-colors ${
-                                    activa ? 'bg-primary text-on-primary' : info ? `${info.pill} hover:brightness-95` : 'bg-page text-label hover:bg-line'
+                                className={`flex h-9 items-center gap-2 rounded-control px-4 text-sm font-medium transition-colors ${
+                                    activa ? 'bg-info text-on-primary' : info ? `${info.pill} hover:brightness-95` : 'bg-page text-label hover:bg-line'
                                 }`}
                             >
-                                {info && <span className={`h-2 w-2 rounded-pill ${activa ? 'bg-surface' : info.punto}`} />}
+                                {info && <span className={`h-2 w-2 rounded-full ${activa ? 'bg-surface' : info.punto}`} />}
                                 {p.label} ({p.cantidad})
                             </button>
                         );
@@ -311,7 +311,7 @@ export const ConciliacionPage = () => {
                         </select>
                     </label>
                     {hayFiltros && (
-                        <button type="button" onClick={limpiar} className="flex h-10 items-center gap-1.5 justify-self-start rounded-pill px-3 text-sm font-medium text-label transition-colors hover:bg-page hover:text-ink">
+                        <button type="button" onClick={limpiar} className="flex h-10 items-center gap-1.5 justify-self-start rounded-full px-3 text-sm font-medium text-label transition-colors hover:bg-page hover:text-ink">
                             <X size={15} /> Limpiar filtros
                         </button>
                     )}
@@ -332,7 +332,7 @@ export const ConciliacionPage = () => {
                                 <button
                                     type="button"
                                     onClick={() => cambiarApelacion([...seleccion], true)}
-                                    className="flex h-9 items-center gap-2 rounded-pill bg-warning-soft px-3 text-sm font-medium text-warning transition-colors hover:bg-warning-soft"
+                                    className="flex h-9 items-center gap-2 rounded-full bg-warning-soft px-3 text-sm font-medium text-warning transition-colors hover:bg-warning-soft"
                                 >
                                     <Megaphone size={15} /> Marcar para apelación
                                 </button>
@@ -346,7 +346,7 @@ export const ConciliacionPage = () => {
                     <table className="w-full text-sm">
                         <thead className="border-y border-line bg-page/70 text-[11px] font-semibold uppercase tracking-wide text-label">
                             <tr>
-                                <th className="w-10 px-5 py-3"><input type="checkbox" checked={todasMarcadas} onChange={alternarTodas} className="h-4 w-4 accent-primary" aria-label="Seleccionar todas" /></th>
+                                <th className="w-10 px-5 py-3"><input type="checkbox" checked={todasMarcadas} onChange={alternarTodas} className="h-4 w-4 accent-info" aria-label="Seleccionar todas" /></th>
                                 <th className="px-3 py-3 text-left">SOT</th>
                                 <th className="px-3 py-3 text-left">Fecha</th>
                                 <th className="px-3 py-3 text-left">Técnico</th>
@@ -371,10 +371,10 @@ export const ConciliacionPage = () => {
                                 <tr
                                     key={f.ordenId}
                                     onClick={() => setFilaAbierta(f)}
-                                    className={`cursor-pointer transition-colors ${filaAbierta?.ordenId === f.ordenId ? 'bg-primary-soft/60' : 'hover:bg-page/80'}`}
+                                    className={`cursor-pointer transition-colors ${filaAbierta?.ordenId === f.ordenId ? 'bg-info-soft/60' : 'hover:bg-page/80'}`}
                                 >
                                     <td className="px-5 py-3.5" onClick={(e) => e.stopPropagation()}>
-                                        <input type="checkbox" checked={seleccion.has(f.ordenId)} onChange={() => alternar(f.ordenId)} className="h-4 w-4 accent-primary" aria-label={`Seleccionar SOT ${f.sot}`} />
+                                        <input type="checkbox" checked={seleccion.has(f.ordenId)} onChange={() => alternar(f.ordenId)} className="h-4 w-4 accent-info" aria-label={`Seleccionar SOT ${f.sot}`} />
                                     </td>
                                     <td className="px-3 py-3.5">
                                         <div className="flex items-center gap-1.5 font-semibold text-ink">
@@ -396,7 +396,7 @@ export const ConciliacionPage = () => {
                                     <td className="px-3 py-3.5"><EstadoPagoChip estado={f.estadoPago} motivo={f.motivoNoPago} /></td>
                                     <td className="px-3 py-3.5 text-center">
                                         {f.cantidadImagenes > 0 ? (
-                                            <span title={`${f.cantidadImagenes} imágenes`} className="inline-flex text-primary"><ImageIcon size={17} /></span>
+                                            <span title={`${f.cantidadImagenes} imágenes`} className="inline-flex text-info"><ImageIcon size={17} /></span>
                                         ) : (
                                             <span className="inline-flex flex-col items-center text-muted" title="Sin evidencia">
                                                 <ImageOff size={17} />

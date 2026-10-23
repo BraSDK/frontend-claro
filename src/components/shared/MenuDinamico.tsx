@@ -76,7 +76,7 @@ export const MenuDinamico = ({opciones, icono, title = "Más opciones"}:MenuDina
                 type="button"
                 title={title}
                 onClick={() => (abierto ? cerrar() : abrir())}
-                className={`flex h-8 w-8 items-center justify-center rounded-pill transition-colors hover:bg-hover hover:text-ink ${abierto ? "bg-hover text-ink" : "text-label"}`}
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-hover hover:text-ink ${abierto ? "bg-hover text-ink" : "text-label"}`}
             >
                 {icono ?? <MoreVertical size={18} strokeWidth={1.75} />}
             </button>
@@ -88,7 +88,7 @@ export const MenuDinamico = ({opciones, icono, title = "Más opciones"}:MenuDina
                 <div
                     ref={menuRef}
                     style={posicion}
-                    className="fixed z-50 w-52 overflow-hidden rounded-mid border border-line bg-surface p-1.5 text-left shadow-menu"
+                    className="fixed z-50 w-52 overflow-hidden rounded-card border border-line bg-surface p-1.5 text-left shadow-menu"
                 >
                     {opciones.map((opcion, index) => (
                         <button

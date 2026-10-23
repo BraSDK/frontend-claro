@@ -14,17 +14,17 @@ import { formatoFecha, formatoSoles, iniciales, NOMBRES_MES, variacion } from '.
 
 // nombre y color de cada tipo de detalle (coincide con el enum TipoDetalle del back)
 const TIPOS_DETALLE: Record<number, { label: string; color: string }> = {
-    0: { label: 'Servicio principal', color: 'bg-primary' },
-    1: { label: 'Adicional (decos / repetidores)', color: 'bg-primary-light' },
-    2: { label: 'Drop 150', color: 'bg-primary/55' },
-    3: { label: 'Drop 220', color: 'bg-primary-light/45' },
+    0: { label: 'Servicio principal', color: 'bg-info' },
+    1: { label: 'Adicional (decos / repetidores)', color: 'bg-info/75' },
+    2: { label: 'Drop 150', color: 'bg-info/55' },
+    3: { label: 'Drop 220', color: 'bg-info/45' },
     4: { label: 'Drop 300', color: 'bg-line-fixed' },
 };
 
 // barra horizontal simple: porcentaje respecto al mayor valor de la lista
-const Barra = ({ porcentaje, color = 'bg-primary' }: { porcentaje: number; color?: string }) => (
-    <div className="h-2 w-full overflow-hidden rounded-pill bg-page">
-        <div className={`h-full rounded-pill ${color} transition-all duration-500`} style={{ width: `${Math.max(porcentaje, 2)}%` }} />
+const Barra = ({ porcentaje, color = 'bg-info' }: { porcentaje: number; color?: string }) => (
+    <div className="h-2 w-full overflow-hidden rounded-full bg-page">
+        <div className={`h-full rounded-control ${color} transition-all duration-500`} style={{ width: `${Math.max(porcentaje, 2)}%` }} />
     </div>
 );
 
@@ -76,7 +76,7 @@ export const DashboardPage = () => {
             {/* Cabecera con selector de mes */}
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-primary-soft text-primary">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-info-soft text-info">
                         <LayoutDashboard size={26} />
                     </div>
                     <div>
@@ -87,7 +87,7 @@ export const DashboardPage = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-1 rounded-mid border border-line bg-surface p-1 ">
+                <div className="flex items-center gap-1 rounded-card border border-line bg-surface p-1 ">
                     <button type="button" onClick={() => moverMes(-1)} className="rounded-control p-2 text-label transition-colors hover:bg-page" title="Mes anterior">
                         <ChevronLeft size={18} />
                     </button>
@@ -115,7 +115,7 @@ export const DashboardPage = () => {
                     icon={ClipboardList}
                     value={r?.totalSots ?? '-'}
                     trend={r ? tendencia(r.totalSots, r.totalSotsMesAnterior) : undefined}
-                    iconClassName="bg-primary-soft text-primary"
+                    iconClassName="bg-info-soft text-info"
                 />
                 {!esTecnico && (
                     <>
@@ -133,7 +133,7 @@ export const DashboardPage = () => {
                             trend={r && r.montoTotal > r.montoAPagar
                                 ? { value: formatoSoles(r.montoTotal - r.montoAPagar), direction: 'down', label: 'en descuentos y multas' }
                                 : undefined}
-                            iconClassName="bg-primary-soft text-primary"
+                            iconClassName="bg-info-soft text-info"
                         />
                     </>
                 )}
@@ -150,7 +150,7 @@ export const DashboardPage = () => {
                 <button
                     type="button"
                     onClick={() => navigate('/ordenes')}
-                    className="flex items-center justify-between gap-3 rounded-mid border border-warning/30 bg-warning-soft px-5 py-3 text-left text-sm text-warning transition-colors hover:bg-warning-soft"
+                    className="flex items-center justify-between gap-3 rounded-card border border-warning/30 bg-warning-soft px-5 py-3 text-left text-sm text-warning transition-colors hover:bg-warning-soft"
                 >
                     <span className="flex items-center gap-2">
                         <ImageOff size={18} />
@@ -164,7 +164,7 @@ export const DashboardPage = () => {
             <Card title="SOTs por estado" subtitle="Cómo avanza el trabajo del mes">
                 {!r || r.totalSots === 0 ? <SinDatos /> : (
                     <>
-                        <div className="flex h-3 w-full overflow-hidden rounded-pill bg-page">
+                        <div className="flex h-3 w-full overflow-hidden rounded-control bg-page">
                             {r.porEstado.map((e) => (
                                 <div
                                     key={e.estado}
@@ -180,7 +180,7 @@ export const DashboardPage = () => {
                                 return (
                                     <div key={valor} className="flex items-center justify-between rounded-control border border-line bg-page/60 px-4 py-3">
                                         <div className="flex items-center gap-2">
-                                            <span className={`h-2.5 w-2.5 rounded-pill ${info.barra}`} />
+                                            <span className={`h-2.5 w-2.5 rounded-full ${info.barra}`} />
                                             <span className="text-sm font-medium text-label">{info.label}</span>
                                         </div>
                                         <div className="text-right">
@@ -201,13 +201,13 @@ export const DashboardPage = () => {
                     <Card
                         title="Producción por técnico"
                         subtitle="Ordenado por monto"
-                        icon={<div className="flex h-10 w-10 items-center justify-center rounded-pill bg-primary-soft text-primary"><Users size={20} strokeWidth={1.75} /></div>}
+                        icon={<div className="flex h-10 w-10 items-center justify-center rounded-full bg-info-soft text-info"><Users size={20} strokeWidth={1.75} /></div>}
                     >
                         {!r || r.porTecnico.length === 0 ? <SinDatos /> : (
                             <ul className="space-y-4">
                                 {r.porTecnico.map((t, i) => (
                                     <li key={t.usuarioId} className="flex items-center gap-3">
-                                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-pill text-xs font-bold ${i === 0 ? 'bg-brand text-on-primary' : 'bg-page text-label'}`}>
+                                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold ${i === 0 ? 'bg-info text-on-primary' : 'bg-page text-label'}`}>
                                             {iniciales(t.nombre)}
                                         </div>
                                         <div className="min-w-0 flex-1">
@@ -216,7 +216,7 @@ export const DashboardPage = () => {
                                                 <p className="shrink-0 text-sm font-semibold text-ink">{formatoSoles(t.monto)}</p>
                                             </div>
                                             <div className="flex items-center gap-3">
-                                                <Barra porcentaje={(t.monto / maxTecnico) * 100} color={i === 0 ? 'bg-primary' : 'bg-primary-light/50'} />
+                                                <Barra porcentaje={(t.monto / maxTecnico) * 100} color={i === 0 ? 'bg-info' : 'bg-info/50'} />
                                                 <span className="shrink-0 text-xs text-muted">{t.cantidad} SOTs</span>
                                             </div>
                                         </div>
@@ -231,7 +231,7 @@ export const DashboardPage = () => {
                 <Card
                     title="Servicios más realizados"
                     subtitle="Servicio principal de cada SOT"
-                    icon={<div className="flex h-10 w-10 items-center justify-center rounded-pill bg-primary-soft text-primary"><Wrench size={20} /></div>}
+                    icon={<div className="flex h-10 w-10 items-center justify-center rounded-full bg-info-soft text-info"><Wrench size={20} /></div>}
                 >
                     {!r || r.porServicio.length === 0 ? <SinDatos /> : (
                         <ul className="space-y-3.5">
@@ -244,7 +244,7 @@ export const DashboardPage = () => {
                                             {!esTecnico && <span className="ml-2 text-xs font-normal text-muted">{formatoSoles(s.monto)}</span>}
                                         </p>
                                     </div>
-                                    <Barra porcentaje={(s.cantidad / maxServicio) * 100} color="bg-primary" />
+                                    <Barra porcentaje={(s.cantidad / maxServicio) * 100} color="bg-info" />
                                 </li>
                             ))}
                         </ul>
@@ -256,11 +256,11 @@ export const DashboardPage = () => {
                     <Card
                         title="Composición del monto"
                         subtitle="Servicio principal, adicionales y drops"
-                        icon={<div className="flex h-10 w-10 items-center justify-center rounded-pill bg-primary-soft text-primary"><Layers size={20} /></div>}
+                        icon={<div className="flex h-10 w-10 items-center justify-center rounded-full bg-info-soft text-info"><Layers size={20} /></div>}
                     >
                         {!r || totalTipos === 0 ? <SinDatos /> : (
                             <>
-                                <div className="flex h-3 w-full overflow-hidden rounded-pill bg-page">
+                                <div className="flex h-3 w-full overflow-hidden rounded-control bg-page">
                                     {r.porTipoDetalle.map((t) => (
                                         <div
                                             key={t.tipo}
@@ -273,7 +273,7 @@ export const DashboardPage = () => {
                                     {r.porTipoDetalle.map((t) => (
                                         <li key={t.tipo} className="flex items-center justify-between py-2.5 text-sm">
                                             <div className="flex items-center gap-2">
-                                                <span className={`h-2.5 w-2.5 rounded-pill ${TIPOS_DETALLE[t.tipo]?.color ?? 'bg-ink'}`} />
+                                                <span className={`h-2.5 w-2.5 rounded-full ${TIPOS_DETALLE[t.tipo]?.color ?? 'bg-ink'}`} />
                                                 <span className="text-ink">{TIPOS_DETALLE[t.tipo]?.label ?? `Tipo ${t.tipo}`}</span>
                                                 <span className="text-xs text-muted">× {t.cantidad}</span>
                                             </div>
@@ -298,7 +298,7 @@ export const DashboardPage = () => {
                         <button
                             type="button"
                             onClick={() => navigate('/ordenes')}
-                            className="flex items-center gap-1 rounded-pill px-2 py-1 text-sm font-medium text-primary transition-colors hover:bg-primary-soft"
+                            className="flex items-center gap-1 rounded-full px-2 py-1 text-sm font-medium text-info transition-colors hover:bg-info-soft"
                         >
                             Ver todas <ArrowRight size={16} />
                         </button>

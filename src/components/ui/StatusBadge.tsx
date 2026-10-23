@@ -1,15 +1,15 @@
-// Píldora de estado.
+// Pastilla de estado con fondo sólido.
 // Para cambiar qué color lleva cada estado, edita solo MAPEO_ESTADOS.
 
 export type Tono = "success" | "warning" | "danger" | "info" | "neutral";
 
-// Píldora suave: fondo tenue del estado + texto y punto del color del estado (verde = positivo)
-const estilos: Record<Tono, { pildora: string; punto: string }> = {
-    success: { pildora: "bg-success-soft text-success", punto: "bg-success" },
-    warning: { pildora: "bg-warning-soft text-warning", punto: "bg-warning" },
-    danger: { pildora: "bg-danger-soft text-danger", punto: "bg-danger" },
-    info: { pildora: "bg-primary-soft text-primary", punto: "bg-primary" },
-    neutral: { pildora: "bg-page text-label", punto: "bg-muted" },
+// Pastilla sólida: fondo del color de estado, texto blanco en negrita (verde = positivo)
+const fondos: Record<Tono, string> = {
+    success: "bg-success",
+    warning: "bg-warning",
+    danger: "bg-danger",
+    info: "bg-info",
+    neutral: "bg-muted",
 };
 
 export const MAPEO_ESTADOS = {
@@ -41,8 +41,7 @@ export const MAPEO_ESTADOS = {
 } satisfies Record<string, Record<number, { label: string; tono: Tono }>>;
 
 export const StatusBadge = ({ tono, children }: { tono: Tono; children: React.ReactNode }) => (
-    <span className={`inline-flex h-6 items-center gap-1.5 whitespace-nowrap rounded-badge px-2.5 text-xs font-semibold ${estilos[tono].pildora}`}>
-        <span className={`h-1.5 w-1.5 shrink-0 rounded-pill ${estilos[tono].punto}`} aria-hidden />
+    <span className={`inline-flex h-5 items-center whitespace-nowrap rounded-badge px-2 text-[13px] font-bold leading-5 text-white ${fondos[tono]}`}>
         {children}
     </span>
 );

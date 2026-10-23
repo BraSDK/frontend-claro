@@ -39,7 +39,7 @@ export const ServiciosTable = ({ servicios, isLoading, onEdit, onDelete }: Props
                 <td className="px-6 py-4 font-medium text-ink">{servicio.nombre}</td>
                 <td className="px-6 py-4 font-medium text-ink">{servicio.precio}</td>
                 <td className="px-6 py-4">
-                    <span className="px-3 py-1 text-xs font-medium bg-primary-soft text-primary rounded-pill">
+                    <span className="px-3 py-1 text-xs font-medium bg-info-soft text-info rounded-badge">
                         {servicio.categoria} {/* Ahora imprimimos el texto directamente */}
                     </span>
                 </td>
@@ -48,7 +48,7 @@ export const ServiciosTable = ({ servicios, isLoading, onEdit, onDelete }: Props
                         <button 
                         title="Editar"
                         onClick={() => onEdit(servicio)}
-                        className="p-1.5 text-muted hover:text-primary hover:bg-primary-soft rounded transition-colors"
+                        className="p-1.5 text-muted hover:text-info hover:bg-info-soft rounded transition-colors"
                         >
                         <Pencil size={18} />
                         </button>

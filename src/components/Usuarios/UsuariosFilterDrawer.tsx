@@ -105,14 +105,14 @@ import type { UsuarioFilterState } from '../../types/usuario.types';
           <button
             type="button"
             onClick={handleReset}
-            className="w-1/2 inline-flex h-10 items-center justify-center gap-2 rounded-pill border border-line bg-surface px-5 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-1/2 inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control border border-line-input bg-surface px-3 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
             Limpiar
           </button>
           <button
             type="button"
             onClick={handleApply}
-            className="w-1/2 inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-1/2 inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control bg-primary px-3 text-sm font-bold text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:opacity-50"
           >
             Aplicar Filtros
           </button>

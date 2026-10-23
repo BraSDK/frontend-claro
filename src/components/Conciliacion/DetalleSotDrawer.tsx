@@ -24,7 +24,7 @@ interface Props {
 }
 
 const Fila = ({ etiqueta, children, destacada = false }: { etiqueta: string; children: React.ReactNode; destacada?: boolean }) => (
-    <div className={`flex items-center justify-between px-3 py-2 text-sm ${destacada ? "rounded-control bg-primary-soft font-semibold text-primary" : "text-label"}`}>
+    <div className={`flex items-center justify-between px-3 py-2 text-sm ${destacada ? "rounded-control bg-info-soft font-semibold text-info" : "text-label"}`}>
         <span>{etiqueta}</span>
         <span className={destacada ? "" : "font-medium text-ink"}>{children}</span>
     </div>
@@ -64,7 +64,7 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
         <aside className="fixed bottom-0 right-0 top-0 z-40 flex w-full max-w-[380px] flex-col border-l border-line bg-surface shadow-menu">
             <header className="flex items-center justify-between border-b border-line px-6 py-4">
                 <h2 className="text-base font-semibold text-ink">Detalle de SOT</h2>
-                <button type="button" onClick={onClose} className="rounded-pill p-1.5 text-muted transition-colors hover:bg-page hover:text-ink" title="Cerrar (Esc)">
+                <button type="button" onClick={onClose} className="rounded-full p-1.5 text-muted transition-colors hover:bg-page hover:text-ink" title="Cerrar (Esc)">
                     <X size={18} />
                 </button>
             </header>
@@ -82,7 +82,7 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
                         <span className="col-span-2 flex items-center gap-1.5 truncate" title={fila.tipoServicio}><Wrench size={14} className="shrink-0 text-muted" /> {fila.tipoServicio || "-"}</span>
                         <span className="flex items-center gap-1.5">
                             {fila.cantidadImagenes > 0
-                                ? <><ImageIcon size={14} className="text-primary" /> Con evidencia</>
+                                ? <><ImageIcon size={14} className="text-info" /> Con evidencia</>
                                 : <><ImageOff size={14} className="text-muted" /> Sin evidencia</>}
                         </span>
                     </div>
@@ -91,7 +91,7 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
                 {/* Valorización almacén */}
                 <section>
                     <h3 className="mb-2 text-sm font-semibold text-ink">Valorización almacén</h3>
-                    <div className="rounded-mid border border-line p-1">
+                    <div className="rounded-card border border-line p-1">
                         {LINEAS_VALORIZACION.map((l) => {
                             const monto = montoTipo(l.tipo);
                             return <Fila key={l.tipo} etiqueta={l.label}>{!orden ? "…" : monto > 0 ? formatoSoles(monto) : "-"}</Fila>;
@@ -104,7 +104,7 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
                 {/* Pago (según auditoría) */}
                 <section>
                     <h3 className="mb-2 text-sm font-semibold text-ink">Pago Claro</h3>
-                    <div className="rounded-mid border border-line p-1">
+                    <div className="rounded-card border border-line p-1">
                         <Fila etiqueta="Monto a pagar">{fila.pagado === null ? "—" : formatoSoles(fila.pagado)}</Fila>
                         <Fila etiqueta="Estado de pago">
                             <EstadoPagoChip estado={fila.estadoPago} motivo={fila.motivoNoPago} />
@@ -127,9 +127,9 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
                         {imagenes.length > 0 && <span className="text-xs text-muted">{imagenes.length} {imagenes.length === 1 ? "evidencia" : "evidencias"}</span>}
                     </div>
                     {!orden ? (
-                        <div className="h-20 animate-pulse rounded-mid bg-page" />
+                        <div className="h-20 animate-pulse rounded-card bg-page" />
                     ) : imagenes.length === 0 ? (
-                        <p className="flex items-center gap-2 rounded-mid border border-dashed border-warning/30 bg-warning-soft/50 px-3 py-3 text-xs text-warning">
+                        <p className="flex items-center gap-2 rounded-card border border-dashed border-warning/30 bg-warning-soft/50 px-3 py-3 text-xs text-warning">
                             <ImageOff size={16} /> Falta imagen del técnico para validar
                         </p>
                     ) : (
@@ -139,13 +139,13 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
                                     key={img.archivoId}
                                     src={urlArchivo(img)}
                                     alt={img.nombreArchivo}
-                                    className="h-20 w-20 rounded-mid border border-line object-cover"
+                                    className="h-20 w-20 rounded-card border border-line object-cover"
                                 />
                             ))}
                             <button
                                 type="button"
                                 onClick={() => navigate(`/ordenes/${fila.sot}/editar`)}
-                                className="flex h-20 flex-1 flex-col items-center justify-center rounded-mid text-xs font-medium text-primary transition-colors hover:bg-primary-soft"
+                                className="flex h-20 flex-1 flex-col items-center justify-center rounded-card text-xs font-medium text-info transition-colors hover:bg-info-soft"
                             >
                                 <ChevronRight size={18} /> Ver todas
                             </button>
@@ -154,14 +154,14 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
                 </section>
 
                 {/* Apelación */}
-                <section className="rounded-mid border border-warning/30 bg-warning-soft/40 p-4">
+                <section className="rounded-card border border-warning/30 bg-warning-soft/40 p-4">
                     <div className="flex items-start gap-3">
                         <Megaphone size={18} className="mt-0.5 shrink-0 text-warning" />
                         <div>
                             <div className="flex items-center gap-2">
                                 <p className="text-sm font-semibold text-ink">Marcar para apelación</p>
                                 {fila.marcadaApelacion && (
-                                    <span className="inline-flex items-center gap-1 rounded-pill bg-warning-soft px-2 py-0.5 text-[11px] font-semibold text-warning">
+                                    <span className="inline-flex items-center gap-1 rounded-badge bg-warning-soft px-2 py-0.5 text-[11px] font-semibold text-warning">
                                         <CheckCircle2 size={11} /> Marcada
                                     </span>
                                 )}
@@ -173,10 +173,10 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
                         type="button"
                         onClick={cambiarApelacion}
                         disabled={guardandoApelacion}
-                        className={`mt-3 flex w-full items-center justify-center gap-2 rounded-pill border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60 ${
+                        className={`mt-3 flex w-full items-center justify-center gap-2 rounded-control border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-60 ${
                             fila.marcadaApelacion
                                 ? "border-line bg-surface text-label hover:bg-page"
-                                : "border-primary/40 bg-surface text-primary hover:bg-primary-soft"
+                                : "border-info/40 bg-surface text-info hover:bg-info-soft"
                         }`}
                     >
                         <Megaphone size={15} />
@@ -189,7 +189,7 @@ export const DetalleSotDrawer = ({ fila, onClose, onApelacion }: Props) => {
                 <button
                     type="button"
                     onClick={() => navigate(`/ordenes/${fila.sot}/editar`)}
-                    className="w-full inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="w-full inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control bg-primary px-3 text-sm font-bold text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     <ClipboardCheck size={16} /> Ver orden de trabajo
                 </button>

@@ -15,7 +15,7 @@ export const ProximamentePage = ({ titulo, descripcion, atajo }: Props) => {
         <div className="flex flex-col gap-6">
             <h1 className="text-2xl font-bold text-ink">{titulo}</h1>
             <div className="flex flex-col items-center rounded-card border border-dashed border-line bg-surface px-6 py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-pill bg-primary-soft text-primary">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-info-soft text-info">
                     <Hammer size={26} />
                 </div>
                 <p className="mt-4 text-base font-semibold text-ink">Sección en construcción</p>
@@ -24,7 +24,7 @@ export const ProximamentePage = ({ titulo, descripcion, atajo }: Props) => {
                     <button
                         type="button"
                         onClick={() => navigate(atajo.ruta)}
-                        className="mt-6 inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="mt-6 inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control bg-primary px-3 text-sm font-bold text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {atajo.texto} <ArrowRight size={16} />
                     </button>

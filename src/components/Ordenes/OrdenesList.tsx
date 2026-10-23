@@ -44,7 +44,7 @@ export const OrdenesTable = ({ ordenes, cargando, nombreTecnico, onVerImagenes, 
     return (
         <table className={claseTabla}>
             <thead>
-                <tr className="bg-page">
+                <tr className="bg-surface">
                     <th className={`${claseTh} ${fijaSot} z-30`}>SOT</th>
                     <th className={`${claseTh} min-w-52`}>Técnico</th>
                     <th className={claseTh}>Doc. técnico</th>
@@ -83,7 +83,7 @@ export const OrdenesTable = ({ ordenes, cargando, nombreTecnico, onVerImagenes, 
                                         </span>
                                     </td>
                                     <td className={claseTd}>
-                                        {nombre ?? <span className="text-placeholder">Sin coincidencia</span>}
+                                        {nombre ?? <span className="italic text-placeholder">Sin coincidencia</span>}
                                     </td>
                                     <td className={`${claseTd} px-1`}>
                                         <CeldaEditable
@@ -100,7 +100,7 @@ export const OrdenesTable = ({ ordenes, cargando, nombreTecnico, onVerImagenes, 
                                             valor={orden.trabajoRealizado}
                                             maxLength={MAX_TRABAJO_REALIZADO}
                                             deshabilitada={!puedeEditarCampos}
-                                            mostrar={orden.trabajoRealizado || <span className="text-placeholder">Sin descripción</span>}
+                                            mostrar={orden.trabajoRealizado || <span className="italic text-placeholder">Sin descripción</span>}
                                             onGuardar={(v) => guardar(orden.ordenTrabajoId, { trabajoRealizado: v })}
                                         />
                                     </td>
@@ -125,7 +125,7 @@ export const OrdenesTable = ({ ordenes, cargando, nombreTecnico, onVerImagenes, 
                                                 <Images size={16} strokeWidth={1.75} /> {orden.archivos.length}
                                             </button>
                                         ) : (
-                                            <span className="text-placeholder">Sin imágenes</span>
+                                            <span className="italic text-placeholder">Sin imágenes</span>
                                         )}
                                     </td>
                                     <td className={`${claseTd} ${fijaAcciones} px-1`}>

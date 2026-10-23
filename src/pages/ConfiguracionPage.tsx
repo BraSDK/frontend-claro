@@ -6,7 +6,7 @@ import { iniciales, NOMBRES_ROL } from '../utils/formato';
 
 const claseCampo = "h-11 w-full rounded-control border border-line px-3.5 text-sm text-ink outline-none transition-all";
 const claseLectura = `${claseCampo} bg-page`;
-const claseEditable = `${claseCampo} bg-surface hover:border-line focus:border-primary focus:ring-4 focus:ring-primary/10`;
+const claseEditable = `${claseCampo} bg-surface hover:border-line focus:border-info focus:ring-4 focus:ring-info/10`;
 
 const formatoLargo = (iso?: string) =>
     iso ? new Date(iso).toLocaleDateString('es-PE', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
@@ -106,7 +106,7 @@ export const ConfiguracionPage = () => {
         <div className="flex flex-col gap-6">
             {/* Título */}
             <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-primary-soft text-primary">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-info-soft text-info">
                     <User size={24} />
                 </div>
                 <div>
@@ -118,21 +118,21 @@ export const ConfiguracionPage = () => {
             {error && <p className="rounded-control border border-danger/30 bg-danger-soft px-4 py-2.5 text-sm text-danger">{error}</p>}
 
             {/* Tarjeta principal */}
-            <section className="flex flex-col gap-6 rounded-card border border-primary/40 bg-gradient-to-br from-primary/80 via-primary/50 to-white p-8 md:flex-row md:items-center">
+            <section className="flex flex-col gap-6 rounded-card border border-info/40 bg-gradient-to-br from-primary/80 via-primary/50 to-white p-8 md:flex-row md:items-center">
                 <div className="flex flex-1 items-center gap-6">
-                    <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-pill bg-brand text-3xl font-semibold text-on-primary">
+                    <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-2 border-surface bg-avatar text-3xl font-semibold text-avatar-ink">
                         {cargando && !perfil ? '' : iniciales(perfil?.nombreCompleto || perfil?.email)}
                     </div>
                     <div className="min-w-0">
                         <h2 className="truncate text-xl font-bold text-ink">{perfil?.nombreCompleto || (cargando ? 'Cargando...' : 'Sin nombre')}</h2>
                         <p className="truncate text-sm text-label">{perfil?.email}</p>
-                        <span className="mt-2 inline-flex items-center rounded-pill bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success">
+                        <span className="mt-2 inline-flex items-center rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success">
                             Activo
                         </span>
                     </div>
                 </div>
 
-                <div className="hidden h-24 w-px bg-primary-soft md:block" />
+                <div className="hidden h-24 w-px bg-info-soft md:block" />
 
                 <div className="flex flex-col gap-4 md:w-64">
                     <Dato icono={<ShieldCheck size={18} />} etiqueta="Rol" valor={rol} />
@@ -150,7 +150,7 @@ export const ConfiguracionPage = () => {
                         type="button"
                         onClick={() => { setEditando(true); setMensajePerfil(null); }}
                         disabled={!perfil}
-                        className="flex items-center gap-2 rounded-control border border-primary/40 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary-soft disabled:opacity-50"
+                        className="flex items-center gap-2 rounded-control border border-info/40 px-4 py-2 text-sm font-medium text-info transition-colors hover:bg-info-soft disabled:opacity-50"
                     >
                         <Pencil size={16} /> Editar
                     </button>
@@ -201,14 +201,14 @@ export const ConfiguracionPage = () => {
                                 type="button"
                                 onClick={cancelarEdicion}
                                 disabled={guardando}
-                                className="flex items-center gap-2 rounded-pill border border-line bg-surface px-4 py-2.5 text-sm font-medium text-label transition-colors hover:bg-page"
+                                className="flex items-center gap-2 rounded-control border border-line bg-surface px-4 py-2.5 text-sm font-medium text-label transition-colors hover:bg-page"
                             >
                                 <X size={16} /> Cancelar
                             </button>
                             <button
                                 type="submit"
                                 disabled={guardando}
-                                className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control bg-primary px-3 text-sm font-bold text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:opacity-50"
                             >
                                 <Save size={16} /> {guardando ? 'Guardando...' : 'Guardar cambios'}
                             </button>
@@ -257,7 +257,7 @@ export const ConfiguracionPage = () => {
                         <button
                             type="submit"
                             disabled={cambiandoPass}
-                            className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-primary-soft px-5 text-sm font-semibold text-primary transition-colors hover:bg-primary-soft/70 disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control border border-line-input bg-surface px-3 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <KeyRound size={16} /> {cambiandoPass ? 'Cambiando...' : 'Cambiar contraseña'}
                         </button>

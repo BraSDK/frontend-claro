@@ -90,7 +90,7 @@ export const UsuariosPage = () => {
           <button
             type="button"
             onClick={openFilter}
-            className="bg-page hover:bg-line text-ink px-4 py-2.5 rounded-pill text-sm font-medium transition-colors flex items-center gap-2 border border-line"
+            className="bg-page hover:bg-line text-ink px-4 py-2.5 rounded-control text-sm font-medium transition-colors flex items-center gap-2 border border-line"
           >
             <Filter size={16} />
             Filtros
@@ -101,7 +101,7 @@ export const UsuariosPage = () => {
             <button
               type="button"
               onClick={openForCreate}
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control bg-primary px-3 text-sm font-bold text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:opacity-50"
             >
               <UserPlus size={16} />
               Nuevo Usuario

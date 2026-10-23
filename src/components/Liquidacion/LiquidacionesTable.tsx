@@ -63,14 +63,14 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
                                 {row.precioTotalEditable ? `S/ ${row.precioTotalEditable.toFixed(2)}` : '-'}
                             </td>
                             <td className={claseTd}>
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-soft text-primary">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-info-soft text-info">
                                     {row.estadoSistema}
                                 </span>
                             </td>
                             <td className={claseTd}>
                                 <div className="flex items-center justify-center gap-2">
                                     <button 
-                                        className="text-label hover:text-primary transition-colors"
+                                        className="text-label hover:text-info transition-colors"
                                         title="Editar liquidación"
                                         onClick={() => onEdit && onEdit(row)}
                                     >

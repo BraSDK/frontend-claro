@@ -127,7 +127,7 @@ export const UsuarioForm = ({
           value={formData.nombreCompleto}
           onChange={handleChange}
           placeholder="Ej. Juan Pérez"
-          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-info focus:border-transparent"
         />
       </div>
 
@@ -144,7 +144,7 @@ export const UsuarioForm = ({
           value={formData.documentoIdentidad}
           onChange={handleChange}
           placeholder="DNI o Cédula"
-          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-info focus:border-transparent"
         />
       </div>
 
@@ -161,7 +161,7 @@ export const UsuarioForm = ({
           value={formData.email}
           onChange={handleChange}
           placeholder="usuario@claro.com"
-          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-info focus:border-transparent"
         />
       </div>
 
@@ -179,7 +179,7 @@ export const UsuarioForm = ({
             value={formData.password}
             onChange={handleChange}
             placeholder="••••••••"
-            className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-info focus:border-transparent"
           />
         </div>
       )}
@@ -195,7 +195,7 @@ export const UsuarioForm = ({
           disabled={!canChangeRole}
           value={formData.rol}
           onChange={handleChange}
-          className={`w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent ${
+          className={`w-full px-3.5 py-2 border border-line rounded-control text-sm focus:outline-none focus:ring-2 focus:ring-info focus:border-transparent ${
             !canChangeRole ? 'bg-page text-label cursor-not-allowed' : 'bg-surface'
           }`}
         >
@@ -218,14 +218,14 @@ export const UsuarioForm = ({
           type="button"
           onClick={onCancel}
           disabled={isSubmitting}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-pill border border-line bg-surface px-5 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control border border-line-input bg-surface px-3 text-sm font-medium text-ink transition-colors hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-pill bg-brand px-5 text-sm font-semibold text-on-primary transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-[30px] items-center justify-center gap-1.5 rounded-control bg-primary px-3 text-sm font-bold text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? 'Guardando...' : isEditing ? 'Guardar Cambios' : 'Registrar Usuario'}
         </button>

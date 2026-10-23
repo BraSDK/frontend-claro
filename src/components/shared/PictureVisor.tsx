@@ -11,18 +11,18 @@ export const PictureVisor = ({ imgs, inicial = 0 }: { imgs: ArchivoOrden[]; inic
         return (
             <div className="flex flex-col items-center gap-2 py-10 text-label">
                 <ImageOff size={32} strokeWidth={1.5} />
-                <p>Sin imágenes</p>
+                <p className="italic">Sin imágenes</p>
             </div>
         );
     }
 
     const actual = imgs[Math.min(activa, imgs.length - 1)];
     const mover = (paso: number) => setActiva((i) => (i + paso + imgs.length) % imgs.length);
-    const claseFlecha = "absolute top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-pill bg-surface/90 text-ink transition-colors hover:bg-surface";
+    const claseFlecha = "absolute top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-surface/90 text-ink transition-colors hover:bg-surface";
 
     return (
         <div>
-            <figure className="relative flex h-80 w-full items-center justify-center overflow-hidden rounded-image bg-page">
+            <figure className="relative flex h-80 w-full items-center justify-center overflow-hidden rounded-control bg-page">
                 <img src={urlArchivo(actual)} alt={actual.nombreArchivo} className="max-h-full max-w-full object-contain" />
                 {imgs.length > 1 && (
                     <>
@@ -34,7 +34,7 @@ export const PictureVisor = ({ imgs, inicial = 0 }: { imgs: ArchivoOrden[]; inic
                         </button>
                     </>
                 )}
-                <figcaption className="absolute bottom-2 right-3 rounded-pill bg-ink/70 px-2.5 text-xs font-semibold text-white">
+                <figcaption className="absolute bottom-2 right-3 rounded-badge bg-ink/70 px-2.5 text-xs font-semibold text-white">
                     {activa + 1} / {imgs.length}
                 </figcaption>
             </figure>
@@ -46,7 +46,7 @@ export const PictureVisor = ({ imgs, inicial = 0 }: { imgs: ArchivoOrden[]; inic
                         type="button"
                         onClick={() => setActiva(i)}
                         title={img.nombreArchivo}
-                        className={`h-16 w-16 overflow-hidden rounded-image border-2 transition ${i === activa ? "border-primary" : "border-transparent opacity-60 hover:opacity-100"}`}
+                        className={`h-16 w-16 overflow-hidden rounded-control border-2 transition ${i === activa ? "border-info" : "border-transparent opacity-60 hover:opacity-100"}`}
                     >
                         <img src={urlArchivo(img)} alt={img.nombreArchivo} className="h-full w-full object-cover" />
                     </button>

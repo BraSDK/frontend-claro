@@ -63,7 +63,7 @@ export const CeldaEditable = ({ tipo, valor, opciones = [], mostrar, alinear = "
         if (e.key === "Escape") { cancelado.current = true; setBorrador(valor); campoRef.current?.blur(); }
     };
 
-    const claseCampo = `h-8 w-full rounded-control border border-transparent bg-surface px-2 text-sm text-ink outline-none ring-2 ring-primary ${alinear === "derecha" ? "text-right" : alinear === "centro" ? "text-center" : ""}`;
+    const claseCampo = `h-[30px] w-full rounded-control border-2 border-ink bg-surface px-2 text-sm text-ink outline-none ${alinear === "derecha" ? "text-right" : alinear === "centro" ? "text-center" : ""}`;
 
     if (editando) {
         return tipo === "select" ? (
@@ -101,9 +101,9 @@ export const CeldaEditable = ({ tipo, valor, opciones = [], mostrar, alinear = "
             onClick={empezar}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === "F2") { e.preventDefault(); empezar(); } }}
             title={error ?? (deshabilitada ? undefined : "Click para editar")}
-            className={`flex min-h-8 items-center gap-1.5 rounded-control px-2 py-0.5 transition-colors ${
+            className={`flex min-h-[30px] items-center gap-1.5 rounded-control px-2 py-0.5 transition-colors ${
                 alinear === "derecha" ? "justify-end" : alinear === "centro" ? "justify-center" : ""
-            } ${deshabilitada ? "" : "cursor-text hover:bg-page focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary"} ${
+            } ${deshabilitada ? "" : "cursor-text hover:ring-1 hover:ring-inset hover:ring-line-input focus:outline-none focus:ring-2 focus:ring-inset focus:ring-ink"} ${
                 error ? "ring-1 ring-inset ring-danger bg-danger-soft" : ""
             }`}
         >

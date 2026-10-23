@@ -96,7 +96,7 @@ export const LiquidacionPage: React.FC = () => {
                     title="Liquidaciones en vista"
                     icon={ClipboardList}
                     value={metricas.totalLiquidaciones}
-                    iconClassName="bg-primary-soft text-primary"
+                    iconClassName="bg-info-soft text-info"
                 />
                 <StatCard
                     title="Monto Editable (Pág. actual)"

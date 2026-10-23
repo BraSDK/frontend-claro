@@ -7,7 +7,7 @@ const PILL: Record<Tono, { pill: string; punto: string }> = {
     success: { pill: "bg-success-soft text-success", punto: "bg-success" },
     warning: { pill: "bg-warning-soft text-warning", punto: "bg-warning" },
     danger: { pill: "bg-danger-soft text-danger", punto: "bg-danger" },
-    info: { pill: "bg-primary-soft text-primary", punto: "bg-primary" },
+    info: { pill: "bg-info-soft text-info", punto: "bg-info" },
     neutral: { pill: "bg-page text-label", punto: "bg-muted" },
 };
 
