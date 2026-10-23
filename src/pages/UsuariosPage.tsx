@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Filter, UserPlus } from 'lucide-react';
-import { useModal } from '../hooks/useModal';
-import { Modal } from '../components/shared/Modal';
+// import { useModal } from '../hooks/useModal';
+// import { Modal } from '../components/shared/Modal';
+// import { UsuarioForm } from '../components/Usuarios/UsuarioForm';
 
 import { useUsuarios } from '../hooks/usuario/useUsuarios';
 import { useUsuariosFilter } from '../hooks/usuario/useUsuariosFilter';
 import { UsuariosTable } from '../components/Usuarios/UsuariosTable';
-import { UsuarioForm } from '../components/Usuarios/UsuarioForm';
 import { UsuariosFilterDrawer } from '../components/Usuarios/UsuariosFilterDrawer';
 
 import type { Usuario, RegisterRequestDto, EditRequestDto } from '../types/usuario.types';
@@ -23,14 +23,6 @@ export const UsuariosPage = () => {
   } = useUsuarios();
 
   const {
-    isOpen,
-    itemToEdit,
-    openForCreate,
-    openForEdit,
-    closeModal,
-  } = useModal<Usuario>();
-
-  const {
     isFilterOpen,
     usuariosFiltrados,
     openFilter,
@@ -39,7 +31,6 @@ export const UsuariosPage = () => {
     resetFilters,
   } = useUsuariosFilter(usuarios);
 
-  // Rol del usuario en sesión extraído de claims/token o storage
   const [rolLogueado, setRolLogueado] = useState<string | null>(null);
 
   useEffect(() => {
@@ -47,25 +38,44 @@ export const UsuariosPage = () => {
     setRolLogueado(rolActual);
   }, []);
 
-  const handleGuardarUsuario = async (datosFormulario: RegisterRequestDto | EditRequestDto) => {
+  // Lógica para guardar desde la grilla RevoGrid (Bulk Save)
+  const handleSaveMasivo = async (datosValidos: Partial<Usuario>[]) => {
     try {
-      if (itemToEdit) {
-        await editUsuario({
-          ...datosFormulario,
-          id: itemToEdit.id,
-        });
-      } else {
-        await addUsuario(datosFormulario as RegisterRequestDto);
-      }
-      closeModal();
+      const promesas = datosValidos.map((fila) => {
+        if (fila.id) {
+          return editUsuario({
+            id: fila.id,
+            nombreCompleto: fila.nombreCompleto!,
+            documentoIdentidad: fila.documentoIdentidad!,
+            email: fila.email!,
+            rol: fila.rol!
+          } as EditRequestDto);
+        } else {
+          return addUsuario({
+            nombreCompleto: fila.nombreCompleto!,
+            documentoIdentidad: fila.documentoIdentidad!,
+            email: fila.email!,
+            rol: fila.rol!,
+            password: 'User123!' 
+          } as RegisterRequestDto);
+        }
+      });
+
+      await Promise.all(promesas);
+      alert("¡Cambios guardados correctamente!");
+      
+      // ¡CRÍTICO! Llama a la función que actualiza tu lista de usuarios desde el backend
+      // Si tu hook useUsuarios no tiene un refetch, debes agregarlo.
+      // fetchUsuarios(); 
+      
     } catch (err) {
-      console.error('Fallo al guardar el usuario:', err);
+      console.error('Fallo al guardar los usuarios masivamente:', err);
+      alert("Ocurrió un error al guardar. Revisa la consola.");
     }
   };
 
   const handleEliminarUsuario = async (id: number) => {
     const confirmar = window.confirm('¿Estás seguro de que deseas eliminar este usuario?');
-
     if (confirmar) {
       try {
         await removeUsuario(id);
@@ -96,7 +106,7 @@ export const UsuariosPage = () => {
             Filtros
           </button>
 
-          {/* Botón Nuevo Usuario (Exclusivo para ADMIN según autorización) */}
+          {/* Botón Nuevo Usuario (Exclusivo para ADMIN según autorización) 
           {rolLogueado === Rol.ADMIN && (
             <button
               type="button"
@@ -107,6 +117,7 @@ export const UsuariosPage = () => {
               Nuevo Usuario
             </button>
           )}
+          */}
         </div>
       </div>
 
@@ -122,7 +133,7 @@ export const UsuariosPage = () => {
         <UsuariosTable
           usuarios={usuariosFiltrados}
           isLoading={isLoading}
-          onEdit={openForEdit}
+          onSaveMasivo={handleSaveMasivo}
           onDelete={handleEliminarUsuario}
           rolLogueado={rolLogueado}
         />
@@ -139,7 +150,7 @@ export const UsuariosPage = () => {
       )}
 
       {/* Modal Reutilizable para Registro y Edición */}
-      <Modal
+      {/*<Modal
         isOpen={isOpen}
         onClose={closeModal}
         title={itemToEdit ? 'Editar Usuario' : 'Registrar Nuevo Usuario'}
@@ -153,6 +164,7 @@ export const UsuariosPage = () => {
           />
         )}
       </Modal>
+      */}
     </div>
   );
 };
