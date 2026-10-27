@@ -23,11 +23,16 @@ export const getUsuariosColumns = (
     prop: 'rol', 
     name: 'Rol', 
     size: 150,
-    columnType: 'select', // Convierte la celda en un Dropdown al editar
-    source: [Rol.ADMIN, Rol.TECNICO, Rol.ALMACEN], // Las opciones disponibles
+    columnType: 'select',
+    source: [Rol.ADMIN, Rol.TECNICO, Rol.ALMACEN],
     cellTemplate: (h: any, props: any) => {
-      const rol = props.model[props.prop] as Rol | undefined;
-      if (!rol) return ''; 
+      let rol = props.model[props.prop];
+      if (rol === undefined || rol === null || rol === '') return ''; 
+
+      // Si por alguna razón la celda recibe el entero de C#, lo traducimos al texto
+      if (rol === 0 || rol === '0') rol = Rol.ADMIN;
+      if (rol === 1 || rol === '1') rol = Rol.TECNICO;
+      if (rol === 2 || rol === '2') rol = Rol.ALMACEN;
 
       let bgClass = 'bg-gray-100 text-gray-700';
       if (rol === Rol.ADMIN) bgClass = 'bg-purple-100 text-purple-700';
@@ -47,8 +52,6 @@ export const getUsuariosColumns = (
     readonly: true,
     cellTemplate: (h: any, props: any) => {
       const usuario = props.model as Partial<Usuario>;
-      
-      // Si la fila no tiene ID (es una de las 200 filas vacías de relleno), no mostramos botón de eliminar
       if (!usuario.id) return '';
 
       const botones = [];

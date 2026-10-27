@@ -8,7 +8,7 @@ import type {
 
 export const getLiquidaciones = async ( params?: ListParamsLiquidacionesDto): Promise<ListarRequestLiquidacionesDto[]> => {
     const response = await api.get('/Liquidacion/Listar', {params});
-    return response.data.datos ?? response.data
+    return response.data.listaGenerica ?? response.data.datos ?? response.data;
 };
 
 export const postLiquidacion = async ( nuevaLiquidacion: CrearLiquidacionRequest): Promise<any> => {
