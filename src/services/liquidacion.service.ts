@@ -21,7 +21,7 @@ export const updateLiquidacion = async ( id: number, datosActualizados: EditarLi
     return response.data;
 };
 
-export const deleteLiquidacion =async (id: number): Promise<any> => {
-    const response = await api.delete(`/Liquidacion/${id}/delete`);
+export const deleteLiquidacion =async (sot: number): Promise<any> => {
+    const response = await api.delete(`/Liquidacion/${sot}/delete`);
     return response.data;
 }

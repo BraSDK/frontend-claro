@@ -10,7 +10,7 @@ import { mapGridToCrearDto, mapGridToEditarDto } from '../utils/liquidacion.mapp
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../types/liquidacion.types';
 
 export const LiquidacionPage: React.FC = () => {
-    const { data, loading, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
+    const { data, loading, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, fetchLiquidaciones, eliminarLiquidacion } = useLiquidaciones();
     
     const [drawerAbierto, setDrawerAbierto] = useState(false);
     const [importarAbierto, setImportarAbierto] = useState(false);
@@ -70,7 +70,7 @@ export const LiquidacionPage: React.FC = () => {
     const handleDelete = async (sot: number) => {
         if (window.confirm(`¿Seguro que deseas eliminar la liquidación SOT: ${sot}?`)) {
             console.log("Eliminando SOT:", sot);
-            // Llamar a la API: await deleteLiquidacion(sot)
+            await eliminarLiquidacion(sot)
         }
     };
 

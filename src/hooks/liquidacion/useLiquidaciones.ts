@@ -71,11 +71,11 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
         }
     }
 
-    const eliminarLiquidacion = async (id: number) => {
+    const eliminarLiquidacion = async (sot: number) => {
         setLoading(true);
         setError(null);
         try{
-            await deleteLiquidacion(id);
+            await deleteLiquidacion(sot);
             await fetchLiquidaciones();  
         }catch(err: any){
             const msg = err.response?.data?.error || err.response?.data?.mensaje || "Error al eliminar la liquidación";
