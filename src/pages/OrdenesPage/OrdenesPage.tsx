@@ -15,6 +15,7 @@ import type { OrdenTrabajo } from '../../types/Ordenes';
 const TAMANO_PAGINA = 15;
 
 export const OrdenesPage = () => {
+
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const { puedeCrear } = usePermisosOrden();
@@ -47,6 +48,7 @@ export const OrdenesPage = () => {
         desde: aplicados.desde || undefined,
         hasta: aplicados.hasta || undefined,
     });
+
 
     const buscar = () => {
         setAplicados({ buscar: sot, desde, hasta });
