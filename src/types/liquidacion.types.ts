@@ -6,7 +6,7 @@ export interface CrearDetalleRequest {
 }
 
 export interface EditarDetalleRequest {
-    detalleLiquidacionId: number;
+    detalleId: number;            // así se llama en el back (EditarDetalleRequest.DetalleId)
     concepto?: string;
     precioUnitario?: number;
     cantidad?: number;
@@ -22,9 +22,12 @@ export interface DetalleResponseDto {
     tipo: number | string;
   }
   
+  // Igual que CrearObservacionDto del back
   export interface CrearObservacionDto {
-    observacion: string;
+    textoObservacion?: string;
+    tipo: number;                 // TipoObservacion: FOTOS = 0, SI_PAGO = 1, NO_PAGO = 2
     motivoObservacionId?: number;
+    usuarioId: number;
   }
   
   export interface EditarObservacionDto {
@@ -86,6 +89,7 @@ export interface DetalleResponseDto {
   // 4. RESPUESTAS (Responses)
   // ==========================================
   export interface ListarRequestLiquidacionesDto {
+    liquidacionId: number;
     sot: number;
     tipoOrden?: string;
     nombreSubTipoOrden: string;
@@ -94,6 +98,7 @@ export interface DetalleResponseDto {
     estadoSistema: number | string;
     detallesLiquidacion: DetalleResponseDto[];
     precioTotalEditable?: number;
+  
   }
   
   // Si devuelves paginación estándar, este es el Wrapper
@@ -106,6 +111,7 @@ export interface DetalleResponseDto {
   }
 
   export type FilaLiquidacionGrid = {
+    liquidacionId?: number;
     sot?: number;
     tecnico?: string;
     tipoOrden?: string;
@@ -121,5 +127,7 @@ export interface DetalleResponseDto {
     obsNoPago?: string;
     obsSiPago?: string;
     total?: number;
-    esRegistroExistente?: boolean; 
+    estadoSistema?: number | string;   // se conserva al editar
+    detallesIds?: Record<string, number>;   // concepto → detalleLiquidacionId (para editar/eliminar sin duplicar)
+    esRegistroExistente?: boolean;
   };

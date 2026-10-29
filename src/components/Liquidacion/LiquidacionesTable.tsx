@@ -1,54 +1,57 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo,useRef } from 'react';
 import { RevoGrid } from '@revolist/react-datagrid';
 import { temaClaro } from '@/theme/revogrid-theme';
 import { DataTable } from '@/components/shared/Tabla';
-import { RotateCcw } from 'lucide-react';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../../types/liquidacion.types';
 import { getLiquidacionesColumns } from './liquidacionesColumns';
 
 const MAX_FILAS_EXCEL = 200;
-const DRAFT_STORAGE_KEY = 'liquidaciones_grid_draft_auto_v1';
 
-// Actualizamos Props para incluir onAutoSave
 interface LiquidacionesTableProps {
   liquidaciones: ListarRequestLiquidacionesDto[];
   isLoading: boolean;
-  onAutoSave: (filaEditada: Partial<FilaLiquidacionGrid>) => Promise<void>;
+  onAutoSave: (filas: Partial<FilaLiquidacionGrid>[]) => Promise<void>;   // 1 fila (edición) o varias (pegado/autollenado)
   onDelete?: (sot: number) => void;
-  onRefresh: () => Promise<void>;
   accionesExtras?: React.ReactNode;
   pie?: React.ReactNode;
 }
 
-export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({ 
-  liquidaciones, 
-  isLoading, 
-  onAutoSave, 
+// Fila nueva que el usuario ya empezó a llenar (todavía no está en el servidor)
+const esFilaPendiente = (f: Partial<FilaLiquidacionGrid>) =>
+  !f.esRegistroExistente && Object.values(f).some((v) => v !== undefined && v !== null && v !== '');
+
+export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
+  liquidaciones,
+  isLoading,
+  onAutoSave,
   onDelete,
-  onRefresh,
   accionesExtras,
   pie
 }) => {
   const [gridData, setGridData] = useState<Partial<FilaLiquidacionGrid>[]>([]);
-  const [hayBorrador, setHayBorrador] = useState(false);
+  const gridRef = useRef<HTMLRevoGridElement>(null); // traemos todos los metodos de revogrid
 
   // Función traductora: APLANA el JSON anidado del backend hacia columnas planas
   const aplanarDatos = (datosServidor: ListarRequestLiquidacionesDto[]): FilaLiquidacionGrid[] => {
     return datosServidor.map(liq => {
       const filaPlana: FilaLiquidacionGrid = {
+        liquidacionId: liq.liquidacionId,
         sot: liq.sot,
         tecnico: liq.nombreTecnico,
         tipoOrden: liq.tipoOrden,
         fechaProgramacion: liq.fechaProgramacion,
         subTipoOrden: liq.nombreSubTipoOrden,
         total: liq.precioTotalEditable,
-        esRegistroExistente: true // Crítico para que el AutoSave sepa que debe hacer PUT
+        estadoSistema: liq.estadoSistema,   // para no pisar el estado al editar
+        esRegistroExistente: true, // Crítico para que el AutoSave sepa que debe hacer PUT
+        detallesIds: {},
       };
 
       // Desempaquetar arreglo de detalles a columnas sueltas
       if (liq.detallesLiquidacion && liq.detallesLiquidacion.length > 0) {
         liq.detallesLiquidacion.forEach((detalle: any) => {
           const concepto = detalle.concepto?.toUpperCase();
+          if (concepto) filaPlana.detallesIds![concepto] = detalle.detalleLiquidacionId;   // para que editar no duplique
           if (concepto === 'COSTO DE SERVICIO') filaPlana.costoServicio = detalle.precioTotal;
           if (concepto === 'DECO') filaPlana.deco = detalle.cantidad;
           if (concepto === 'REPETIDOR') filaPlana.repetidor = detalle.cantidad;
@@ -58,66 +61,34 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
         });
       }
 
-      // Si tu backend enviara observaciones en el GET, se desempaquetarían aquí
-      // liq.observaciones?.forEach(...)
-
       return filaPlana;
     });
   };
 
-  const restablecerDesdeServidor = (datosServidor: ListarRequestLiquidacionesDto[]) => {
-    const datosAplanados = aplanarDatos(datosServidor);
-    const filasVaciasNecesarias = Math.max(0, MAX_FILAS_EXCEL - datosServidor.length);
-    const arrayVacio: Partial<FilaLiquidacionGrid>[] = Array.from({ length: filasVaciasNecesarias }).map(() => ({}));
-
-    setGridData([...datosAplanados, ...arrayVacio]);
-    setHayBorrador(false);
-    localStorage.removeItem(DRAFT_STORAGE_KEY);
-  };
-
+  // Al llegar datos del servidor: servidor + filas nuevas a medio llenar (sin SOT o que aún no se guardaron) + relleno.
+  // Así, guardar una fila no borra lo que se estaba escribiendo en otra.
   useEffect(() => {
     if (isLoading) return;
+    const servidor = aplanarDatos(liquidaciones);
+    const sotsServidor = new Set(servidor.map((f) => f.sot));
 
-    const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
-    if (savedDraft) {
-      try {
-        const parsedDraft = JSON.parse(savedDraft) as Partial<ListarRequestLiquidacionesDto>[];
-        if (Array.isArray(parsedDraft) && parsedDraft.length > 0) {
-          setGridData(parsedDraft);
-          setHayBorrador(true);
-          return;
-        }
-      } catch (e) {
-        console.error("Error al recuperar borrador local:", e);
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
-      }
-    }
-
-    restablecerDesdeServidor(liquidaciones);
+    setGridData((prev) => {
+      const pendientes = prev.filter((f) => esFilaPendiente(f) && !sotsServidor.has(Number(f.sot)));
+      const relleno = Math.max(0, MAX_FILAS_EXCEL - servidor.length - pendientes.length);
+      return [...servidor, ...pendientes, ...Array.from({ length: relleno }, () => ({}))];
+    });
   }, [liquidaciones, isLoading]);
 
   const columns = useMemo(() => getLiquidacionesColumns(onDelete), [onDelete]);
 
+  // Edición simple → detail.model (1 fila) | Pegado o autollenado → detail.models + detail.data (varias filas)
   const handleAfterEdit = async (e: CustomEvent) => {
-    // 1. Guardar en memoria local al instante
-    setHayBorrador(true);
-    localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(gridData));
-    
-    // 2. Ejecutar el autoguardado hacia la API
-    const filaEditada = e.detail.model as Partial<FilaLiquidacionGrid>;
-    await onAutoSave(filaEditada);
+    const d = e.detail;
+    const filas: Partial<FilaLiquidacionGrid>[] = d.models
+      ? Object.keys(d.models).map((i) => ({ ...d.models[i], ...d.data?.[i] }))   // fila completa + valores pegados
+      : [d.model];
 
-    // Refrescar la lista desde el backend
-    if (onRefresh) {
-      await onRefresh();
-    }
-  };
-
-  const descartarBorrador = () => {
-    const confirmar = window.confirm('¿Deseas limpiar la memoria local y recargar los datos originales?');
-    if (confirmar) {
-      restablecerDesdeServidor(liquidaciones);
-    }
+    await onAutoSave(filas.filter(Boolean));
   };
 
   return (
@@ -125,21 +96,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
       titulo="Control de Liquidaciones"
       cantidad={liquidaciones.length}
       pie={pie}
-      acciones={
-        <div className="flex items-center gap-2">
-          {hayBorrador && (
-            <button
-              type="button"
-              onClick={descartarBorrador}
-              className="inline-flex h-[32px] items-center gap-1.5 rounded-md px-3 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
-              title="Descartar ediciones incompletas en memoria"
-            >
-              <RotateCcw size={14} /> Descartar borrador local
-            </button>
-          )}
-          {accionesExtras} 
-        </div>
-      }
+      acciones={<div className="flex items-center gap-2">{accionesExtras}</div>}
     >
       <div className="relative w-full overflow-x-auto border border-gray-200 rounded-md">
         <div className="min-w-[850px] w-full" style={{ height: 'calc(100vh - 300px)', minHeight: '400px', maxHeight: '600px' }}>
@@ -150,12 +107,15 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
           )}
 
           <RevoGrid
+            range = {true}
+            ref = {gridRef}
             columns={columns}
             source={gridData}
             theme={temaClaro.name}
             rowSize={45}
             onAfteredit={handleAfterEdit}
             resize={true}
+            useClipboard={true}
           />
         </div>
       </div>

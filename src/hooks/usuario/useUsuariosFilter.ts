@@ -30,7 +30,7 @@ export const useUsuariosFilter = (usuarios: Usuario[] = []) => {
       const nombre = (usuario?.nombreCompleto ?? '').toLowerCase();
       const documento = (usuario?.documentoIdentidad ?? '').toLowerCase();
       const email = (usuario?.email ?? '').toLowerCase();
-
+      
       const coincideNombreODocumento =
         !query ||
         nombre.includes(query) ||

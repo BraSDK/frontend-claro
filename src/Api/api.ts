@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 // 1. Creamos la instancia con la URL base de tu entorno
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -28,10 +27,9 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Aquí podrías forzar el cierre de sesión o redirigir al Login
       console.error("Token expirado o inválido");
-      // localStorage.removeItem('jwt_token');
-      // window.location.href = '/login';
+      localStorage.removeItem('jwt_token');
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

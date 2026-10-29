@@ -34,25 +34,29 @@ const celdaArchivo = ({ model, onVer }:ColumnDataSchemaModel & { onVer?: (o: Ord
     );  
 }
 
-export const OrdenesTable = ({ ordenes, cargando, nombreTecnico, onVerImagenes, onEliminar }: Props) => {
-
-    const filas = ordenes.map(o => ({ ...o, cantArchivos: o.archivos?.length ?? 0,estado: MAPEO_ESTADOS.campo[o.estadoCampo]?.label }))
+export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes }: Props) => {   // nombreTecnico = nombreDe de useTecnicos (lo pasa OrdenesPage)
+    const filas = ordenes.map(o => ({
+        ...o,
+        cantArchivos: o.archivos?.length ?? 0,
+        estado: MAPEO_ESTADOS.campo[o.estadoCampo]?.label,
+        tecnico: nombreTecnico?.(o.docTecnico) ?? o.docTecnico,   // NUEVO: nombre del técnico cruzando docTecnico ↔ documentoIdentidad; si no lo encuentra, muestra el documento
+    }));
     const filasOrdenadas = [...filas].sort( (a,b) => a.ordenTrabajoId - b.ordenTrabajoId);
     const columnas : ColumnRegular[] = [
         //prop => propiedad de la columna, name => nombre de la columna,size: tamaño de la columna.
         { prop: 'ordenTrabajoId', name: 'Orden_ID', size: 120, readonly:true },
         { prop: 'sot', name: 'SOT', size: 120 },
         { prop: 'docTecnico', name: 'Doc. técnico', size: 140},
+        { prop: 'tecnico', name: 'Técnico', size: 240, readonly: true },   // NUEVO: lee el campo 'tecnico' armado en filas; readonly porque es un dato calculado, no editable
         { prop: 'trabajoRealizado', name: 'Trabajo realizado', size: 320 },
         { prop: 'estadoCampo', name: 'Estado Campo', size: 140,readonly:true, cellTemplate: (h,props) => h('span',{class:'inline-flex h-5 items-center whitespace-nowrap rounded-badge px-2 text-[13px] font-bold leading-5 text-white bg-success'},props.model.estado)},
         { prop: 'cantArchivos', name: 'Archivos', size: 140 , cellTemplate: Template(((props: any) => celdaArchivo({ ...props, onVer: onVerImagenes })) as any) },
-        { prop: 'usuarioId', name: 'Usuario Creador', size: 240},
     ];
 
    
     return (
         <div style={{ height: 320 }}>
-            <RevoGrid source={filasOrdenadas} columns={columnas} />
+            <RevoGrid source={filasOrdenadas} columns={columnas} stretch={true} />
         </div>
     );
 };

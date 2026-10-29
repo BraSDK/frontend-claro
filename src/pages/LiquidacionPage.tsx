@@ -10,7 +10,7 @@ import { mapGridToCrearDto, mapGridToEditarDto } from '../utils/liquidacion.mapp
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../types/liquidacion.types';
 
 export const LiquidacionPage: React.FC = () => {
-    const { data, loading, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
+    const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
     
     const [drawerAbierto, setDrawerAbierto] = useState(false);
     const [importarAbierto, setImportarAbierto] = useState(false);
@@ -43,34 +43,32 @@ export const LiquidacionPage: React.FC = () => {
         validadas: data.filter(d => d.estadoSistema === 'Validada' || d.estadoSistema === 2).length,
     }), [data, totalRecords]);
 
-    // Función para autoguardado desde RevoGrid
-    const handleAutoSave = async (filaPlana: Partial<FilaLiquidacionGrid>) => {
-        console.log('🔵 handleAutoSave - fila recibida:', filaPlana);
+    // Autoguardado desde RevoGrid: recibe 1 fila (edición simple) o varias (pegado / autollenado).
+    // Solo se guardan las filas con SOT; existentes → PUT por SOT, nuevas → POST. Se recarga una sola vez al final.
+    const handleAutoSave = async (filas: Partial<FilaLiquidacionGrid>[]) => {
+        const conSot = filas.filter((f) => Number(f.sot) > 0);
+        if (conSot.length === 0) return;
 
-        if (!filaPlana.sot || !filaPlana.tecnico || !filaPlana.fechaProgramacion) {
-            console.log('⏳ Fila incompleta, esperando más datos...');
-            return;
-          }
-          
-        try {
-            if (filaPlana.esRegistroExistente && filaPlana.sot) {
-              await editarLiquidacion(filaPlana.sot, mapGridToEditarDto(filaPlana));
-            } else if (filaPlana.sot) {
-              await crearLiquidacion(mapGridToCrearDto(filaPlana));
-        
-              // Marcar registro como existente y limpiar memoria local
-              filaPlana.esRegistroExistente = true;
-              localStorage.removeItem('liquidaciones_grid_draft_auto_v1');
-            }
-          } catch (error) {
-            console.error('Error en el autoguardado:', error);
-          }
+        const errores: string[] = [];
+        for (const fila of conSot) {   // en orden, una petición a la vez
+            const sot = Number(fila.sot);
+            const err = fila.esRegistroExistente
+                ? await editarLiquidacion(sot, mapGridToEditarDto(fila), false)
+                : await crearLiquidacion(mapGridToCrearDto(fila), false);
+            if (err) errores.push(`SOT ${sot}: ${err}`);
+            else fila.esRegistroExistente = true;   // si se vuelve a editar antes de recargar, ya va como PUT
+        }
+
+        setError(errores.length ? errores.join(' · ') : null);
+        await fetchLiquidaciones();
     };
 
     const handleDelete = async (sot: number) => {
-        if (window.confirm(`¿Seguro que deseas eliminar la liquidación SOT: ${sot}?`)) {
-            console.log("Eliminando SOT:", sot);
-            // Llamar a la API: await deleteLiquidacion(sot)
+        if (!window.confirm(`¿Seguro que deseas eliminar la liquidación SOT: ${sot}?`)) return;
+        try {
+            await eliminarLiquidacion(sot);   // DELETE /Liquidacion/{sot}/delete y recarga
+        } catch {
+            // el hook ya deja el mensaje en `error`
         }
     };
 
@@ -93,6 +91,9 @@ export const LiquidacionPage: React.FC = () => {
                 </Campo>
             </FilterBar>
 
+            {/* Errores del guardado (por SOT) o de la carga: antes se perdían sin mostrarse */}
+            {error && <div className="rounded-control bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard title="Liquidaciones en vista" icon={ClipboardList} value={metricas.totalLiquidaciones} iconClassName="bg-info-soft text-info" />
                 <StatCard title="Monto Editable (Pág. actual)" icon={Wallet} value={`S/ ${metricas.montoTotal.toFixed(2)}`} iconClassName="bg-success-soft text-success" />
@@ -106,7 +107,6 @@ export const LiquidacionPage: React.FC = () => {
                 isLoading={loading} 
                 onAutoSave={handleAutoSave}
                 onDelete={handleDelete}
-                onRefresh={fetchLiquidaciones}
                 accionesExtras={
                     <>
                         <AccionTabla icono={<FileSpreadsheet size={16} />} onClick={() => setImportarAbierto(true)}>
