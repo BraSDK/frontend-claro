@@ -28,10 +28,8 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
         setError(null);
         try {
             const result = await getLiquidaciones(params);
-            setData(result);
-            // Si tu backend no devuelve el total real en la respuesta, usamos la longitud del array
-            // Lo ideal es que el GET devuelva { datos: [...], totalRegistros: 100 }
-            setTotalRecords(result.length);
+            setData(Array.isArray(result) ? result : []);
+            setTotalRecords(Array.isArray(result) ? result.length : 0);
         }catch(err: any){
             const msg = err.response?.data?.error || err.response?.data?.mensaje || "Error al cargar liquidaciones";
             setError(msg);
@@ -52,7 +50,7 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
             await postLiquidacion(req);
             await fetchLiquidaciones();
         }catch(err: any){
-            const msg = err.response?.data?.error || err.respone?.data?.mesanje || "Error al crear la liquidación";
+            const msg = err.response?.data?.error || err.response?.data?.mesanje || "Error al crear la liquidación";
             setError(msg);
         }finally{
             setLoading(false);

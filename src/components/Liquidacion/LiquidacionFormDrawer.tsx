@@ -1,165 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Drawer } from '@/components/shared/Drawer';
-import { Campo, Entrada, Selector } from '@/components/shared/Filtros';
-import { Boton } from '@/components/shared/Tabla';
-import type { CrearLiquidacionRequest, EditarLiquidacionRequestDto } from '../../types/liquidacion.types';
+import type { ListarRequestLiquidacionesDto } from '../../types/liquidacion.types';
 
 interface LiquidacionFormDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  liquidacionToEdit?: EditarLiquidacionRequestDto | null;
-  onSubmit: (data: any) => Promise<void>;
+  liquidacion?: ListarRequestLiquidacionesDto | null;
 }
 
 export const LiquidacionFormDrawer: React.FC<LiquidacionFormDrawerProps> = ({
   isOpen,
   onClose,
-  liquidacionToEdit,
-  onSubmit
+  liquidacion
 }) => {
-  const [loading, setLoading] = useState(false);
-  
-  const [formData, setFormData] = useState<Partial<CrearLiquidacionRequest>>({
-    sot: 0,
-    nombreSubTipoOrden: '',
-    nombreTecnico: '',
-    fechaProgramacion: new Date().toISOString().split('T')[0],
-    estadoSistema: 1,
-    detalles: []
-  });
-
-  useEffect(() => {
-    if (liquidacionToEdit) {
-      setFormData({
-        sot: liquidacionToEdit.sot,
-        nombreSubTipoOrden: liquidacionToEdit.nombreSubTipoOrden,
-        nombreTecnico: liquidacionToEdit.nombreTecnico,
-        // Adaptar fecha u otros campos según necesites
-      });
-    } else {
-      setFormData({
-        sot: 0,
-        nombreSubTipoOrden: '',
-        nombreTecnico: '',
-        fechaProgramacion: new Date().toISOString().split('T')[0],
-        estadoSistema: 1,
-      });
-    }
-  }, [liquidacionToEdit, isOpen]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await onSubmit(formData);
-      onClose();
-    } catch (error) {
-      console.error("Error al guardar:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Drawer 
       isOpen={isOpen} 
       onClose={onClose} 
-      title={liquidacionToEdit ? 'Editar Liquidación' : 'Nueva Liquidación'}
-      widthClass="w-[600px]" // Más ancho para acomodar la tabla de detalles cómodamente
+      title={`Detalles de Liquidación ${liquidacion?.sot ? `- SOT: ${liquidacion.sot}` : ''}`}
+      widthClass="w-[900px]" // Extra ancho para acomodar la grilla de conceptos cómodamente
       footer={
-        <div className="flex items-center justify-end gap-3">
+        <div className="flex items-center justify-end">
           <button 
             type="button" 
             onClick={onClose} 
-            disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-ink bg-surface border border-line rounded-control hover:bg-page transition-colors"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
           >
-            Cancelar
+            Cerrar
           </button>
-          <Boton 
-            type="submit" 
-            form="liquidacion-form" 
-            disabled={loading}
-            className="w-auto px-6 py-2" // Sobrescribe el ancho si es necesario
-          >
-            {loading ? 'Guardando...' : 'Guardar Liquidación'}
-          </Boton>
         </div>
       }
     >
-      <form id="liquidacion-form" onSubmit={handleSubmit} className="flex flex-col gap-6">
-        
-        {/* Sección de Datos Generales */}
-        <section>
-          <h3 className="text-sm font-bold text-ink mb-4 border-b pb-2">Datos Principales</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {liquidacion ? (
+        <div className="flex flex-col gap-5 h-full">
+          {/* Cabecera de solo lectura con contexto */}
+          <div className="flex flex-wrap gap-x-8 gap-y-2 p-4 bg-gray-50 border border-gray-200 rounded-md text-sm">
+            <div><span className="font-semibold text-gray-700">SOT:</span> {liquidacion.sot}</div>
+            <div><span className="font-semibold text-gray-700">SubTipo:</span> {liquidacion.nombreSubTipoOrden}</div>
+            <div><span className="font-semibold text-gray-700">Técnico:</span> {liquidacion.nombreTecnico || 'Sin asignar'}</div>
+            <div>
+              <span className="font-semibold text-gray-700">Total Editable:</span> 
+              <span className="ml-1 text-green-600 font-bold">
+                {liquidacion.precioTotalEditable ? `S/ ${liquidacion.precioTotalEditable.toFixed(2)}` : 'S/ 0.00'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex-1 flex flex-col min-h-0">
+            <h3 className="text-sm font-bold text-gray-900 mb-1">Conceptos de la Orden</h3>
+            <p className="text-xs text-gray-500 mb-3">
+              Edita las celdas para autoguardar los materiales y baremos de esta liquidación.
+            </p>
             
-            <Campo label="Número SOT">
-              <Entrada 
-                type="number" 
-                name="sot" 
-                value={formData.sot || ''} 
-                onChange={handleChange} 
-                required 
-              />
-            </Campo>
-
-            <Campo label="SubTipo Orden">
-              <Entrada 
-                type="text" 
-                name="nombreSubTipoOrden" 
-                value={formData.nombreSubTipoOrden || ''} 
-                onChange={handleChange} 
-                required 
-              />
-            </Campo>
-
-            <Campo label="Técnico">
-              <Entrada 
-                type="text" 
-                name="nombreTecnico" 
-                value={formData.nombreTecnico || ''} 
-                onChange={handleChange} 
-              />
-            </Campo>
-
-            <Campo label="Fecha Programación">
-              <Entrada 
-                type="date" 
-                name="fechaProgramacion" 
-                value={formData.fechaProgramacion as string || ''} 
-                onChange={handleChange} 
-                required 
-              />
-            </Campo>
-
-            <Campo label="Estado">
-              <Selector 
-                name="estadoSistema" 
-                value={formData.estadoSistema || ''} 
-                onChange={handleChange}
-              >
-                <option value={1}>Ingresada</option>
-                <option value={2}>Validada</option>
-              </Selector>
-            </Campo>
-
+            {/* AQUÍ INYECTAREMOS EL NUEVO REVOGRID DE DETALLES */}
+            <div className="flex-1 border border-dashed border-gray-300 flex items-center justify-center text-gray-400 rounded-md bg-gray-50 min-h-[400px]">
+              [Próximo paso: Componente DetallesTable con RevoGrid]
+            </div>
           </div>
-        </section>
-
-        {/* Sección de Detalles (Aquí irá la tabla de conceptos luego) */}
-        <section>
-          <h3 className="text-sm font-bold text-ink mb-4 border-b pb-2">Detalles y Conceptos</h3>
-          <div className="p-8 text-center text-label border-2 border-dashed border-line rounded-control">
-            Aún no hay conceptos agregados a esta liquidación.
-          </div>
-        </section>
-
-      </form>
+        </div>
+      ) : (
+        <div className="text-center text-gray-500 mt-10">
+          No se ha seleccionado ninguna liquidación válida.
+        </div>
+      )}
     </Drawer>
   );
 };

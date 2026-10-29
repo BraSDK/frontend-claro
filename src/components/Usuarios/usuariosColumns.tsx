@@ -1,0 +1,71 @@
+import { Rol } from '../../types/usuario.types';
+import type { Usuario } from '../../types/usuario.types';
+import type { ColumnRegular } from '@revolist/react-datagrid';
+
+export const getUsuariosColumns = (
+  onDelete: (id: number) => void,
+  rolLogueado?: string | null
+): ColumnRegular[] => [
+  { 
+    prop: 'id', 
+    name: 'ID', 
+    size: 80, 
+    readonly: true,
+    cellTemplate: (h: any, props: any) => {
+      const id = props.model[props.prop];
+      return h('span', { class: 'text-gray-400 font-mono text-xs' }, id ? `#${id}` : '-');
+    }
+  },
+  { prop: 'nombreCompleto', name: 'Nombre Completo', size: 250 },
+  { prop: 'documentoIdentidad', name: 'Documento', size: 150 },
+  { prop: 'email', name: 'Email', size: 250 },
+  { 
+    prop: 'rol', 
+    name: 'Rol', 
+    size: 150,
+    columnType: 'select',
+    source: [Rol.ADMIN, Rol.TECNICO, Rol.ALMACEN],
+    cellTemplate: (h: any, props: any) => {
+      let rol = props.model[props.prop];
+      if (rol === undefined || rol === null || rol === '') return ''; 
+
+      // Si por alguna razón la celda recibe el entero de C#, lo traducimos al texto
+      if (rol === 0 || rol === '0') rol = Rol.ADMIN;
+      if (rol === 1 || rol === '1') rol = Rol.TECNICO;
+      if (rol === 2 || rol === '2') rol = Rol.ALMACEN;
+
+      let bgClass = 'bg-gray-100 text-gray-700';
+      if (rol === Rol.ADMIN) bgClass = 'bg-purple-100 text-purple-700';
+      else if (rol === Rol.TECNICO) bgClass = 'bg-blue-100 text-blue-700';
+      else if (rol === Rol.ALMACEN) bgClass = 'bg-amber-100 text-amber-700';
+
+      return h('span', { 
+        class: `px-3 py-1 text-xs font-medium rounded-full inline-block mt-1.5 ${bgClass}` 
+      }, rol);
+    }
+  },
+  {
+    prop: 'acciones',
+    name: 'Acciones',
+    size: 80,
+    pin: 'colPinEnd',
+    readonly: true,
+    cellTemplate: (h: any, props: any) => {
+      const usuario = props.model as Partial<Usuario>;
+      if (!usuario.id) return '';
+
+      const botones = [];
+      if (rolLogueado === Rol.ADMIN) {
+        botones.push(
+          h('button', {
+            type: 'button',
+            class: 'p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors',
+            title: 'Eliminar registro',
+            onClick: () => usuario.id && onDelete(usuario.id)
+          }, '🗑')
+        );
+      }
+      return h('div', { class: 'flex items-center justify-center w-full h-full' }, botones);
+    }
+  }
+];

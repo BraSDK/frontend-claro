@@ -104,3 +104,22 @@ export interface DetalleResponseDto {
     canPagina: number;
     totalPages: number;
   }
+
+  export type FilaLiquidacionGrid = {
+    sot?: number;
+    tecnico?: string;
+    tipoOrden?: string;
+    fechaProgramacion?: string;
+    subTipoOrden?: string;
+    costoServicio?: number;
+    deco?: number;
+    repetidor?: number;
+    drop150?: number;
+    drop220?: number;
+    drop300?: number;
+    obsFotos?: string;
+    obsNoPago?: string;
+    obsSiPago?: string;
+    total?: number;
+    esRegistroExistente?: boolean; 
+  };
