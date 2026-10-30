@@ -15,10 +15,11 @@ import type { OrdenTrabajo } from '../../types/Ordenes';
 const TAMANO_PAGINA = 15;
 
 export const OrdenesPage = () => {
+
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const { puedeCrear } = usePermisosOrden();
-    const { nombreDe } = useTecnicos();
+    const { nombreDe , tecnicos} = useTecnicos();
 
     // ===== Filtros: lo que escribe el usuario y lo que se aplicó con "Buscar" =====
     const inicial = searchParams.get('buscar') ?? '';
@@ -48,6 +49,7 @@ export const OrdenesPage = () => {
         hasta: aplicados.hasta || undefined,
     });
 
+
     const buscar = () => {
         setAplicados({ buscar: sot, desde, hasta });
         setPagina(1);
@@ -76,8 +78,7 @@ export const OrdenesPage = () => {
         } catch (err) {
             setAviso({ tipo: 'error', texto: mensajeError(err, 'No se pudo eliminar la orden.') });
         }
-    };
-
+    }
     return (
         <div className="flex flex-col gap-5">
             <FilterBar onBuscar={buscar} onLimpiar={limpiar} hayFiltros={hayFiltros}>

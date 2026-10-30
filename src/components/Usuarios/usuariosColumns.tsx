@@ -16,9 +16,9 @@ export const getUsuariosColumns = (
       return h('span', { class: 'text-gray-400 font-mono text-xs' }, id ? `#${id}` : '-');
     }
   },
-  { prop: 'nombreCompleto', name: 'Nombre Completo', size: 250 },
-  { prop: 'documentoIdentidad', name: 'Documento', size: 150 },
-  { prop: 'email', name: 'Email', size: 250 },
+  { prop: 'nombreCompleto', name: 'Nombre Completo', size: 250, readonly:true},
+  { prop: 'documentoIdentidad', name: 'Documento', size: 150, readonly:true},
+  { prop: 'email', name: 'Email', size: 250, readonly:true},
   { 
     prop: 'rol', 
     name: 'Rol', 

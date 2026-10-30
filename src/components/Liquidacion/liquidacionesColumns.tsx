@@ -6,12 +6,14 @@ export const getLiquidacionesColumns = (
   ): ColumnRegular[] => [
     { 
       prop: 'sot', 
-      name: 'SOT', 
+      name: 'SOT',
       size: 100,
+      readonly: (props: any) => !!props.model?.esRegistroExistente,   // la SOT es la clave: editable solo en filas nuevas
       cellTemplate: (h: any, props: any) => {
         const sot = props.model[props.prop];
         return h('span', { class: 'font-mono text-sm' }, sot || '');
       }
+      , pin:'colPinStart'
     },
     { 
         prop: 'tecnico', 
@@ -33,13 +35,10 @@ export const getLiquidacionesColumns = (
           const fecha = props.model[props.prop];
           if (!fecha) return '';
           
-          const parsed = new Date(fecha);
-          // Si la fecha es inválida para JavaScript, retornamos el texto crudo
-          if (isNaN(parsed.getTime())) {
-              return h('span', {}, fecha); 
-          }
-          // Si es válida, la formateamos
-          return h('span', {}, parsed.toLocaleDateString());
+          // 'YYYY-MM-DD...' → 'DD/MM/YYYY' sin pasar por new Date():
+          // el back guarda medianoche UTC y new Date() la movía al día anterior en hora de Perú
+          const iso = String(fecha).match(/^(\d{4})-(\d{2})-(\d{2})/);
+          return h('span', {}, iso ? `${iso[3]}/${iso[2]}/${iso[1]}` : fecha);
         }
     },
     { prop: 'subTipoOrden', name: 'SubTipo Orden', size: 160},
@@ -48,9 +47,9 @@ export const getLiquidacionesColumns = (
     { prop: 'costoServicio', name: 'Costo Servicio', size: 120 },
     { prop: 'deco', name: 'Deco', size: 80 },
     { prop: 'repetidor', name: 'Repetidor', size: 100 },
-    { prop: 'drop150', name: 'Drop 150', size: 90 },
-    { prop: 'drop220', name: 'Drop 220', size: 90 },
-    { prop: 'drop300', name: 'Drop 300', size: 90 },
+    { prop: 'drop150', name: 'Drop 150', size: 150 },
+    { prop: 'drop220', name: 'Drop 220', size: 150},
+    { prop: 'drop300', name: 'Drop 300', size: 150},
 
     // --- OBSERVACIONES (Textos) ---
     { prop: 'obsFotos', name: 'Obs. Fotos', size: 200 },

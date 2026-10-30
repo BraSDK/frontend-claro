@@ -43,31 +43,25 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
         fetchLiquidaciones();
     }, [fetchLiquidaciones]);
     
-    const crearLiquidacion = async (req: CrearLiquidacionRequest) => {
-        setLoading(true);
-        setError(null);
+    // recargar = false para el guardado masivo: se recarga una sola vez al final.
+    // Devuelve el mensaje de error (o null si salió bien) para poder juntar los errores del lote.
+    const crearLiquidacion = async (req: CrearLiquidacionRequest, recargar = true): Promise<string | null> => {
         try{
             await postLiquidacion(req);
-            await fetchLiquidaciones();
+            if (recargar) await fetchLiquidaciones();
+            return null;
         }catch(err: any){
-            const msg = err.response?.data?.error || err.response?.data?.mesanje || "Error al crear la liquidación";
-            setError(msg);
-        }finally{
-            setLoading(false);
+            return err.response?.data?.error || err.response?.data?.mensaje || "Error al crear la liquidación";
         }
     };
 
-    const editarLiquidacion = async (id: number, req: EditarLiquidacionRequestDto) => {
-        setLoading(true);
-        setError(null);
+    const editarLiquidacion = async (sot: number, req: EditarLiquidacionRequestDto, recargar = true): Promise<string | null> => {
         try{
-            await updateLiquidacion(id, req);
-            await fetchLiquidaciones();
+            await updateLiquidacion(sot, req);
+            if (recargar) await fetchLiquidaciones();
+            return null;
         }catch(err: any){
-            const msg = err.response?.data?.error || err.response?.data?.mensaje || "Error al editar la liquidación";
-            setError(msg);
-        }finally{
-            setLoading(false);
+            return err.response?.data?.error || err.response?.data?.mensaje || "Error al editar la liquidación";
         }
     }
 
@@ -85,5 +79,5 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
         }
     }
 
-    return {data, totalRecords, loading, error, params, setParams, fetchLiquidaciones, crearLiquidacion, editarLiquidacion, eliminarLiquidacion};
+    return {data, totalRecords, loading, error, setError, params, setParams, fetchLiquidaciones, crearLiquidacion, editarLiquidacion, eliminarLiquidacion};
 };

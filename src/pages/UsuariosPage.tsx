@@ -26,7 +26,6 @@ export const UsuariosPage = () => {
     removeUsuario 
     // fetchUsuarios // <- Ideal si tu hook expone la función de recarga
   } = useUsuarios();
-
   const {
     isFilterOpen,
     usuariosFiltrados,
@@ -123,7 +122,7 @@ export const UsuariosPage = () => {
 
       {/* Componente Tabla (Ahora utiliza onAutoSave) */}
       <UsuariosTable
-        usuarios={usuariosFiltrados}
+        usuarios={usuarios}
         isLoading={isLoading}
         onAutoSave={handleAutoSave}
         onDelete={handleEliminarUsuario}

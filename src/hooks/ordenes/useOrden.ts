@@ -20,12 +20,12 @@ export function useOrdenes(params: ListarOrdenesParams) {
             .catch((err) => {
                 if (vigente) setRespuesta((r) => ({ peticion, pagina: r?.pagina ?? null, error: mensajeError(err, 'No se pudieron cargar las órdenes.') }));
             });
+
         return () => { vigente = false; };
     }, [clave, peticion]);
 
     const recargar = useCallback(() => setVersion((v) => v + 1), []);
     const pagina = respuesta?.pagina ?? null;
-
     return {
         ordenes: pagina?.listaGenerica ?? [],
         pagina,

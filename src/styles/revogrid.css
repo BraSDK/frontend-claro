@@ -1,33 +1,33 @@
 /* =========================================================
    RevoGrid con estilo front_claro (variables de la v4.29)
    ========================================================= */
-   revo-grid {
-    --revo-grid-font-family: var(--font-sans);
-    --revo-grid-font-size: 14px;
-    --revo-grid-text: var(--color-ink-cell);
-    --revo-grid-background: var(--color-surface);
-  
-    /* encabezado: blanco, negrita 15px, borde inferior un poco más oscuro */
-    --revo-grid-header-bg: var(--color-surface);
-    --revo-grid-header-color: var(--color-ink);
-    --revo-grid-header-font-size: 15px;
-    --revo-grid-header-font-weight: 700;
-    --revo-grid-header-height: 37px;
-    --revo-grid-header-border: var(--color-line-strong);
-    --revo-grid-header-text-align: center;
-    --revo-grid-header-hover-bg: var(--color-hover);
-  
-    /* grilla tipo Excel: todas las líneas visibles */
-    --revo-grid-cell-border: var(--color-line-soft);
-    --revo-grid-cell-vertical-border: var(--color-line-soft);
-    --revo-grid-cell-text-align: center;
-    --revo-grid-cell-padding: 0 12px;
-    --revo-grid-divider: var(--color-line-fixed);   /* separador de columnas fijas */
-  
-    /* hover y selección */
-    --revo-grid-row-hover: var(--color-hover);
-    --revo-grid-focused-bg: var(--color-selected);
-    --revo-grid-selection-border: var(--color-focus); /* foco de celda */
-    --revo-grid-selection-bg: transparent;
-    --revo-grid-primary: var(--color-info);
-  }
+revo-grid {
+  --revo-grid-font-family: var(--font-sans);
+  --revo-grid-font-size: 14px;
+  --revo-grid-text: var(--color-ink-cell);
+  --revo-grid-background: var(--color-surface);
+
+  /* encabezado: blanco, negrita 15px, borde inferior un poco más oscuro */
+  --revo-grid-header-bg: var(--color-surface);
+  --revo-grid-header-color: var(--color-ink);
+  --revo-grid-header-font-size: 15px;
+  --revo-grid-header-font-weight: 700;
+  --revo-grid-header-height: 37px;
+  --revo-grid-header-border: var(--color-line-strong);
+  --revo-grid-header-text-align: center;
+  --revo-grid-header-hover-bg: var(--color-hover);
+
+  /* grilla tipo Excel: todas las líneas visibles */
+  --revo-grid-cell-border: var(--color-line-soft);
+  --revo-grid-cell-vertical-border: var(--color-line-soft);
+  --revo-grid-cell-text-align: center;
+  --revo-grid-cell-padding: 0 12px;
+  --revo-grid-divider: var(--color-line-fixed);   /* separador de columnas fijas */
+  --revo-grid-cell-disabled-bg: transparent; /*transparente cuando esta readonly*/
+  /* hover y selección */
+  --revo-grid-row-hover: var(--color-hover);
+  --revo-grid-focused-bg: var(--color-selected);
+  --revo-grid-selection-border: var(--color-focus); /* foco de celda */
+  --revo-grid-selection-bg: transparent;
+  --revo-grid-primary: var(--color-info);
+}

@@ -122,6 +122,7 @@ export const UsuariosTable = ({
             source={gridData}
             theme={temaClaro.name}
             rowSize={45}
+            stretch={true}
             columnTypes={pluginSelect}
             onAfteredit={handleAfterEdit}
           />
