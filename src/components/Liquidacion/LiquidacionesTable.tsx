@@ -3,7 +3,7 @@ import { RevoGrid } from '@revolist/react-datagrid';
 import { temaClaro } from '@/theme/revogrid-theme';
 import { DataTable } from '@/components/shared/Tabla';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../../types/liquidacion.types';
-import { getLiquidacionesColumns } from './liquidacionesColumns';
+import { getLiquidacionesColumns, gridEditors } from './liquidacionesColumns';
 
 const MAX_FILAS_EXCEL = 200;
 
@@ -110,6 +110,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
             range = {true}
             ref = {gridRef}
             columns={columns}
+            editors={gridEditors}
             source={gridData}
             theme={temaClaro.name}
             rowSize={45}

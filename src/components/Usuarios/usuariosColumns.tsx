@@ -4,6 +4,7 @@ import type { ColumnRegular } from '@revolist/react-datagrid';
 
 export const getUsuariosColumns = (
   onDelete: (id: number) => void,
+  onChangePassword: (usuario: Usuario) => void,
   rolLogueado?: string | null
 ): ColumnRegular[] => [
   { 
@@ -47,25 +48,30 @@ export const getUsuariosColumns = (
   {
     prop: 'acciones',
     name: 'Acciones',
-    size: 80,
+    size: 90,
     pin: 'colPinEnd',
     readonly: true,
     cellTemplate: (h: any, props: any) => {
-      const usuario = props.model as Partial<Usuario>;
-      if (!usuario.id) return '';
+        const row = props.model;
+        if (!row.id) return '';
 
-      const botones = [];
-      if (rolLogueado === Rol.ADMIN) {
-        botones.push(
-          h('button', {
-            type: 'button',
-            class: 'p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors',
-            title: 'Eliminar registro',
-            onClick: () => usuario.id && onDelete(usuario.id)
-          }, '🗑')
-        );
-      }
-      return h('div', { class: 'flex items-center justify-center w-full h-full' }, botones);
+        return h('div', { class: 'flex items-center justify-center gap-3 w-full h-full' }, [
+            // NUEVO BOTÓN PARA CONTRASEÑA
+            h('button', {
+                type: 'button',
+                class: 'text-gray-400 hover:text-amber-500 transition-colors p-1',
+                title: 'Asignar / Cambiar Contraseña',
+                onClick: () => onChangePassword && onChangePassword(row)
+            }, '🔑'),
+            
+            // BOTÓN ELIMINAR (El que ya tenías)
+            h('button', {
+                type: 'button',
+                class: 'text-gray-400 hover:text-red-600 transition-colors p-1',
+                title: 'Eliminar usuario',
+                onClick: () => onDelete && onDelete(row.id)
+            }, '✕')
+        ]);
     }
-  }
+}
 ];

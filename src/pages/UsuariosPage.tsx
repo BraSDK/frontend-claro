@@ -5,7 +5,7 @@ import { useUsuarios } from '../hooks/usuario/useUsuarios';
 import { useUsuariosFilter } from '../hooks/usuario/useUsuariosFilter';
 import { UsuariosTable } from '../components/Usuarios/UsuariosTable';
 import { UsuariosFilterDrawer } from '../components/Usuarios/UsuariosFilterDrawer';
-
+import { CambiarPasswordModal } from '../components/Usuarios/CambiarPasswordModal';
 import type { Usuario, RegisterRequestDto, EditRequestDto } from '../types/usuario.types';
 import { Rol } from '../types/usuario.types';
 
@@ -23,7 +23,8 @@ export const UsuariosPage = () => {
     error, 
     addUsuario, 
     editUsuario, 
-    removeUsuario 
+    removeUsuario,
+    cambiarPassword
     // fetchUsuarios // <- Ideal si tu hook expone la función de recarga
   } = useUsuarios();
   const {
@@ -36,6 +37,10 @@ export const UsuariosPage = () => {
   } = useUsuariosFilter(usuarios);
 
   const [rolLogueado, setRolLogueado] = useState<string | null>(null);
+
+  // Estados para el Modal
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState<any>(null);
 
   useEffect(() => {
     const rolActual = localStorage.getItem('user_role') || Rol.ADMIN;
@@ -83,6 +88,16 @@ export const UsuariosPage = () => {
     }
   };
 
+  const handleAbrirModal = (usuario: any) => {
+    setUsuarioSeleccionado(usuario);
+    setModalAbierto(true);
+  };
+
+  const handleActualizarPassword = async (id: number, clave: string) => {
+      console.log("Enviando nueva contraseña...", id, clave);
+      await cambiarPassword(id, clave);
+  };
+
   const handleEliminarUsuario = async (id: number) => {
     const confirmar = window.confirm('¿Estás seguro de que deseas eliminar este usuario?');
     if (confirmar) {
@@ -126,7 +141,14 @@ export const UsuariosPage = () => {
         isLoading={isLoading}
         onAutoSave={handleAutoSave}
         onDelete={handleEliminarUsuario}
-        rolLogueado={rolLogueado}
+        onChangePassword={handleAbrirModal}
+      />
+
+      <CambiarPasswordModal 
+          isOpen={modalAbierto}
+          onClose={() => setModalAbierto(false)}
+          usuario={usuarioSeleccionado}
+          onSubmit={handleActualizarPassword}
       />
 
       <UsuariosFilterDrawer 
