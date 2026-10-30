@@ -33,7 +33,7 @@ export const deleteUsuario = async (id: number): Promise<any> => {
 
 // En src/services/usuario.service.ts
 export const updatePasswordUsuario = async (id: number, nuevaPassword: string): Promise<any> => {
-  const response = await api.put(`/Usuario/${id}/CambiarPassword`, { nuevaPassword });
+  const response = await api.put(`/User/${id}/CambiarPassword`, { nuevaPassword });
   return response.data;
 };
 
