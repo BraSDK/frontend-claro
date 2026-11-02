@@ -5,10 +5,11 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode; // Aquí adentro inyectaremos cualquier formulario
+  ancho?: string;            // clase de ancho máximo (por defecto max-w-md)
 }
 
 // Modal de formulario: tarjeta blanca (radio 8px) con cabecera en negrita
-export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
+export const Modal = ({ isOpen, onClose, title, children, ancho = 'max-w-md' }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -16,7 +17,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
       <div
         role="dialog"
         aria-modal="true"
-        className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-card bg-surface shadow-menu"
+        className={`flex max-h-[90vh] w-full ${ancho} flex-col overflow-hidden rounded-card bg-surface shadow-menu`}
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center justify-between border-b border-line-soft px-6 py-3">

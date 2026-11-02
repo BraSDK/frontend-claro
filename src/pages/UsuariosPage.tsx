@@ -1,10 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Filter } from 'lucide-react';
+import { useState } from 'react';
+import { Filter, UserPlus } from 'lucide-react';
 
 import { useUsuarios } from '../hooks/usuario/useUsuarios';
 import { useUsuariosFilter } from '../hooks/usuario/useUsuariosFilter';
 import { UsuariosTable } from '../components/Usuarios/UsuariosTable';
 import { UsuariosFilterDrawer } from '../components/Usuarios/UsuariosFilterDrawer';
+import { UsuarioForm } from '../components/Usuarios/UsuarioForm';
+import { Drawer } from '../components/shared/Drawer';
+import { Boton } from '../components/shared/Tabla';
+import { useAuth } from '../hooks/useAuth';
 
 import type { Usuario, RegisterRequestDto, EditRequestDto } from '../types/usuario.types';
 import { Rol } from '../types/usuario.types';
@@ -35,12 +39,21 @@ export const UsuariosPage = () => {
     resetFilters,
   } = useUsuariosFilter(usuarios);
 
-  const [rolLogueado, setRolLogueado] = useState<string | null>(null);
+  // rol de quien inició sesión (sale del token); antes se leía de un localStorage que nadie llenaba
+  const { rol } = useAuth();
+  const rolLogueado = rol ?? null;
 
-  useEffect(() => {
-    const rolActual = localStorage.getItem('user_role') || Rol.ADMIN;
-    setRolLogueado(rolActual);
-  }, []);
+  // Drawer de "Nuevo usuario". La key cambia en cada apertura para que el formulario empiece vacío.
+  const [formAbierto, setFormAbierto] = useState(false);
+  const [formKey, setFormKey] = useState(0);
+  const abrirFormulario = () => { setFormKey((k) => k + 1); setFormAbierto(true); };
+
+  // El back recibe el rol como número (enum Rol); si falla, el error lo muestra el formulario
+  const crearDesdeFormulario = async (datos: RegisterRequestDto | EditRequestDto) => {
+    const nuevo = datos as RegisterRequestDto;
+    await addUsuario({ ...nuevo, rol: RolBackendMap[nuevo.rol] as unknown as Rol });
+    setFormAbierto(false);
+  };
 
   // Lógica de Autoguardado por fila (Se dispara al salir de la celda)
   const handleAutoSave = async (fila: Partial<Usuario>) => {
@@ -111,6 +124,9 @@ export const UsuariosPage = () => {
           >
             <Filter size={16} /> Filtros
           </button>
+          {rolLogueado === Rol.ADMIN && (
+            <Boton icono={<UserPlus size={16} />} onClick={abrirFormulario}>Nuevo usuario</Boton>
+          )}
         </div>
       </div>
 
@@ -128,6 +144,16 @@ export const UsuariosPage = () => {
         onDelete={handleEliminarUsuario}
         rolLogueado={rolLogueado}
       />
+
+      <Drawer isOpen={formAbierto} onClose={() => setFormAbierto(false)} title="Nuevo usuario" widthClass="w-[480px]">
+        <UsuarioForm
+          key={formKey}
+          initialData={null}
+          onSubmit={crearDesdeFormulario}
+          onCancel={() => setFormAbierto(false)}
+          rolLogueado={rolLogueado}
+        />
+      </Drawer>
 
       <UsuariosFilterDrawer 
         isOpen={isFilterOpen}

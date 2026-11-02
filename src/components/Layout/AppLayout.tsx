@@ -5,6 +5,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { usePerfil } from '../../hooks/usePerfil';
 import { iniciales, NOMBRES_ROL } from '../../utils/formato';
 import { MODULOS, moduloActivo, tituloDeRuta } from './modulos';
+import { validarPermiso } from '@/utils/permisos';
 
 // Cierra un menú al hacer click fuera de él o con Escape
 const useCerrarFuera = (abierto: boolean, cerrar: () => void) => {
@@ -23,7 +24,7 @@ const useCerrarFuera = (abierto: boolean, cerrar: () => void) => {
 export const AppLayout = () => {
     const navigate = useNavigate();
     const { pathname } = useLocation();
-    const { esTecnico } = useAuth();
+    const { rol } = useAuth();   // el menú se filtra con PERMISOS según este rol
     const { perfil } = usePerfil();
 
     const [menuModulos, setMenuModulos] = useState(false);
@@ -33,11 +34,11 @@ export const AppLayout = () => {
 
     const refModulos = useCerrarFuera(menuModulos, () => setMenuModulos(false));
     const refUsuario = useCerrarFuera(menuUsuario, () => setMenuUsuario(false));
-
     // al cambiar de pantalla se cierran los menús
     useEffect(() => { setMenuModulos(false); setMenuUsuario(false); }, [pathname]);
 
-    const modulos = MODULOS.filter((m) => !(m.soloGestion && esTecnico));
+    const modulos = MODULOS.filter((m) => !m.permiso || validarPermiso(rol,m.permiso));
+    
     const activo = moduloActivo(pathname);
     const titulo = tituloDeRuta(pathname);
 

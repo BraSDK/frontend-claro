@@ -1,22 +1,25 @@
+import type {Permiso} from "../../utils/permisos";
+
 // Módulos del sistema: alimentan el menú desplegable del header y su título según la ruta
 export interface Modulo {
     nombre: string;
     ruta: string;
-    soloGestion?: boolean;   // solo ADMIN y ALMACÉN
+    permiso?: Permiso;  
     grupo?: 'Administración';
 }
 
 export const MODULOS: Modulo[] = [
     { nombre: 'Inicio', ruta: '/dashboard' },
     { nombre: 'Órdenes de trabajo', ruta: '/ordenes' },
-    { nombre: 'Valorización almacén', ruta: '/valorizacion', soloGestion: true },
-    { nombre: 'Pagos Claro', ruta: '/pagos-claro', soloGestion: true },
-    { nombre: 'Conciliación de pagos', ruta: '/conciliacion', soloGestion: true },
-    { nombre: 'Liquidacion', ruta: '/liquidacion', soloGestion: true },
-    { nombre: 'Reportes', ruta: '/reportes', soloGestion: true },
+    { nombre: 'Valorización almacén', ruta: '/valorizacion',permiso: 'verValorizacion'},
+    { nombre: 'Pagos Claro', ruta: '/pagos-claro', permiso:'verPagosClaro'},
+    { nombre: 'Conciliación de pagos', ruta: '/conciliacion',permiso:'verConciliacion' },
+    { nombre: 'Liquidacion', ruta: '/liquidacion',permiso:'verLiquidacion'},
+    { nombre: 'Auditoría de liquidaciones', ruta: '/auditoria', permiso: 'verAuditoria' },
+    { nombre: 'Reportes', ruta: '/reportes' , permiso:'verReportes'},
     { nombre: 'Configuración', ruta: '/configuracion' },
-    { nombre: 'Servicios', ruta: '/servicios', soloGestion: true, grupo: 'Administración' },
-    { nombre: 'Usuarios', ruta: '/usuarios', soloGestion: true, grupo: 'Administración' },
+    { nombre: 'Servicios', ruta: '/servicios', permiso: 'gestionarServicios', grupo: 'Administración' },
+    { nombre: 'Usuarios', ruta: '/usuarios', permiso: 'gestionarUsuarios', grupo: 'Administración' },
 ];
 
 // Pantallas que no son un módulo del menú pero tienen su propio título

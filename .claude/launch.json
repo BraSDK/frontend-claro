@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 5173
+    },
+    {
+      "name": "design-skills-t",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5317", "--directory", "C:/Users/usuario/Documents/design-skills-t"],
+      "port": 5317
     }
   ]
 }

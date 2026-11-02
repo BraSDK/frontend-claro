@@ -18,6 +18,12 @@ const opcionesEstado = Object.entries(MAPEO_ESTADOS.campo).map(([valor, info]) =
 // ===== 1. Constantes de la grilla =====
 const ALTO_FILA = 37;      // --fc-row-h
 const FILAS_MINIMAS = 10; 
+const BASE = 'inline-flex h-5 items-center whitespace-nowrap rounded-badge px-2 text-[13px] font-bold leading-5 text-white';
+const COLOR_ESTADO : Record<string,string>= {
+    'Completado':"bg-success",
+    'En progreso':"bg-warning",
+    'No completado':"bg-danger"
+} 
 const celdaArchivo = ({ model, onVer }:ColumnDataSchemaModel & { onVer?: (o: OrdenTrabajo) => void } ) => {
         const orden = model as OrdenTrabajo & { cantArchivos: number };
         return(
@@ -34,6 +40,7 @@ const celdaArchivo = ({ model, onVer }:ColumnDataSchemaModel & { onVer?: (o: Ord
     );  
 }
 
+
 export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes }: Props) => {   // nombreTecnico = nombreDe de useTecnicos (lo pasa OrdenesPage)
     const filas = ordenes.map(o => ({
         ...o,
@@ -49,7 +56,7 @@ export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes }: Props) =
         { prop: 'docTecnico', name: 'Doc. técnico', size: 140},
         { prop: 'tecnico', name: 'Técnico', size: 240, readonly: true },   // NUEVO: lee el campo 'tecnico' armado en filas; readonly porque es un dato calculado, no editable
         { prop: 'trabajoRealizado', name: 'Trabajo realizado', size: 320 },
-        { prop: 'estadoCampo', name: 'Estado Campo', size: 140,readonly:true, cellTemplate: (h,props) => h('span',{class:'inline-flex h-5 items-center whitespace-nowrap rounded-badge px-2 text-[13px] font-bold leading-5 text-white bg-success'},props.model.estado)},
+        { prop: 'estadoCampo', name: 'Estado Campo', size: 140,readonly:true, cellTemplate: (h,props) => h('span', { class: `${BASE} ${COLOR_ESTADO[props.model.estado] ?? 'bg-gray-400'}` },props.model.estado)},
         { prop: 'cantArchivos', name: 'Archivos', size: 140 , cellTemplate: Template(((props: any) => celdaArchivo({ ...props, onVer: onVerImagenes })) as any) },
     ];
 
