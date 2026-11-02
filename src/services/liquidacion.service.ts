@@ -4,6 +4,8 @@ import type {
     ListarRequestLiquidacionesDto,
     CrearLiquidacionRequest,
     EditarLiquidacionRequestDto,
+    AdicionalDto,
+    GuardarAdicionalDto,
 } from '../types/liquidacion.types';
 
 export const getLiquidaciones = async ( params?: ListParamsLiquidacionesDto): Promise<ListarRequestLiquidacionesDto[]> => {
@@ -25,3 +27,17 @@ export const deleteLiquidacion =async (sot: number): Promise<any> => {
     const response = await api.delete(`/Liquidacion/${sot}/delete`);
     return response.data;
 }
+
+// ===== Catálogo de precios de adicionales =====
+export const getAdicionales = async (): Promise<AdicionalDto[]> => {
+    const response = await api.get<AdicionalDto[]>('/Adicional');
+    return response.data;
+};
+
+export const crearAdicional = async (adicional: GuardarAdicionalDto) => {
+    await api.post('/Adicional', adicional);
+};
+
+export const actualizarAdicional = async (id: number, adicional: GuardarAdicionalDto) => {
+    await api.put(`/Adicional/${id}`, adicional);
+};

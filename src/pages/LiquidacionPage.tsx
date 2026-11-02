@@ -1,13 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLiquidaciones } from '../hooks/liquidacion/useLiquidaciones';
 import { LiquidacionesTable } from '../components/Liquidacion/LiquidacionesTable';
 import { LiquidacionFormDrawer } from '../components/Liquidacion/LiquidacionFormDrawer';        
+import { PreciosAdicionalesModal } from '../components/Liquidacion/PreciosAdicionalesModal';
 import { FilterBar, Campo, Entrada, Selector, RangoFechas } from '@/components/shared/Filtros';
 import { AccionTabla, Boton, BarPaginancion } from '@/components/shared/Tabla';
 import { StatCard } from '@/components/shared/Cards';
-import { ClipboardList, Wallet, Clock, CheckCircle2, FileSpreadsheet, Plus } from 'lucide-react';
-import { mapGridToCrearDto, mapGridToEditarDto } from '../utils/liquidacion.mapper';
-import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../types/liquidacion.types';
+import { ClipboardList, Wallet, Clock, CheckCircle2, FileSpreadsheet, Plus, Tags } from 'lucide-react';
+import { mapGridToCrearDto, mapGridToEditarDto, preciosDesdeCatalogo } from '../utils/liquidacion.mapper';
+import { getAdicionales } from '../services/liquidacion.service';
+import { useAuth } from '../hooks/useAuth';
+import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid, AdicionalDto } from '../types/liquidacion.types';
 
 export const LiquidacionPage: React.FC = () => {
     const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
@@ -15,6 +18,16 @@ export const LiquidacionPage: React.FC = () => {
     const [drawerAbierto, setDrawerAbierto] = useState(false);
     const [importarAbierto, setImportarAbierto] = useState(false);
     const [liquidacionActiva, setLiquidacionActiva] = useState<ListarRequestLiquidacionesDto | null>(null);
+
+    // Catálogo de precios de DECO, REPETIDOR y DROP: con él se calcula el total de cada fila
+    const { rol } = useAuth();
+    const [catalogo, setCatalogo] = useState<AdicionalDto[]>([]);
+    const [preciosAbierto, setPreciosAbierto] = useState(false);
+    const precios = useMemo(() => preciosDesdeCatalogo(catalogo), [catalogo]);
+    const cargarCatalogo = useCallback(() => {
+        getAdicionales().then(setCatalogo).catch(() => setCatalogo([]));
+    }, []);
+    useEffect(() => { cargarCatalogo(); }, [cargarCatalogo]);
 
     const [textoBusqueda, setTextoBusqueda] = useState(params.buscar || '');
     const [estado, setEstado] = useState<string | number>(params.estado || '');
@@ -38,7 +51,7 @@ export const LiquidacionPage: React.FC = () => {
 
     const metricas = useMemo(() => ({
         totalLiquidaciones: totalRecords,
-        montoTotal: data.reduce((sum, item) => sum + (item.precioTotalEditable || 0), 0),
+        montoTotal: data.reduce((sum, item) => sum + (item.precioTotalEditable ?? item.precioTotalReal ?? 0), 0),
         ingresadas: data.filter(d => d.estadoSistema === 'Ingresada' || d.estadoSistema === 1).length,
         validadas: data.filter(d => d.estadoSistema === 'Validada' || d.estadoSistema === 2).length,
     }), [data, totalRecords]);
@@ -96,7 +109,7 @@ export const LiquidacionPage: React.FC = () => {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <StatCard title="Liquidaciones en vista" icon={ClipboardList} value={metricas.totalLiquidaciones} iconClassName="bg-info-soft text-info" />
-                <StatCard title="Monto Editable (Pág. actual)" icon={Wallet} value={`S/ ${metricas.montoTotal.toFixed(2)}`} iconClassName="bg-success-soft text-success" />
+                <StatCard title="Monto total (Pág. actual)" icon={Wallet} value={`S/ ${metricas.montoTotal.toFixed(2)}`} iconClassName="bg-success-soft text-success" />
                 <StatCard title="Ingresadas" icon={Clock} value={metricas.ingresadas} iconClassName="bg-info-soft text-info" />
                 <StatCard title="Validadas / Liquidadas" icon={CheckCircle2} value={metricas.validadas} iconClassName="bg-success-soft text-success" />
             </div>
@@ -107,8 +120,12 @@ export const LiquidacionPage: React.FC = () => {
                 isLoading={loading} 
                 onAutoSave={handleAutoSave}
                 onDelete={handleDelete}
+                precios={precios}
                 accionesExtras={
                     <>
+                        <AccionTabla icono={<Tags size={16} />} onClick={() => setPreciosAbierto(true)}>
+                            Precios adicionales
+                        </AccionTabla>
                         <AccionTabla icono={<FileSpreadsheet size={16} />} onClick={() => setImportarAbierto(true)}>
                             Importar Excel
                         </AccionTabla>
@@ -128,6 +145,14 @@ export const LiquidacionPage: React.FC = () => {
                 }
             />
             
+            <PreciosAdicionalesModal
+                abierto={preciosAbierto}
+                onCerrar={() => setPreciosAbierto(false)}
+                catalogo={catalogo}
+                puedeEditar={rol === 'ADMIN'}
+                onGuardado={() => { cargarCatalogo(); fetchLiquidaciones(); }}
+            />
+
             <LiquidacionFormDrawer 
                 isOpen={drawerAbierto} 
                 onClose={() => setDrawerAbierto(false)} 

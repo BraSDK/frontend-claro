@@ -4,6 +4,7 @@ import { temaClaro } from '@/theme/revogrid-theme';
 import { DataTable } from '@/components/shared/Tabla';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../../types/liquidacion.types';
 import { getLiquidacionesColumns, gridEditors } from './liquidacionesColumns';
+import { calcularTotal, type PreciosAdicionales } from '../../utils/liquidacion.mapper';
 
 const MAX_FILAS_EXCEL = 200;
 
@@ -12,6 +13,7 @@ interface LiquidacionesTableProps {
   isLoading: boolean;
   onAutoSave: (filas: Partial<FilaLiquidacionGrid>[]) => Promise<void>;   // 1 fila (edición) o varias (pegado/autollenado)
   onDelete?: (sot: number) => void;
+  precios: PreciosAdicionales;   // precios del catálogo para calcular el total al editar
   accionesExtras?: React.ReactNode;
   pie?: React.ReactNode;
 }
@@ -25,6 +27,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   isLoading,
   onAutoSave,
   onDelete,
+  precios,
   accionesExtras,
   pie
 }) => {
@@ -41,7 +44,8 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
         tipoOrden: liq.tipoOrden,
         fechaProgramacion: liq.fechaProgramacion,
         subTipoOrden: liq.nombreSubTipoOrden,
-        total: liq.precioTotalEditable,
+        total: liq.precioTotalReal ?? undefined,       // el que guardó el back
+        precioTotalEditable: liq.precioTotalEditable,
         estadoSistema: liq.estadoSistema,   // para no pisar el estado al editar
         esRegistroExistente: true, // Crítico para que el AutoSave sepa que debe hacer PUT
         detallesIds: {},
@@ -79,16 +83,20 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
     });
   }, [liquidaciones, isLoading]);
 
-  const columns = useMemo(() => getLiquidacionesColumns(onDelete), [onDelete]);
+  const columns = useMemo(() => getLiquidacionesColumns(onDelete, precios), [onDelete, precios]);
 
   // Edición simple → detail.model (1 fila) | Pegado o autollenado → detail.models + detail.data (varias filas)
   const handleAfterEdit = async (e: CustomEvent) => {
     const d = e.detail;
-    const filas: Partial<FilaLiquidacionGrid>[] = d.models
-      ? Object.keys(d.models).map((i) => ({ ...d.models[i], ...d.data?.[i] }))   // fila completa + valores pegados
+    const modelos: Partial<FilaLiquidacionGrid>[] = d.models
+      ? Object.keys(d.models).map((i) => Object.assign(d.models[i], d.data?.[i]))   // fila completa + valores pegados
       : [d.model];
 
-    await onAutoSave(filas.filter(Boolean));
+    // el total se ve al instante, sin esperar al guardado (el back lo vuelve a calcular igual)
+    modelos.filter(Boolean).forEach((m) => { m.total = calcularTotal(m, precios) || undefined; });
+    setGridData((prev) => [...prev]);
+
+    await onAutoSave(modelos.filter(Boolean));
   };
 
   return (

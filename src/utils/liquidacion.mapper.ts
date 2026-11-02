@@ -1,22 +1,44 @@
-import type { 
-    FilaLiquidacionGrid, 
-    CrearLiquidacionRequest, 
-    EditarLiquidacionRequestDto 
+import type {
+    FilaLiquidacionGrid,
+    CrearLiquidacionRequest,
+    EditarLiquidacionRequestDto,
+    AdicionalDto,
   } from '../types/liquidacion.types';
-  
+
+  // TipoDetalle del back
+  const TIPO_SERVICIO = 0;
+  const TIPO_ADICIONAL = 1;
+
   // Columna de la grilla → detalle del back. Costo de servicio guarda precio; el resto, cantidad.
-  const CONCEPTOS: { campo: keyof FilaLiquidacionGrid; concepto: string; esPrecio?: boolean }[] = [
+  // tipoCatalogo: TipoAdicional del back para crear el precio en el catálogo (0 Adicional, 1 DROP150, 2 DROP220, 3 DROP300)
+  export const CONCEPTOS: { campo: keyof FilaLiquidacionGrid; concepto: string; esPrecio?: boolean; tipoCatalogo?: number }[] = [
     { campo: 'costoServicio', concepto: 'COSTO DE SERVICIO', esPrecio: true },
-    { campo: 'deco', concepto: 'DECO' },
-    { campo: 'repetidor', concepto: 'REPETIDOR' },
-    { campo: 'drop150', concepto: 'DROP 150' },
-    { campo: 'drop220', concepto: 'DROP 220' },
-    { campo: 'drop300', concepto: 'DROP 300' },
+    { campo: 'deco', concepto: 'DECO', tipoCatalogo: 0 },
+    { campo: 'repetidor', concepto: 'REPETIDOR', tipoCatalogo: 0 },
+    { campo: 'drop150', concepto: 'DROP 150', tipoCatalogo: 1 },
+    { campo: 'drop220', concepto: 'DROP 220', tipoCatalogo: 2 },
+    { campo: 'drop300', concepto: 'DROP 300', tipoCatalogo: 3 },
   ];
 
+  export const CONCEPTOS_ADICIONALES = CONCEPTOS.filter((c) => !c.esPrecio);
+
+  // concepto ('DROP 150') → precio unitario del catálogo
+  export type PreciosAdicionales = Record<string, number>;
+
+  export const preciosDesdeCatalogo = (catalogo: AdicionalDto[]): PreciosAdicionales =>
+    Object.fromEntries(catalogo.map((a) => [a.nombre.trim().toUpperCase(), Number(a.precio) || 0]));
+
+  // Lo mismo que calcula el back al guardar: costo de servicio + cantidad × precio de cada adicional
+  export const calcularTotal = (fila: Partial<FilaLiquidacionGrid>, precios: PreciosAdicionales) =>
+    CONCEPTOS.reduce((total, c) => {
+      const valor = Number(fila[c.campo]) || 0;
+      return total + (c.esPrecio ? valor : valor * (precios[c.concepto] ?? 0));
+    }, 0);
+
+  // El precio de los adicionales lo pone el back desde el catálogo; aquí solo viaja la cantidad
   const detalleDe = (c: typeof CONCEPTOS[number], valor: number) => c.esPrecio
-    ? { concepto: c.concepto, cantidad: 1, precioUnitario: valor, precioTotal: valor, tipo: 1 }
-    : { concepto: c.concepto, cantidad: valor, precioUnitario: 0, precioTotal: 0, tipo: 1 };
+    ? { concepto: c.concepto, cantidad: 1, precioUnitario: valor, precioTotal: valor, tipo: TIPO_SERVICIO }
+    : { concepto: c.concepto, cantidad: Math.trunc(valor), precioUnitario: 0, precioTotal: 0, tipo: TIPO_ADICIONAL };
 
   // Crear: todos los detalles con valor van como nuevos
   const armarDetalles = (fila: Partial<FilaLiquidacionGrid>) =>
@@ -35,7 +57,7 @@ import type {
     }
     return { detallesNuevos: nuevos, detallesEditados: editados, detallesEliminados: eliminados };
   };
-  
+
   // Helper para empaquetar observaciones (TipoObservacion del back: FOTOS = 0, SI_PAGO = 1, NO_PAGO = 2)
   // Sin motivoObservacionId: es opcional y un id fijo que no exista rompe el guardado por clave foránea
   const armarObservaciones = (fila: Partial<FilaLiquidacionGrid>) => {
@@ -76,7 +98,8 @@ import type {
     fechaProgramacion: normalizarFecha(fila.fechaProgramacion),
     nombreTecnico: fila.tecnico || '',
     estadoSistema: fila.estadoSistema ?? 0,   // conserva el estado que tenía (antes se pisaba con 1)
-    precioTotalEditable: fila.total,          // el back lo sobrescribe: si no se manda, borra el total
+    // el back lo sobrescribe: se manda el que ya tenía (lo edita Auditoría), no el total calculado
+    precioTotalEditable: fila.precioTotalEditable ?? undefined,
     estadoPago: 1,
     ...armarCambiosDetalles(fila),
     // El listado no devuelve observaciones, así que al editar no se sabe cuáles ya existen:

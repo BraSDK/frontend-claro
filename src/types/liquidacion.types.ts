@@ -97,7 +97,8 @@ export interface DetalleResponseDto {
     nombreTecnico?: string;
     estadoSistema: number | string;
     detallesLiquidacion: DetalleResponseDto[];
-    precioTotalEditable?: number;
+    precioTotalReal?: number | null;      // calculado por el back con los precios del catálogo
+    precioTotalEditable?: number | null;
   
   }
   
@@ -126,8 +127,20 @@ export interface DetalleResponseDto {
     obsFotos?: string;
     obsNoPago?: string;
     obsSiPago?: string;
-    total?: number;
+    total?: number;                       // calculado: costo de servicio + cantidades × precio del catálogo
+    precioTotalEditable?: number | null;  // lo edita Auditoría; aquí solo se conserva
     estadoSistema?: number | string;   // se conserva al editar
     detallesIds?: Record<string, number>;   // concepto → detalleLiquidacionId (para editar/eliminar sin duplicar)
     esRegistroExistente?: boolean;
   };
+
+  // Catálogo de precios de adicionales (api/Adicional). Tipo: 0 Adicional, 1 DROP150, 2 DROP220, 3 DROP300
+  export interface AdicionalDto {
+    adicionalId: number;
+    nombre: string;
+    precio: number;
+    tipo: number;
+    columnaExcel?: string | null;
+  }
+
+  export type GuardarAdicionalDto = Omit<AdicionalDto, 'adicionalId'>;
