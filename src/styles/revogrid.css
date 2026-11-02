@@ -31,3 +31,35 @@ revo-grid {
   --revo-grid-selection-bg: transparent;
   --revo-grid-primary: var(--color-info);
 }
+
+/* =========================================================
+   Hoja tipo Excel (grilla de liquidaciones): compacta, líneas finas grises,
+   cabecera gris clara, números de fila y foco verde como en Excel
+   ========================================================= */
+.grilla-excel revo-grid {
+  --revo-grid-font-size: 13px;
+  --revo-grid-header-bg: #f3f3f3;
+  --revo-grid-header-color: #3b3b3b;
+  --revo-grid-header-font-size: 13px;
+  --revo-grid-header-font-weight: 600;
+  --revo-grid-header-height: 28px;
+  --revo-grid-header-border: #c8c8c8;
+  --revo-grid-header-hover-bg: #e6e6e6;
+
+  --revo-grid-cell-border: #dadada;
+  --revo-grid-cell-vertical-border: #dadada;
+  --revo-grid-cell-padding: 0 6px;
+  --revo-grid-divider: #c8c8c8;
+
+  --revo-grid-row-hover: transparent;
+  --revo-grid-focused-bg: #e8f2ec;
+  --revo-grid-selection-border: #217346;
+  --revo-grid-primary: #217346;
+}
+
+/* columna de números de fila */
+.grilla-excel revo-grid .rowHeaders {
+  background: #f3f3f3;
+  color: #6b6b6b;
+  font-size: 12px;
+}

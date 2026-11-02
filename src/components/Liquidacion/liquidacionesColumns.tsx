@@ -1,7 +1,7 @@
 import type { ColumnRegular } from '@revolist/react-datagrid';
 import { Editor, type Editors } from '@revolist/react-datagrid';
 import type { FilaLiquidacionGrid } from '../../types/liquidacion.types';
-import type { PreciosAdicionales } from '../../utils/liquidacion.mapper';
+import { esNoPago, type PreciosAdicionales } from '../../utils/liquidacion.mapper';
 import FechaEditor from './FechaEditor';
 
 const formatSoles = (h: any, props: any) => {
@@ -87,7 +87,13 @@ export const getLiquidacionesColumns = (
 
     // --- OBSERVACIONES (Textos) ---
     { prop: 'obsFotos', name: 'Obs. Fotos', size: 200 },
-    { prop: 'obsNoPago', name: 'Obs. No Pago', size: 200 },
+    {
+      prop: 'obsNoPago', name: 'Obs. No Pago', size: 200,
+      cellTemplate: (h: any, props: any) => {
+        const texto = props.model[props.prop];
+        return texto ? h('span', { class: 'text-red-600', title: texto }, texto) : '';
+      },
+    },
     { prop: 'obsSiPago', name: 'Obs. Sí Pago', size: 200 },
 
     // --- TOTAL Y ESTADO ---
@@ -100,6 +106,13 @@ export const getLiquidacionesColumns = (
           const fila = props.model as FilaLiquidacionGrid;
           const total = fila.total;
           if (!total) return '';
+          // con observación de no pago, la SOT no se cobra: monto en rojo y tachado
+          if (esNoPago(fila)) {
+            return h('div', { class: 'flex flex-col items-end leading-tight', title: 'No se cobra: tiene observación de no pago' }, [
+              h('span', { class: 'font-medium text-red-600 line-through' }, `S/ ${Number(fila.precioTotalEditable ?? total).toFixed(2)}`),
+              h('span', { class: 'text-[11px] font-medium text-red-600' }, 'No pago'),
+            ]);
+          }
           // si Auditoría cambió el precio, se cobra ese y el calculado queda tachado
           if (fila.precioTotalEditable != null && Number(fila.precioTotalEditable) !== Number(total)) {
             return h('div', { class: 'flex flex-col items-end leading-tight' }, [

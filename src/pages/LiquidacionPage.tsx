@@ -51,7 +51,11 @@ export const LiquidacionPage: React.FC = () => {
 
     const metricas = useMemo(() => ({
         totalLiquidaciones: totalRecords,
-        montoTotal: data.reduce((sum, item) => sum + (item.precioTotalEditable ?? item.precioTotalReal ?? 0), 0),
+        // las SOT que no se pagan (estadoPago 2 u observación de no pago) no suman
+        montoTotal: data.reduce((sum, item) => {
+            const noPago = item.estadoPago === 2 || (item.observaciones ?? []).some((o) => o.tipo === 2 && o.texto?.trim());
+            return sum + (noPago ? 0 : item.precioTotalEditable ?? item.precioTotalReal ?? 0);
+        }, 0),
         ingresadas: data.filter(d => d.estadoSistema === 'Ingresada' || d.estadoSistema === 1).length,
         validadas: data.filter(d => d.estadoSistema === 'Validada' || d.estadoSistema === 2).length,
     }), [data, totalRecords]);

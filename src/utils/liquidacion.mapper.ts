@@ -58,14 +58,36 @@ import type {
     return { detallesNuevos: nuevos, detallesEditados: editados, detallesEliminados: eliminados };
   };
 
-  // Helper para empaquetar observaciones (TipoObservacion del back: FOTOS = 0, SI_PAGO = 1, NO_PAGO = 2)
-  // Sin motivoObservacionId: es opcional y un id fijo que no exista rompe el guardado por clave foránea
-  const armarObservaciones = (fila: Partial<FilaLiquidacionGrid>) => {
-    const observaciones = [];
-    if (fila.obsFotos) observaciones.push({ textoObservacion: fila.obsFotos, tipo: 0, usuarioId: 1 });
-    if (fila.obsSiPago) observaciones.push({ textoObservacion: fila.obsSiPago, tipo: 1, usuarioId: 1 });
-    if (fila.obsNoPago) observaciones.push({ textoObservacion: fila.obsNoPago, tipo: 2, usuarioId: 1 });
-    return observaciones;
+  // Columna de observación → TipoObservacion del back (FOTOS = 0, SI_PAGO = 1, NO_PAGO = 2)
+  const OBSERVACIONES: { campo: 'obsFotos' | 'obsSiPago' | 'obsNoPago'; tipo: number }[] = [
+    { campo: 'obsFotos', tipo: 0 },
+    { campo: 'obsSiPago', tipo: 1 },
+    { campo: 'obsNoPago', tipo: 2 },
+  ];
+
+  const textoObs = (fila: Partial<FilaLiquidacionGrid>, campo: typeof OBSERVACIONES[number]['campo']) =>
+    String(fila[campo] ?? '').trim().slice(0, 200);   // el back guarda hasta 200 caracteres
+
+  // Una observación con texto es "no pago": esa SOT no se cobra
+  export const esNoPago = (fila: Partial<FilaLiquidacionGrid>) => textoObs(fila, 'obsNoPago') !== '';
+
+  // Crear: una observación por columna con texto.
+  // usuarioId lo reemplaza el back con el usuario del token; sin motivoObservacionId (un id fijo rompe la clave foránea)
+  const armarObservaciones = (fila: Partial<FilaLiquidacionGrid>) =>
+    OBSERVACIONES.filter((o) => textoObs(fila, o.campo)).map((o) => ({ textoObservacion: textoObs(fila, o.campo), tipo: o.tipo, usuarioId: 1 }));
+
+  // Editar: la que ya existe se edita por id, la nueva se agrega y la vaciada se elimina (igual que los detalles)
+  const armarCambiosObservaciones = (fila: Partial<FilaLiquidacionGrid>) => {
+    const ids = fila.observacionesIds ?? {};
+    const nuevas = [], editadas = [], eliminadas: number[] = [];
+    for (const o of OBSERVACIONES) {
+      const texto = textoObs(fila, o.campo);
+      const id = ids[o.tipo];
+      if (texto && id) editadas.push({ observacionLiquidacionId: id, texto });
+      else if (texto) nuevas.push({ textoObservacion: texto, tipo: o.tipo, usuarioId: 1 });
+      else if (id) eliminadas.push(id);
+    }
+    return { observacionesNuevas: nuevas, observacionesEditadas: editadas, observacionesEliminadas: eliminadas };
   };
 
   // El back recibe FechaProgramacion como DateTime: acepta 'YYYY-MM-DD' o 'DD/MM/YYYY'; vacía → hoy
@@ -102,9 +124,5 @@ import type {
     precioTotalEditable: fila.precioTotalEditable ?? undefined,
     estadoPago: 1,
     ...armarCambiosDetalles(fila),
-    // El listado no devuelve observaciones, así que al editar no se sabe cuáles ya existen:
-    // mandarlas otra vez las duplicaría. Por ahora solo se guardan al crear.
-    observacionesNuevas: [],
-    observacionesEditadas: [],
-    observacionesEliminadas: []
+    ...armarCambiosObservaciones(fila),
   });

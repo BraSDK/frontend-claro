@@ -30,10 +30,17 @@ export interface DetalleResponseDto {
     usuarioId: number;
   }
   
+  // Igual que EditarObservacionDto del back
   export interface EditarObservacionDto {
-    observacionId: number;
-    observacion?: string;
+    observacionLiquidacionId: number;
+    texto?: string;
     motivoObservacionId?: number;
+  }
+
+  export interface ObservacionResponseDto {
+    observacionLiquidacionId: number;
+    tipo: number;                 // TipoObservacion: FOTOS = 0, SI_PAGO = 1, NO_PAGO = 2
+    texto?: string | null;
   }
   
   // ==========================================
@@ -99,7 +106,8 @@ export interface DetalleResponseDto {
     detallesLiquidacion: DetalleResponseDto[];
     precioTotalReal?: number | null;      // calculado por el back con los precios del catálogo
     precioTotalEditable?: number | null;
-  
+    estadoPago?: number;                  // EstadoPago: 2 = no pagará
+    observaciones?: ObservacionResponseDto[];
   }
   
   // Si devuelves paginación estándar, este es el Wrapper
@@ -130,7 +138,8 @@ export interface DetalleResponseDto {
     total?: number;                       // calculado: costo de servicio + cantidades × precio del catálogo
     precioTotalEditable?: number | null;  // lo edita Auditoría; aquí solo se conserva
     estadoSistema?: number | string;   // se conserva al editar
-    detallesIds?: Record<string, number>;   // concepto → detalleLiquidacionId (para editar/eliminar sin duplicar)
+    detallesIds?: Record<string, number>;
+    observacionesIds?: Record<number, number>;   // tipo de observación → observacionLiquidacionId   // concepto → detalleLiquidacionId (para editar/eliminar sin duplicar)
     esRegistroExistente?: boolean;
   };
 

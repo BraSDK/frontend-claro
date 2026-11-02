@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo,useRef } from 'react';
 import { RevoGrid } from '@revolist/react-datagrid';
 import { temaClaro } from '@/theme/revogrid-theme';
-import { DataTable } from '@/components/shared/Tabla';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../../types/liquidacion.types';
 import { getLiquidacionesColumns, gridEditors } from './liquidacionesColumns';
 import { calcularTotal, type PreciosAdicionales } from '../../utils/liquidacion.mapper';
@@ -49,7 +48,16 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
         estadoSistema: liq.estadoSistema,   // para no pisar el estado al editar
         esRegistroExistente: true, // Crítico para que el AutoSave sepa que debe hacer PUT
         detallesIds: {},
+        observacionesIds: {},
       };
+
+      // Observaciones: una columna por tipo (FOTOS = 0, SI_PAGO = 1, NO_PAGO = 2)
+      (liq.observaciones ?? []).forEach((o) => {
+        filaPlana.observacionesIds![o.tipo] = o.observacionLiquidacionId;
+        if (o.tipo === 0) filaPlana.obsFotos = o.texto ?? '';
+        if (o.tipo === 1) filaPlana.obsSiPago = o.texto ?? '';
+        if (o.tipo === 2) filaPlana.obsNoPago = o.texto ?? '';
+      });
 
       // Desempaquetar arreglo de detalles a columnas sueltas
       if (liq.detallesLiquidacion && liq.detallesLiquidacion.length > 0) {
@@ -99,35 +107,39 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
     await onAutoSave(modelos.filter(Boolean));
   };
 
+  // Vista tipo Excel: sin tarjeta ni bordes alrededor; una barra simple arriba y la hoja ocupa el resto de la pantalla
   return (
-    <DataTable
-      titulo="Control de Liquidaciones"
-      cantidad={liquidaciones.length}
-      pie={pie}
-      acciones={<div className="flex items-center gap-2">{accionesExtras}</div>}
-    >
-      <div className="relative w-full overflow-x-auto border border-gray-200 rounded-md">
-        <div className="min-w-[850px] w-full" style={{ height: 'calc(100vh - 300px)', minHeight: '400px', maxHeight: '600px' }}>
-          {isLoading && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm">
-              <span className="text-gray-500 font-medium text-sm">Cargando liquidaciones...</span>
-            </div>
-          )}
+    <section className="flex flex-col gap-2">
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-[15px] font-semibold text-gray-900">
+          Control de Liquidaciones <span className="font-normal text-gray-500">({liquidaciones.length})</span>
+        </h2>
+        <div className="flex flex-wrap items-center gap-2">{accionesExtras}</div>
+      </header>
 
-          <RevoGrid
-            range = {true}
-            ref = {gridRef}
-            columns={columns}
-            editors={gridEditors}
-            source={gridData}
-            theme={temaClaro.name}
-            rowSize={45}
-            onAfteredit={handleAfterEdit}
-            resize={true}
-            useClipboard={true}
-          />
-        </div>
+      <div className="grilla-excel relative w-full" style={{ height: 'calc(100vh - 150px)', minHeight: '420px' }}>
+        {isLoading && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
+            <span className="text-gray-500 font-medium text-sm">Cargando liquidaciones...</span>
+          </div>
+        )}
+
+        <RevoGrid
+          range = {true}
+          ref = {gridRef}
+          columns={columns}
+          editors={gridEditors}
+          source={gridData}
+          theme={temaClaro.name}
+          rowSize={34}
+          rowHeaders={true}   // números de fila a la izquierda, como en Excel
+          onAfteredit={handleAfterEdit}
+          resize={true}
+          useClipboard={true}
+        />
       </div>
-    </DataTable>
+
+      {pie}
+    </section>
   );
 };
