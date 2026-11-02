@@ -14,7 +14,8 @@ interface Props {
   isLoading: boolean;
   onAutoSave: (filaEditada: Partial<Usuario>) => Promise<void>;
   onDelete: (id: number) => void;
-  rolLogueado?: string | null;
+  // rolLogueado?: string | null;
+  onChangePassword?: (usuario: Usuario) => void;
 }
 
 export const UsuariosTable = ({
@@ -22,7 +23,7 @@ export const UsuariosTable = ({
   isLoading,
   onAutoSave,
   onDelete,
-  rolLogueado
+  onChangePassword
 }: Props) => {
   const [gridData, setGridData] = useState<Partial<Usuario>[]>([]);
   const [hayBorrador, setHayBorrador] = useState(false);
@@ -71,7 +72,7 @@ export const UsuariosTable = ({
     restablecerDesdeServidor(usuarios);
   }, [usuarios, isLoading]);
 
-  const columns = useMemo(() => getUsuariosColumns(onDelete, rolLogueado), [onDelete, rolLogueado]);
+  const columns = useMemo(() => getUsuariosColumns(onDelete, onChangePassword), [onDelete, onChangePassword]);
 
   // Capturar el evento de salida de celda para el autoguardado
   const handleAfterEdit = async (e: CustomEvent) => {

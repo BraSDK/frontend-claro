@@ -1,5 +1,21 @@
 import type { ColumnRegular } from '@revolist/react-datagrid';
+import { Editor, type Editors } from '@revolist/react-datagrid';
 import type { FilaLiquidacionGrid } from '../../types/liquidacion.types';
+import FechaEditor from './FechaEditor';
+
+const formatSoles = (h: any, props: any) => {
+  const valor = props.model[props.prop];
+  if (valor === null || valor === undefined || valor === '') {
+    return h('span', { class: 'text-gray-400' }, '');
+  }
+  return h('span', { class: 'font-mono text-sm' }, `S/ ${Number(valor).toFixed(2)}`);
+};
+
+const EDITOR_FECHA = 'editor-fecha';
+
+export const gridEditors: Editors = {
+  [EDITOR_FECHA]: Editor(FechaEditor),
+};
 
 export const getLiquidacionesColumns = (
     onDelete?: (sot: number) => void
@@ -30,6 +46,7 @@ export const getLiquidacionesColumns = (
         prop: 'fechaProgramacion', 
         name: 'F. Programación', 
         size: 140,
+        editor: EDITOR_FECHA,
         // Al editar, el usuario ingresará 'YYYY-MM-DD', aquí lo formateamos visualmente
         cellTemplate: (h: any, props: any) => {
           const fecha = props.model[props.prop];
@@ -44,12 +61,12 @@ export const getLiquidacionesColumns = (
     { prop: 'subTipoOrden', name: 'SubTipo Orden', size: 160},
     
     // --- BAREMOS Y MATERIALES (Cantidades / Precios) ---
-    { prop: 'costoServicio', name: 'Costo Servicio', size: 120 },
+    { prop: 'costoServicio', name: 'Costo Servicio', size: 120, cellTemplate: formatSoles },
     { prop: 'deco', name: 'Deco', size: 80 },
-    { prop: 'repetidor', name: 'Repetidor', size: 100 },
-    { prop: 'drop150', name: 'Drop 150', size: 150 },
-    { prop: 'drop220', name: 'Drop 220', size: 150},
-    { prop: 'drop300', name: 'Drop 300', size: 150},
+    { prop: 'repetidor', name: 'Repetidor', size: 100, cellTemplate: formatSoles },
+    { prop: 'drop150', name: 'Drop 150', size: 150, cellTemplate: formatSoles },
+    { prop: 'drop220', name: 'Drop 220', size: 150, cellTemplate: formatSoles},
+    { prop: 'drop300', name: 'Drop 300', size: 150, cellTemplate: formatSoles},
 
     // --- OBSERVACIONES (Textos) ---
     { prop: 'obsFotos', name: 'Obs. Fotos', size: 200 },
@@ -66,6 +83,7 @@ export const getLiquidacionesColumns = (
           const total = props.model[props.prop];
           return h('span', { class: 'font-medium text-green-600' }, total ? `S/ ${Number(total).toFixed(2)}` : '');
         }
+        , pin:'colPinEnd'
     },
     {
         prop: 'acciones',

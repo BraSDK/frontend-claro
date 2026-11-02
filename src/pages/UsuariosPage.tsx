@@ -6,6 +6,7 @@ import { useUsuariosFilter } from '../hooks/usuario/useUsuariosFilter';
 import { UsuariosTable } from '../components/Usuarios/UsuariosTable';
 import { UsuariosFilterDrawer } from '../components/Usuarios/UsuariosFilterDrawer';
 import { UsuarioForm } from '../components/Usuarios/UsuarioForm';
+import { CambiarPasswordModal } from '../components/Usuarios/CambiarPasswordModal';
 import { Drawer } from '../components/shared/Drawer';
 import { Boton } from '../components/shared/Tabla';
 import { useAuth } from '../hooks/useAuth';
@@ -30,6 +31,7 @@ export const UsuariosPage = () => {
     editUsuario, 
     removeUsuario, 
     fetchUsuarios,
+    cambiarPassword,
   } = useUsuarios();
   const {
     isFilterOpen,
@@ -48,6 +50,10 @@ export const UsuariosPage = () => {
   const [formAbierto, setFormAbierto] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const abrirFormulario = () => { setFormKey((k) => k + 1); setFormAbierto(true); };
+
+  // Modal de cambiar contraseña
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [usuarioSeleccionado, setUsuarioSeleccionado] = useState<Usuario | null>(null);
 
   // El back recibe el rol como número (enum Rol). Se llama al servicio directo (no a addUsuario)
   // para que un error se vea solo dentro del formulario y no también en la página.
@@ -99,6 +105,15 @@ export const UsuariosPage = () => {
     }
   };
 
+  const handleAbrirModal = (usuario: Usuario) => {
+    setUsuarioSeleccionado(usuario);
+    setModalAbierto(true);
+  };
+
+  const handleActualizarPassword = async (id: number, clave: string) => {
+      await cambiarPassword(id, clave);
+  };
+
   const handleEliminarUsuario = async (id: number) => {
     const confirmar = window.confirm('¿Estás seguro de que deseas eliminar este usuario?');
     if (confirmar) {
@@ -145,7 +160,14 @@ export const UsuariosPage = () => {
         isLoading={isLoading}
         onAutoSave={handleAutoSave}
         onDelete={handleEliminarUsuario}
-        rolLogueado={rolLogueado}
+        onChangePassword={handleAbrirModal}
+      />
+
+      <CambiarPasswordModal
+        isOpen={modalAbierto}
+        onClose={() => setModalAbierto(false)}
+        usuario={usuarioSeleccionado}
+        onSubmit={handleActualizarPassword}
       />
 
       <Drawer isOpen={formAbierto} onClose={() => setFormAbierto(false)} title="Nuevo usuario" widthClass="w-[480px]">

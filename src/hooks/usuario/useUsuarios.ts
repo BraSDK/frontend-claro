@@ -3,7 +3,8 @@ import {
   getUsuarios, 
   createUsuario, 
   updateUsuario, 
-  deleteUsuario 
+  deleteUsuario, 
+  updatePasswordUsuario
 } from '../../services/usuario.service';
 import type { 
   Usuario, 
@@ -91,6 +92,21 @@ export const useUsuarios = () => {
     }
   };
 
+  const cambiarPassword = async (id: number, nuevaClave: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      await updatePasswordUsuario(id, nuevaClave);
+      // Opcional: await fetchUsuarios(); // Descomenta si necesitas refrescar la grilla
+    } catch (err: any) {
+      const msg = err.response?.data?.error || 'Error al actualizar la contraseña.';
+      setError(msg);
+      throw new Error(msg); // Lanza el error para que el Modal lo capture y no se cierre
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     usuarios,
     isLoading,
@@ -99,5 +115,6 @@ export const useUsuarios = () => {
     addUsuario,
     editUsuario,
     removeUsuario,
+    cambiarPassword,
   };
 };
