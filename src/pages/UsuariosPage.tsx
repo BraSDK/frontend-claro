@@ -9,6 +9,7 @@ import { UsuarioForm } from '../components/Usuarios/UsuarioForm';
 import { Drawer } from '../components/shared/Drawer';
 import { Boton } from '../components/shared/Tabla';
 import { useAuth } from '../hooks/useAuth';
+import { createUsuario } from '../services/usuario.service';
 
 import type { Usuario, RegisterRequestDto, EditRequestDto } from '../types/usuario.types';
 import { Rol } from '../types/usuario.types';
@@ -27,8 +28,8 @@ export const UsuariosPage = () => {
     error, 
     addUsuario, 
     editUsuario, 
-    removeUsuario 
-    // fetchUsuarios // <- Ideal si tu hook expone la función de recarga
+    removeUsuario, 
+    fetchUsuarios,
   } = useUsuarios();
   const {
     isFilterOpen,
@@ -48,11 +49,13 @@ export const UsuariosPage = () => {
   const [formKey, setFormKey] = useState(0);
   const abrirFormulario = () => { setFormKey((k) => k + 1); setFormAbierto(true); };
 
-  // El back recibe el rol como número (enum Rol); si falla, el error lo muestra el formulario
+  // El back recibe el rol como número (enum Rol). Se llama al servicio directo (no a addUsuario)
+  // para que un error se vea solo dentro del formulario y no también en la página.
   const crearDesdeFormulario = async (datos: RegisterRequestDto | EditRequestDto) => {
     const nuevo = datos as RegisterRequestDto;
-    await addUsuario({ ...nuevo, rol: RolBackendMap[nuevo.rol] as unknown as Rol });
+    await createUsuario({ ...nuevo, rol: RolBackendMap[nuevo.rol] as unknown as Rol });
     setFormAbierto(false);
+    await fetchUsuarios();
   };
 
   // Lógica de Autoguardado por fila (Se dispara al salir de la celda)
