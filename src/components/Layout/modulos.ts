@@ -6,6 +6,7 @@ export interface Modulo {
     ruta: string;
     permiso?: Permiso;  
     grupo?: 'Administración';
+    pantallaCompleta?: boolean;   // sin márgenes del <main>: la pantalla va pegada al header y a los bordes (vista tipo hoja)
 }
 
 export const MODULOS: Modulo[] = [
@@ -14,7 +15,7 @@ export const MODULOS: Modulo[] = [
     { nombre: 'Valorización almacén', ruta: '/valorizacion',permiso: 'verValorizacion'},
     { nombre: 'Pagos Claro', ruta: '/pagos-claro', permiso:'verPagosClaro'},
     { nombre: 'Conciliación de pagos', ruta: '/conciliacion',permiso:'verConciliacion' },
-    { nombre: 'Liquidacion', ruta: '/liquidacion',permiso:'verLiquidacion'},
+    { nombre: 'Liquidacion', ruta: '/liquidacion',permiso:'verLiquidacion', pantallaCompleta: true },
     { nombre: 'Auditoría de liquidaciones', ruta: '/auditoria', permiso: 'verAuditoria' },
     { nombre: 'Reportes', ruta: '/reportes' , permiso:'verReportes'},
     { nombre: 'Configuración', ruta: '/configuracion' },

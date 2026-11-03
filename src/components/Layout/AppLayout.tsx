@@ -40,6 +40,7 @@ export const AppLayout = () => {
     const modulos = MODULOS.filter((m) => !m.permiso || validarPermiso(rol,m.permiso));
     
     const activo = moduloActivo(pathname);
+    console.log(pathname);
     const titulo = tituloDeRuta(pathname);
 
     const atras = () => (window.history.length > 1 ? navigate(-1) : navigate('/dashboard'));
@@ -173,7 +174,7 @@ export const AppLayout = () => {
             </header>
 
             {/* ===== Contenido ===== */}
-            <main className="px-4 py-6 md:px-10 xl:px-20">
+            <main className={activo?.pantallaCompleta ? '' : 'px-4 py-6 md:px-10 xl:px-20'}>
                 <Outlet />
             </main>
         </div>
