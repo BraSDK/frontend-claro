@@ -87,6 +87,12 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                 precioTotalEditable: f.precioTotalEditable ?? null,   // se conserva el precio editado que ya tenía
             }));
             const res = await auditarLiquidaciones(items);
+            if (res.enPago?.length) {
+                // las demás sí se guardaron; estas no porque ya están en un pago registrado
+                setError(`${res.actualizadas} SOT guardadas. No se cambiaron porque ya están en un pago registrado: ${res.enPago.join(', ')}`);
+                onConfirmado(res.actualizadas);
+                return;
+            }
             onConfirmado(res.actualizadas);
             cerrar();
         } catch (e: any) {

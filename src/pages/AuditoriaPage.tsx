@@ -93,6 +93,7 @@ export const AuditoriaPage = () => {
             try {
                 const res = await auditarLiquidaciones(items);
                 if (res.noEncontradas.length) errores.push(`No existen: ${res.noEncontradas.join(', ')}`);
+                if (res.enPago?.length) errores.push(`Ya están en un pago registrado (para cambiarlas, elimina ese pago en Pagos Claro): ${res.enPago.join(', ')}`);
                 if (!errores.length) setMensaje({ tipo: 'ok', texto: `${res.actualizadas} SOT guardada(s)` });
             } catch {
                 errores.push('No se pudo guardar la auditoría');

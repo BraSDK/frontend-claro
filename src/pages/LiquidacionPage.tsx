@@ -114,11 +114,10 @@ export const LiquidacionPage: React.FC = () => {
     // Vista tipo hoja (Google Sheets): pegada al header y a los bordes, sin tarjetas.
     // Arriba una barra de herramientas de una línea, en medio la hoja y abajo la barra de estado.
     return (
-        <div className="flex h-[calc(100vh-58px)] flex-col bg-white">
+        <div className="flex h-[calc(100vh-58px)] flex-col bg-white mt-4">
             {/* Barra de herramientas: filtros compactos + acciones */}
 
            <FilterBar onBuscar={aplicarBusqueda} onLimpiar={limpiarFiltros} hayFiltros={hayFiltros}>
-                
                     <Campo label="SOT">
                         <Entrada inputMode="numeric" value={textoBusqueda} onChange={(e)=>setTextoBusqueda(e.target.value) }/>
                     </Campo>
