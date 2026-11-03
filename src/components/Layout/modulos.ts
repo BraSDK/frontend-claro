@@ -10,7 +10,7 @@ export interface Modulo {
 }
 
 export const MODULOS: Modulo[] = [
-    { nombre: 'Inicio', ruta: '/inicio' },          // pantalla principal: botones a cada módulo
+    { nombre: 'Inicio', ruta: '/inicio', pantallaCompleta: true },          // pantalla principal: botones a cada módulo
     { nombre: 'Dashboard', ruta: '/dashboard' },
     { nombre: 'Órdenes de trabajo', ruta: '/ordenes' },
     { nombre: 'Pagos Claro', ruta: '/pagos-claro', permiso:'verPagosClaro'},

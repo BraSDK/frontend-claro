@@ -174,7 +174,7 @@ export const AppLayout = () => {
             </header>
 
             {/* ===== Contenido ===== */}
-            <main className={activo?.pantallaCompleta ? '' : 'px-4 py-6 md:px-10 xl:px-20'}>
+            <main className={`relative flex flex-1 flex-col ${activo?.pantallaCompleta ? '' : 'px-4 py-6 md:px-10 xl:px-20'}`}>
                 <Outlet />
             </main>
         </div>
