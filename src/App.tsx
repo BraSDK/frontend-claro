@@ -2,7 +2,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from './components/Auth/Login';
 import { AppLayout } from './components/Layout/AppLayout';
-import { ServiciosPage } from './pages/ServiciosPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import { OrdenesPage } from './pages/OrdenesPage/OrdenesPage';
 import { OrdenesCrearPage } from './pages/OrdenesPage/OrdenesCrearPage';
@@ -45,9 +44,6 @@ function App() {
           </Route>
           <Route element={<RutaProtegida permiso="verPagosClaro"/>}>
             <Route path="/pagos-claro" element={<PagosClaroPage />} />
-          </Route>
-          <Route element={<RutaProtegida permiso="gestionarServicios"/>}>
-            <Route path="/servicios" element={<ServiciosPage />} />
           </Route>
           <Route path="/ordenes" element={<OrdenesPage />} />
           <Route path="/ordenes/nueva" element={<OrdenesCrearPage />} />

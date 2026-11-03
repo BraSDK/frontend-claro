@@ -18,7 +18,6 @@ export const MODULOS: Modulo[] = [
     { nombre: 'Auditoría de liquidaciones', ruta: '/auditoria', permiso: 'verAuditoria' },
     { nombre: 'Reportes', ruta: '/reportes' , permiso:'verReportes'},
     { nombre: 'Configuración', ruta: '/configuracion' },
-    { nombre: 'Servicios', ruta: '/servicios', permiso: 'gestionarServicios', grupo: 'Administración' },
     { nombre: 'Usuarios', ruta: '/usuarios', permiso: 'gestionarUsuarios', grupo: 'Administración' },
 ];
 
