@@ -10,11 +10,10 @@ export interface Modulo {
 }
 
 export const MODULOS: Modulo[] = [
-    { nombre: 'Inicio', ruta: '/dashboard' },
+    { nombre: 'Inicio', ruta: '/inicio' },          // pantalla principal: botones a cada módulo
+    { nombre: 'Dashboard', ruta: '/dashboard' },
     { nombre: 'Órdenes de trabajo', ruta: '/ordenes' },
-    { nombre: 'Valorización almacén', ruta: '/valorizacion',permiso: 'verValorizacion'},
     { nombre: 'Pagos Claro', ruta: '/pagos-claro', permiso:'verPagosClaro'},
-    { nombre: 'Conciliación de pagos', ruta: '/conciliacion',permiso:'verConciliacion' },
     { nombre: 'Liquidacion', ruta: '/liquidacion',permiso:'verLiquidacion', pantallaCompleta: true },
     { nombre: 'Auditoría de liquidaciones', ruta: '/auditoria', permiso: 'verAuditoria' },
     { nombre: 'Reportes', ruta: '/reportes' , permiso:'verReportes'},
