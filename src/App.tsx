@@ -9,11 +9,11 @@ import { OrdenEditarPage } from './pages/OrdenesPage/OrdenEditarPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { InicioPage } from './pages/InicioPage';
 import { ConciliacionPage } from './pages/ConciliacionPage';
-import { ProximamentePage } from './pages/ProximamentePage';
 import { ConfiguracionPage } from './pages/ConfiguracionPage';
 import { LiquidacionPage } from './pages/LiquidacionPage';
 import { AuditoriaPage } from './pages/AuditoriaPage';
 import { PagosClaroPage } from './pages/PagosClaroPage';
+import { ReportesPage } from './pages/ReportesPage';
 import { RutaProtegida } from './components/Auth/RutaProtegida';
 function App() {
   return (
@@ -40,7 +40,7 @@ function App() {
             <Route path="/auditoria" element={<AuditoriaPage />} />
           </Route>
           <Route element={<RutaProtegida permiso='verReportes'/>}>
-            <Route path="/reportes" element={<ProximamentePage titulo="Reportes" descripcion="Reportes descargables por periodo, técnico y servicio. Por ahora puedes exportar las diferencias desde la conciliación y ver los totales en el Dashboard." atajo={{ texto: 'Ir al Dashboard', ruta: '/dashboard' }} />} />
+            <Route path="/reportes" element={<ReportesPage />} />
           </Route>
           <Route element={<RutaProtegida permiso="verPagosClaro"/>}>
             <Route path="/pagos-claro" element={<PagosClaroPage />} />
