@@ -11,6 +11,12 @@ import { mapGridToCrearDto, mapGridToEditarDto, preciosDesdeCatalogo } from '../
 import { getAdicionales } from '../services/liquidacion.service';
 import { useAuth } from '../hooks/useAuth';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid, AdicionalDto } from '../types/liquidacion.types';
+<<<<<<< HEAD
+=======
+import { FilterBar } from '../components/ui/FilterBar';
+import { exportarAExcel } from '../utils/exportarExcel';
+import { Download } from 'lucide-react';
+>>>>>>> 5168ff1 (Feature: Diseño y Exportar Excel (boton))
 
 export const LiquidacionPage: React.FC = () => {
     const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
@@ -89,6 +95,30 @@ export const LiquidacionPage: React.FC = () => {
         }
     };
 
+<<<<<<< HEAD
+=======
+    const handleExportar = () => {
+        if (!data || data.length === 0) {
+            alert("No hay liquidaciones registradas para exportar.");
+            return;
+        }
+        // Puedes mapearla si quieres cambiar los nombres de las columnas antes de exportar
+        const datosMapeados = data.map(fila => ({
+            "SOT": fila.sot,
+            "Tipo Orden": fila.tipoOrden || '', 
+            "SubTipo Orden": fila.nombreSubTipoOrden || '',
+            "Técnico": fila.nombreTecnico || 'Sin asignar',
+            "Fecha Programación": fila.fechaProgramacion || '',
+            "Estado Sistema": fila.estadoSistema === 1 ? 'Ingresada' : fila.estadoSistema === 2 ? 'Validada' : fila.estadoSistema,
+            "Precio Total": fila.precioTotalEditable ?? fila.precioTotalReal ?? 0
+        }));
+    
+        exportarAExcel(datosMapeados, 'Liquidaciones');
+    };
+
+    // Vista tipo hoja (Google Sheets): pegada al header y a los bordes, sin tarjetas.
+    // Arriba una barra de herramientas de una línea, en medio la hoja y abajo la barra de estado.
+>>>>>>> 5168ff1 (Feature: Diseño y Exportar Excel (boton))
     return (
         <div className="flex flex-col gap-5">
             <FilterBar onBuscar={aplicarBusqueda} onLimpiar={limpiarFiltros} hayFiltros={hayFiltros}>
@@ -102,10 +132,26 @@ export const LiquidacionPage: React.FC = () => {
                         <option value="1">Ingresada</option>
                         <option value="2">Validada</option>
                     </Selector>
+<<<<<<< HEAD
                 </Campo>
                 <Campo label="Fecha de programación">
                     <RangoFechas desde={desde} hasta={hasta} onDesde={cambiarFiltro(setDesde)} onHasta={cambiarFiltro(setHasta)} />
                 </Campo>
+=======
+                    <Campo label="fechaProgramacion">
+                        <RangoFechas desde={desde} hasta={hasta} onDesde={cambiarFiltro(setDesde)} onHasta={cambiarFiltro(setHasta)} />
+                    </Campo>
+                    {/* Botón de Exportar Excel */}
+                    <button
+                        type="button"
+                        onClick={handleExportar}
+                        className="inline-flex h-[28px] items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+                        title="Exportar liquidaciones a Excel"
+                    >
+                        <FileSpreadsheet size={14} className="text-white" />
+                        <span>Exportar</span>
+                    </button>
+>>>>>>> 5168ff1 (Feature: Diseño y Exportar Excel (boton))
             </FilterBar>
 
             {/* Errores del guardado (por SOT) o de la carga: antes se perdían sin mostrarse */}
