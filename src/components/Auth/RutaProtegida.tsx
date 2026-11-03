@@ -5,5 +5,5 @@ import { validarPermiso, type Permiso } from '../../utils/permisos';
 
 export const RutaProtegida = ({ permiso }: { permiso: Permiso }) => {
     const { rol } = useAuth();
-    return validarPermiso(rol, permiso) ? <Outlet /> : <Navigate to="/dashboard" replace />;
+    return validarPermiso(rol, permiso) ? <Outlet /> : <Navigate to="/inicio" replace />;
 }

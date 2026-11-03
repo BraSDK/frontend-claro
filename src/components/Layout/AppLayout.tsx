@@ -40,9 +40,10 @@ export const AppLayout = () => {
     const modulos = MODULOS.filter((m) => !m.permiso || validarPermiso(rol,m.permiso));
     
     const activo = moduloActivo(pathname);
+    console.log(pathname);
     const titulo = tituloDeRuta(pathname);
 
-    const atras = () => (window.history.length > 1 ? navigate(-1) : navigate('/dashboard'));
+    const atras = () => (window.history.length > 1 ? navigate(-1) : navigate('/inicio'));
 
     const buscar = (e: React.FormEvent) => {
         e.preventDefault();
@@ -72,7 +73,7 @@ export const AppLayout = () => {
                     {/* logo genérico del sistema (sin marca de terceros) */}
                     <button
                         type="button"
-                        onClick={() => navigate('/dashboard')}
+                        onClick={() => navigate('/inicio')}
                         className="hidden h-8 items-center gap-2 rounded-control px-1 text-on-primary sm:flex"
                         title="Inicio"
                     >
@@ -173,7 +174,7 @@ export const AppLayout = () => {
             </header>
 
             {/* ===== Contenido ===== */}
-            <main className="px-4 py-6 md:px-10 xl:px-20">
+            <main className={activo?.pantallaCompleta ? '' : 'px-4 py-6 md:px-10 xl:px-20'}>
                 <Outlet />
             </main>
         </div>

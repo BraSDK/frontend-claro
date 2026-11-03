@@ -13,8 +13,6 @@ interface LiquidacionesTableProps {
   onAutoSave: (filas: Partial<FilaLiquidacionGrid>[]) => Promise<void>;   // 1 fila (edición) o varias (pegado/autollenado)
   onDelete?: (sot: number) => void;
   precios: PreciosAdicionales;   // precios del catálogo para calcular el total al editar
-  accionesExtras?: React.ReactNode;
-  pie?: React.ReactNode;
 }
 
 // Fila nueva que el usuario ya empezó a llenar (todavía no está en el servidor)
@@ -27,8 +25,6 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   onAutoSave,
   onDelete,
   precios,
-  accionesExtras,
-  pie
 }) => {
   const [gridData, setGridData] = useState<Partial<FilaLiquidacionGrid>[]>([]);
   const gridRef = useRef<HTMLRevoGridElement>(null); // traemos todos los metodos de revogrid
@@ -107,39 +103,28 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
     await onAutoSave(modelos.filter(Boolean));
   };
 
-  // Vista tipo Excel: sin tarjeta ni bordes alrededor; una barra simple arriba y la hoja ocupa el resto de la pantalla
+  // Solo la hoja: ocupa todo el alto del contenedor que le dé la página (la barra de herramientas y la paginación van en la página)
   return (
-    <section className="flex flex-col gap-2">
-      <header className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-[15px] font-semibold text-gray-900">
-          Control de Liquidaciones <span className="font-normal text-gray-500">({liquidaciones.length})</span>
-        </h2>
-        <div className="flex flex-wrap items-center gap-2">{accionesExtras}</div>
-      </header>
+    <div className="grilla-excel relative h-full w-full">
+      {isLoading && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
+          <span className="text-gray-500 font-medium text-sm">Cargando liquidaciones...</span>
+        </div>
+      )}
 
-      <div className="grilla-excel relative w-full" style={{ height: 'calc(100vh - 150px)', minHeight: '420px' }}>
-        {isLoading && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/70">
-            <span className="text-gray-500 font-medium text-sm">Cargando liquidaciones...</span>
-          </div>
-        )}
-
-        <RevoGrid
-          range = {true}
-          ref = {gridRef}
-          columns={columns}
-          editors={gridEditors}
-          source={gridData}
-          theme={temaClaro.name}
-          rowSize={34}
-          rowHeaders={true}   // números de fila a la izquierda, como en Excel
-          onAfteredit={handleAfterEdit}
-          resize={true}
-          useClipboard={true}
-        />
-      </div>
-
-      {pie}
-    </section>
+      <RevoGrid
+        range = {true}
+        ref = {gridRef}
+        columns={columns}
+        editors={gridEditors}
+        source={gridData}
+        theme={temaClaro.name}
+        rowSize={34}
+        rowHeaders={true}   // números de fila a la izquierda, como en Excel
+        onAfteredit={handleAfterEdit}
+        resize={true}
+        useClipboard={true}
+      />
+    </div>
   );
 };

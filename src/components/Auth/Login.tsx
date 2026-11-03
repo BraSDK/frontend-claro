@@ -14,7 +14,7 @@ export const Login = () => {
         e.preventDefault();
         try {
             await login({ email, password });
-            navigate('/dashboard');
+            navigate('/inicio');
         } catch {
             // el hook ya guarda el mensaje de error
         }

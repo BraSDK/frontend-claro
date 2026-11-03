@@ -58,10 +58,11 @@ const leerCsv = (contenido: string): TablaExcel => {
 export const leerExcel = async (archivo: File): Promise<TablaExcel> => {
     if (archivo.name.toLowerCase().endsWith('.csv')) return leerCsv(await archivo.text());
 
-    const leer = abrirZip(await archivo.arrayBuffer());
+    const leer = abrirZip(await archivo.arrayBuffer()); 
 
     // la primera hoja del libro (workbook.xml dice cuál es; sus rels dicen en qué archivo está)
     let rutaHoja = 'xl/worksheets/sheet1.xml';
+
     const [libro, rels] = await Promise.all([leer('xl/workbook.xml'), leer('xl/_rels/workbook.xml.rels')]);
     if (libro && rels) {
         const id = etiquetas(xml(libro), 'sheet')[0]?.getAttribute('r:id');

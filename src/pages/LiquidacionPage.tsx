@@ -1,22 +1,19 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLiquidaciones } from '../hooks/liquidacion/useLiquidaciones';
 import { LiquidacionesTable } from '../components/Liquidacion/LiquidacionesTable';
-import { LiquidacionFormDrawer } from '../components/Liquidacion/LiquidacionFormDrawer';        
+import { LiquidacionFormDrawer } from '../components/Liquidacion/LiquidacionFormDrawer';    
+    
 import { PreciosAdicionalesModal } from '../components/Liquidacion/PreciosAdicionalesModal';
-import { FilterBar, Campo, Entrada, Selector, RangoFechas } from '@/components/shared/Filtros';
+import { Campo, Entrada, Selector, RangoFechas } from '@/components/shared/Filtros';
 import { AccionTabla, Boton, BarPaginancion } from '@/components/shared/Tabla';
-import { StatCard } from '@/components/shared/Cards';
-import { ClipboardList, Wallet, Clock, CheckCircle2, FileSpreadsheet, Plus, Tags } from 'lucide-react';
+import { FileSpreadsheet, Tags, Search, FilterX } from 'lucide-react';
 import { mapGridToCrearDto, mapGridToEditarDto, preciosDesdeCatalogo } from '../utils/liquidacion.mapper';
 import { getAdicionales } from '../services/liquidacion.service';
 import { useAuth } from '../hooks/useAuth';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid, AdicionalDto } from '../types/liquidacion.types';
-<<<<<<< HEAD
-=======
 import { FilterBar } from '../components/ui/FilterBar';
 import { exportarAExcel } from '../utils/exportarExcel';
 import { Download } from 'lucide-react';
->>>>>>> 5168ff1 (Feature: Diseño y Exportar Excel (boton))
 
 export const LiquidacionPage: React.FC = () => {
     const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
@@ -95,8 +92,6 @@ export const LiquidacionPage: React.FC = () => {
         }
     };
 
-<<<<<<< HEAD
-=======
     const handleExportar = () => {
         if (!data || data.length === 0) {
             alert("No hay liquidaciones registradas para exportar.");
@@ -118,26 +113,19 @@ export const LiquidacionPage: React.FC = () => {
 
     // Vista tipo hoja (Google Sheets): pegada al header y a los bordes, sin tarjetas.
     // Arriba una barra de herramientas de una línea, en medio la hoja y abajo la barra de estado.
->>>>>>> 5168ff1 (Feature: Diseño y Exportar Excel (boton))
     return (
-        <div className="flex flex-col gap-5">
-            <FilterBar onBuscar={aplicarBusqueda} onLimpiar={limpiarFiltros} hayFiltros={hayFiltros}>
-                {/* Tus Campos de filtro se mantienen intactos */}
-                <Campo label="SOT">
-                    <Entrada inputMode="numeric" value={textoBusqueda} onChange={(e) => setTextoBusqueda(e.target.value)} placeholder="Ingrese el número de SOT" />
-                </Campo>
-                <Campo label="Estado">
-                    <Selector value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value === '' ? '' : Number(e.target.value))}>
-                        <option value="">Todos</option>
+        <div className="flex h-[calc(100vh-58px)] flex-col bg-white mt-4">
+            {/* Barra de herramientas: filtros compactos + acciones */}
+
+           <FilterBar onBuscar={aplicarBusqueda} onLimpiar={limpiarFiltros} hayFiltros={hayFiltros}>
+                    <Campo label="SOT">
+                        <Entrada inputMode="numeric" value={textoBusqueda} onChange={(e)=>setTextoBusqueda(e.target.value) }/>
+                    </Campo>
+                    <Selector className="!h-[28px] w-32" value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value === '' ? '' : Number(e.target.value))}>
+                        <option value="">Estado</option>
                         <option value="1">Ingresada</option>
                         <option value="2">Validada</option>
                     </Selector>
-<<<<<<< HEAD
-                </Campo>
-                <Campo label="Fecha de programación">
-                    <RangoFechas desde={desde} hasta={hasta} onDesde={cambiarFiltro(setDesde)} onHasta={cambiarFiltro(setHasta)} />
-                </Campo>
-=======
                     <Campo label="fechaProgramacion">
                         <RangoFechas desde={desde} hasta={hasta} onDesde={cambiarFiltro(setDesde)} onHasta={cambiarFiltro(setHasta)} />
                     </Campo>
@@ -151,62 +139,45 @@ export const LiquidacionPage: React.FC = () => {
                         <FileSpreadsheet size={14} className="text-white" />
                         <span>Exportar</span>
                     </button>
->>>>>>> 5168ff1 (Feature: Diseño y Exportar Excel (boton))
             </FilterBar>
 
-            {/* Errores del guardado (por SOT) o de la carga: antes se perdían sin mostrarse */}
-            {error && <div className="rounded-control bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
+            {/* Errores del guardado (por SOT) o de la carga */}
+            {error && <div className="border-b border-danger/30 bg-danger-soft px-3 py-1 text-sm text-danger">{error}</div>}
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <StatCard title="Liquidaciones en vista" icon={ClipboardList} value={metricas.totalLiquidaciones} iconClassName="bg-info-soft text-info" />
-                <StatCard title="Monto total (Pág. actual)" icon={Wallet} value={`S/ ${metricas.montoTotal.toFixed(2)}`} iconClassName="bg-success-soft text-success" />
-                <StatCard title="Ingresadas" icon={Clock} value={metricas.ingresadas} iconClassName="bg-info-soft text-info" />
-                <StatCard title="Validadas / Liquidadas" icon={CheckCircle2} value={metricas.validadas} iconClassName="bg-success-soft text-success" />
+            {/* La hoja ocupa todo el espacio libre */}
+            <div className="min-h-0 flex-1">
+                <LiquidacionesTable
+                    liquidaciones={data}
+                    isLoading={loading}
+                    onAutoSave={handleAutoSave}
+                    onDelete={handleDelete}
+                    precios={precios}
+                />
             </div>
 
-            {/* Invocamos a la tabla pasando botones extras y paginación como props */}
-            <LiquidacionesTable 
-                liquidaciones={data} 
-                isLoading={loading} 
-                onAutoSave={handleAutoSave}
-                onDelete={handleDelete}
-                precios={precios}
-                accionesExtras={
-                    <>
-                        <AccionTabla icono={<Tags size={16} />} onClick={() => setPreciosAbierto(true)}>
-                            Precios adicionales
-                        </AccionTabla>
-                        <AccionTabla icono={<FileSpreadsheet size={16} />} onClick={() => setImportarAbierto(true)}>
-                            Importar Excel
-                        </AccionTabla>
-                        <Boton icono={<Plus size={16} />} onClick={() => { setLiquidacionActiva(null); setDrawerAbierto(true); }} className="ml-1">
-                            Nueva Liquidación
-                        </Boton>
-                    </>
-                }
-                pie={
+            {/* Barra de estado (como la de Sheets): resumen de la página y paginación */}
+            <footer className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-gray-300 bg-gray-50 px-3 py-1 text-xs text-gray-600">
+                <span><b className="text-gray-800">{metricas.totalLiquidaciones}</b> liquidaciones</span>
+                <span>Monto: <b className="text-gray-800">S/ {metricas.montoTotal.toFixed(2)}</b></span>
+                <span>Ingresadas: <b className="text-gray-800">{metricas.ingresadas}</b></span>
+                <span>Validadas: <b className="text-gray-800">{metricas.validadas}</b></span>
+                <div className="ml-auto">
                     <BarPaginancion
                         onHandle={(pagina: number) => setParams(prev => ({ ...prev, pagina }))}
                         numeroPagina={params.pagina || 1}
                         totalRegistros={totalRecords}
                         totalRegistrosPagina={params.canPagina || 15}
-                        totalPaginasTotales={Math.ceil(totalRecords / (params.canPagina || 15))}
+                        totalPaginasTotales={Math.max(1, Math.ceil(totalRecords / (params.canPagina || 15)))}
                     />
-                }
-            />
-            
+                </div>
+            </footer>
+
             <PreciosAdicionalesModal
                 abierto={preciosAbierto}
                 onCerrar={() => setPreciosAbierto(false)}
                 catalogo={catalogo}
                 puedeEditar={rol === 'ADMIN'}
                 onGuardado={() => { cargarCatalogo(); fetchLiquidaciones(); }}
-            />
-
-            <LiquidacionFormDrawer 
-                isOpen={drawerAbierto} 
-                onClose={() => setDrawerAbierto(false)} 
-                liquidacion={liquidacionActiva}
             />
         </div>
     );

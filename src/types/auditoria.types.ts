@@ -101,4 +101,5 @@ export interface AuditarLiquidacionItem {
 export interface AuditarLiquidacionesResponse {
     actualizadas: number;
     noEncontradas: number[];
+    enPago: number[];   // ya están en un pago de Claro registrado: su auditoría no se cambia
 }
