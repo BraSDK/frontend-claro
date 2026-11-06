@@ -16,7 +16,7 @@ import { exportarAExcel } from '../utils/exportarExcel';
 import { Download } from 'lucide-react';
 
 export const LiquidacionPage: React.FC = () => {
-    const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
+    const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones, evaluarImportacion  } = useLiquidaciones();
     
     const [drawerAbierto, setDrawerAbierto] = useState(false);
     const [importarAbierto, setImportarAbierto] = useState(false);
@@ -47,7 +47,7 @@ export const LiquidacionPage: React.FC = () => {
 
     const limpiarFiltros = () => {
         setTextoBusqueda(''); setEstado(''); setDesde(''); setHasta('');
-        setParams({ pagina: 1, canPagina: 15 });
+        setParams({ pagina: 1, canPagina: 20 });
     };
 
     const cambiarFiltro = (setter: React.Dispatch<React.SetStateAction<any>>) => (valor: any) => setter(valor);
@@ -152,6 +152,8 @@ export const LiquidacionPage: React.FC = () => {
                     onAutoSave={handleAutoSave}
                     onDelete={handleDelete}
                     precios={precios}
+                    onAprobarImportacion={(sot) => evaluarImportacion(sot, true)}
+                    onRechazarImportacion={(sot) => evaluarImportacion(sot, false)}
                 />
             </div>
 
@@ -166,8 +168,8 @@ export const LiquidacionPage: React.FC = () => {
                         onHandle={(pagina: number) => setParams(prev => ({ ...prev, pagina }))}
                         numeroPagina={params.pagina || 1}
                         totalRegistros={totalRecords}
-                        totalRegistrosPagina={params.canPagina || 15}
-                        totalPaginasTotales={Math.max(1, Math.ceil(totalRecords / (params.canPagina || 15)))}
+                        totalRegistrosPagina={params.canPagina || 20}
+                        totalPaginasTotales={Math.max(1, Math.ceil(totalRecords / (params.canPagina || 20)))}
                     />
                 </div>
             </footer>

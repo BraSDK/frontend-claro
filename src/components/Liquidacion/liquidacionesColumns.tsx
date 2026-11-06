@@ -35,6 +35,8 @@ export const gridEditors: Editors = {
 
 export const getLiquidacionesColumns = (
     onDelete?: (sot: number) => void,
+    onAprobarImportacion?: (sot: number) => void,   // 👈 Agrega
+    onRechazarImportacion?: (sot: number) => void,
     precios: PreciosAdicionales = {}
   ): ColumnRegular[] => [
     { 
@@ -125,23 +127,42 @@ export const getLiquidacionesColumns = (
         , pin:'colPinEnd'
     },
     {
-        prop: 'acciones',
-        name: '🗑️',
-        size: 70,
-        pin: 'colPinEnd',
-        readonly: true,
-        cellTemplate: ( h: any, props: any ) => {
-            const row = props.model as FilaLiquidacionGrid;
-            if (!row.sot) return '';
-            
-            return h('div', { class: 'flex items-center justify-center gap-3 w-full h-full' }, [
-                h('button', {
-                    type: 'button',
-                    class: 'text-gray-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50',
-                    title: 'Eliminar liquidación',
-                    onClick: () => onDelete && row.sot && onDelete(row.sot)
-                }, '✕')
-            ]);
-        }
-    }
+      prop: 'acciones',
+      name: 'Acciones',
+      size: 110, // Ajusta el ancho para que quepan los botones
+      pin: 'colPinEnd',
+      readonly: true,
+      cellTemplate: (h: any, props: any) => {
+          const row = props.model as FilaLiquidacionGrid;
+          if (!row.sot) return '';
+
+          // 👇 Si es una SOT que viene del Excel, mostramos Aprobar/Rechazar
+          if (row.estadoSistema === 3) {
+              return h('div', { class: 'flex items-center justify-center gap-2 w-full h-full' }, [
+                  h('button', {
+                      type: 'button',
+                      class: 'text-green-600 hover:bg-green-50 px-2 py-1 rounded font-bold transition-colors',
+                      title: 'Aprobar SOT',
+                      onClick: () => onAprobarImportacion && onAprobarImportacion(row.sot!)
+                  }, '✓'),
+                  h('button', {
+                      type: 'button',
+                      class: 'text-red-600 hover:bg-red-50 px-2 py-1 rounded font-bold transition-colors',
+                      title: 'Rechazar SOT',
+                      onClick: () => onRechazarImportacion && onRechazarImportacion(row.sot!)
+                  }, '✕')
+              ]);
+          }
+
+          // 👇 Si ya es una liquidación normal, mostramos el botón de eliminar
+          return h('div', { class: 'flex items-center justify-center w-full h-full' }, [
+              h('button', {
+                  type: 'button',
+                  class: 'text-gray-400 hover:text-red-600 transition-colors p-1 rounded hover:bg-red-50',
+                  title: 'Eliminar liquidación',
+                  onClick: () => onDelete && onDelete(row.sot!)
+              }, '🗑️')
+          ]);
+      }
+  }
 ];

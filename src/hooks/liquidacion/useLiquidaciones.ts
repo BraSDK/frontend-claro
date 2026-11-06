@@ -4,6 +4,7 @@ import {
     postLiquidacion,
     updateLiquidacion,
     deleteLiquidacion,
+    cambiarEstadoImportacion,
 } from '../../services/liquidacion.service';
 
 import type { 
@@ -20,7 +21,7 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
     const [error, setError] = useState<string | null>(null);
 
     const [params, setParams] = useState<ListParamsLiquidacionesDto>(
-        initialParams || { pagina: 1, canPagina:15 }
+        initialParams || { pagina: 1, canPagina:20 }
     );
 
     const fetchLiquidaciones = useCallback(async () => {
@@ -65,6 +66,17 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
         }
     }
 
+    const evaluarImportacion = async (sot: number, aprobar: boolean) => {
+        try {
+            await cambiarEstadoImportacion(sot, aprobar);
+            // Al terminar, recargamos la tabla para que la fila cambie de color/estado
+            await fetchLiquidaciones();
+        } catch (err: any) {
+            const msg = err.response?.data?.error || "Error al procesar la SOT";
+            setError(msg); // Mostramos el error en el hook
+        }
+    }
+
     const eliminarLiquidacion = async (sot: number) => {
         setLoading(true);
         setError(null);
@@ -79,5 +91,5 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
         }
     }
 
-    return {data, totalRecords, loading, error, setError, params, setParams, fetchLiquidaciones, crearLiquidacion, editarLiquidacion, eliminarLiquidacion};
+    return {data, totalRecords, loading, error, setError, params, setParams, fetchLiquidaciones, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, evaluarImportacion};
 };

@@ -141,6 +141,7 @@ export interface DetalleResponseDto {
     detallesIds?: Record<string, number>;
     observacionesIds?: Record<number, number>;   // tipo de observación → observacionLiquidacionId   // concepto → detalleLiquidacionId (para editar/eliminar sin duplicar)
     esRegistroExistente?: boolean;
+    miClaseFila?: string;
   };
 
   // Catálogo de precios de adicionales (api/Adicional). Tipo: 0 Adicional, 1 DROP150, 2 DROP220, 3 DROP300

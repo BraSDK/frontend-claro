@@ -11,7 +11,7 @@ import { formatoSoles } from '../../utils/formato';
 interface Props {
     abierto: boolean;
     onCerrar: () => void;
-    onConfirmado: (actualizadas: number) => void;
+    onConfirmado: (actualizadas: number, nuevas: number) => void;
 }
 
 // Adivina la columna por su título (ej. "SOT", "Monto pagado")
@@ -80,7 +80,7 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
         if (!vista) return;
         setCargando(true); setError(null);
         try {
-            const items = vista.filas.filter((f) => f.existe).map((f) => ({
+            const items = vista.filas.map((f) => ({
                 sot: f.sot,
                 estadoPago: estados[f.sot] ?? f.estadoSugerido,
                 montoPagado: f.montoPagado,
@@ -89,11 +89,14 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
             const res = await auditarLiquidaciones(items);
             if (res.enPago?.length) {
                 // las demás sí se guardaron; estas no porque ya están en un pago registrado
-                setError(`${res.actualizadas} SOT guardadas. No se cambiaron porque ya están en un pago registrado: ${res.enPago.join(', ')}`);
-                onConfirmado(res.actualizadas);
+                setError(
+                    `${res.actualizadas} actualizadas, ${res.nuevasImportadas} nuevas importadas. ` +
+                    `No se cambiaron porque ya están en un pago registrado: ${res.enPago.join(', ')}`
+                );
+                onConfirmado(res.actualizadas, res.nuevasImportadas);
                 return;
             }
-            onConfirmado(res.actualizadas);
+            onConfirmado(res.actualizadas, res.nuevasImportadas);
             cerrar();
         } catch (e: any) {
             setError(e.response?.data?.error ?? 'No se pudo guardar la auditoría');
@@ -143,7 +146,7 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                     <>
                         <div className="flex flex-wrap gap-4 text-sm">
                             <span><b className="text-success">{vista.encontradas}</b> SOT encontradas</span>
-                            <span><b className="text-danger">{vista.noEncontradas}</b> no existen en el sistema (no se guardan)</span>
+                            <span><b className="text-warning">{vista.noEncontradas}</b>nuevas (se importarán como IMPORTADA) (no se guardan)</span>
                         </div>
                         <div className="max-h-[45vh] overflow-auto rounded-md border border-gray-200">
                             <table className={claseTabla}>
@@ -154,9 +157,9 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                                 </thead>
                                 <tbody>
                                     {vista.filas.map((f) => (
-                                        <tr key={f.sot} className={f.existe ? claseFila : 'bg-danger-soft'}>
+                                        <tr key={f.sot} className={f.existe ? claseFila : 'bg-yellow-soft'}>
                                             <td className={`${claseTd} font-mono`}>{f.sot}</td>
-                                            <td className={`${claseTd} text-left`}>{f.existe ? f.nombreTecnico : <span className="text-danger">No existe en el sistema</span>}</td>
+                                            <td className={`${claseTd} text-left`}>{f.existe ? f.nombreTecnico : <span className="text-warning">Nueva (se importará)</span>}</td>
                                             <td className={`${claseTd} text-right`}>{f.existe ? formatoSoles(f.totalACobrar) : ''}</td>
                                             <td className={`${claseTd} text-right`}>
                                                 {formatoSoles(f.montoPagado)}
@@ -191,8 +194,8 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                     {!vista ? (
                         <Boton onClick={comparar} disabled={!tabla || cargando}>{cargando ? 'Comparando…' : 'Comparar con el sistema'}</Boton>
                     ) : (
-                        <Boton onClick={confirmar} disabled={cargando || vista.encontradas === 0}>
-                            {cargando ? 'Guardando…' : `Confirmar ${vista.encontradas} SOT`}
+                        <Boton onClick={confirmar} disabled={cargando || (vista.encontradas + vista.noEncontradas) === 0}>
+                            {cargando ? 'Guardando…' : `Confirmar ${vista.encontradas + vista.noEncontradas} SOT`}
                         </Boton>
                     )}
                 </div>

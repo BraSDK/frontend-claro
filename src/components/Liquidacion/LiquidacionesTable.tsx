@@ -13,6 +13,8 @@ interface LiquidacionesTableProps {
   onAutoSave: (filas: Partial<FilaLiquidacionGrid>[]) => Promise<void>;   // 1 fila (edición) o varias (pegado/autollenado)
   onDelete?: (sot: number) => void;
   precios: PreciosAdicionales;   // precios del catálogo para calcular el total al editar
+  onAprobarImportacion?: (sot: number) => void;
+  onRechazarImportacion?: (sot: number) => void;
 }
 
 // Fila nueva que el usuario ya empezó a llenar (todavía no está en el servidor)
@@ -25,6 +27,8 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   onAutoSave,
   onDelete,
   precios,
+  onAprobarImportacion,     
+  onRechazarImportacion,
 }) => {
   const [gridData, setGridData] = useState<Partial<FilaLiquidacionGrid>[]>([]);
   const gridRef = useRef<HTMLRevoGridElement>(null); // traemos todos los metodos de revogrid
@@ -77,7 +81,14 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   // Así, guardar una fila no borra lo que se estaba escribiendo en otra.
   useEffect(() => {
     if (isLoading) return;
-    const servidor = aplanarDatos(liquidaciones);
+    const servidor = aplanarDatos(liquidaciones).map((fila) => ({
+      ...fila,
+      miClaseFila: fila.estadoSistema === 3
+        ? 'bg-amber-50 text-amber-900 border-l-4 border-amber-400' // Importada (Pendiente)
+        : fila.estadoSistema === 4 
+          ? 'bg-red-50 text-red-900 opacity-75'                    // Rechazada
+          : '', //Normal
+    }));
     const sotsServidor = new Set(servidor.map((f) => f.sot));
 
     setGridData((prev) => {
@@ -87,7 +98,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
     });
   }, [liquidaciones, isLoading]);
 
-  const columns = useMemo(() => getLiquidacionesColumns(onDelete, precios), [onDelete, precios]);
+  const columns = useMemo(() => getLiquidacionesColumns(onDelete, onAprobarImportacion, onRechazarImportacion, precios), [onDelete, onAprobarImportacion, onRechazarImportacion, precios]);
 
   // Edición simple → detail.model (1 fila) | Pegado o autollenado → detail.models + detail.data (varias filas)
   const handleAfterEdit = async (e: CustomEvent) => {
@@ -124,6 +135,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
         onAfteredit={handleAfterEdit}
         resize={true}
         useClipboard={true}
+        rowClass="miClaseFila"
       />
     </div>
   );
