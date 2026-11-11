@@ -2,6 +2,7 @@ export interface CrearDetalleRequest {
     concepto: string;
     precioUnitario: number;
     cantidad: number;
+    servicio?: number;
     tipo: number | string;
 }
 
@@ -10,6 +11,7 @@ export interface EditarDetalleRequest {
     concepto?: string;
     precioUnitario?: number;
     cantidad?: number;
+    servicio?: number;
     tipo?: number | string;
 }
 
@@ -20,15 +22,16 @@ export interface DetalleResponseDto {
     cantidad: number;
     precioTotal: number;
     tipo: number | string;
-  }
+} 
   
-  // Igual que CrearObservacionDto del back
-  export interface CrearObservacionDto {
+// Igual que CrearObservacionDto del back
+export interface CrearObservacionDto {
     textoObservacion?: string;
+    
     tipo: number;                 // TipoObservacion: FOTOS = 0, SI_PAGO = 1, NO_PAGO = 2
     motivoObservacionId?: number;
     usuarioId: number;
-  }
+}
   
   // Igual que EditarObservacionDto del back
   export interface EditarObservacionDto {
@@ -63,6 +66,7 @@ export interface DetalleResponseDto {
     sot: number;
     tipoOrden?: string;
     nombreSubTipoOrden: string;
+    servicioCodigo?: number;
     fechaProgramacion: string;
     nombreTecnico?: string;
     estadoSistema: number | string;
@@ -78,6 +82,7 @@ export interface DetalleResponseDto {
     sot: number;
     tipoOrden?: string;
     nombreSubTipoOrden: string;
+    servicioCodigo?: number;
     fechaProgramacion: string;
     nombreTecnico?: string;
     estadoSistema: number | string;
@@ -99,6 +104,7 @@ export interface DetalleResponseDto {
     liquidacionId: number;
     sot: number;
     tipoOrden?: string;
+    codigoServicio?: number;
     nombreSubTipoOrden: string;
     fechaProgramacion: string;
     nombreTecnico?: string;
@@ -125,6 +131,7 @@ export interface DetalleResponseDto {
     tecnico?: string;
     tipoOrden?: string;
     fechaProgramacion?: string;
+    codigoServicio?: number;
     subTipoOrden?: string;
     costoServicio?: number;
     deco?: number;
@@ -147,9 +154,10 @@ export interface DetalleResponseDto {
   export interface AdicionalDto {
     adicionalId: number;
     nombre: string;
+    codigo: Number;
     precio: number;
     tipo: number;
     columnaExcel?: string | null;
   }
 
-  export type GuardarAdicionalDto = Omit<AdicionalDto, 'adicionalId'>;
+  export type GuardarAdicionalDto = Omit<AdicionalDto, 'adicionalId'|'precio'>;

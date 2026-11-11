@@ -24,10 +24,14 @@ import type {
 
   // concepto ('DROP 150') → precio unitario del catálogo
   export type PreciosAdicionales = Record<string, number>;
+  export type CodigosAdicionales = Record<string, number>;
 
   export const preciosDesdeCatalogo = (catalogo: AdicionalDto[]): PreciosAdicionales =>
     Object.fromEntries(catalogo.map((a) => [a.nombre.trim().toUpperCase(), Number(a.precio) || 0]));
 
+  //exportamos codigos
+  export const codigosDesdeCatalago = (catalogo: AdicionalDto[]): CodigosAdicionales =>
+    Object.fromEntries( catalogo.map(( e ) => [e.nombre.trim().toLocaleUpperCase(),Number(e.codigo)]))
   // Lo mismo que calcula el back al guardar: costo de servicio + cantidad × precio de cada adicional
   export const calcularTotal = (fila: Partial<FilaLiquidacionGrid>, precios: PreciosAdicionales) =>
     CONCEPTOS.reduce((total, c) => {
@@ -102,6 +106,7 @@ import type {
   export const mapGridToCrearDto = (fila: Partial<FilaLiquidacionGrid>): CrearLiquidacionRequest => ({
     sot: Number(fila.sot),
     tipoOrden: fila.tipoOrden || 'ORDEN',
+    servicioCodigo: Number(fila.codigoServicio),
     nombreSubTipoOrden: fila.subTipoOrden || 'INSTALACION',
     fechaProgramacion: normalizarFecha(fila.fechaProgramacion),
     nombreTecnico: fila.tecnico || '',
@@ -116,6 +121,7 @@ import type {
     liquidacionId: Number(fila.liquidacionId ?? 0),
     sot: Number(fila.sot),
     tipoOrden: fila.tipoOrden || '',
+    servicioCodigo: Number(fila.codigoServicio), // si es null lo evita
     nombreSubTipoOrden: fila.subTipoOrden || '',
     fechaProgramacion: normalizarFecha(fila.fechaProgramacion),
     nombreTecnico: fila.tecnico || '',

@@ -5,6 +5,7 @@ import { AccionTabla, Boton } from '../shared/Tabla';
 import { CONCEPTOS_ADICIONALES } from '../../utils/liquidacion.mapper';
 import { actualizarAdicional, crearAdicional } from '../../services/liquidacion.service';
 import type { AdicionalDto } from '../../types/liquidacion.types';
+import { useServicios } from '@/hooks/servicio/useServicios';
 
 interface Props {
     abierto: boolean;
@@ -19,7 +20,8 @@ export const PreciosAdicionalesModal = ({ abierto, onCerrar, catalogo, puedeEdit
     const [precios, setPrecios] = useState<Record<string, string>>({});
     const [guardando, setGuardando] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
+    const [codigos, setCodigos] = useState<Record<string, number>>({});
+    const { servicios } = useServicios();
     const buscar = (concepto: string) => catalogo.find((a) => a.nombre.trim().toUpperCase() === concepto);
 
     // al abrir, se cargan los precios actuales
@@ -27,6 +29,7 @@ export const PreciosAdicionalesModal = ({ abierto, onCerrar, catalogo, puedeEdit
         if (!abierto) return;
         setError(null);
         setPrecios(Object.fromEntries(CONCEPTOS_ADICIONALES.map((c) => [c.concepto, buscar(c.concepto)?.precio?.toString() ?? ''])));
+        setCodigos(Object.fromEntries(CONCEPTOS_ADICIONALES.map((c) => [c.concepto,Number(buscar(c.concepto)?.codigo)])));
     }, [abierto, catalogo]);
 
     const guardar = async () => {
@@ -37,11 +40,11 @@ export const PreciosAdicionalesModal = ({ abierto, onCerrar, catalogo, puedeEdit
                 if (texto === '') continue;
                 const precio = Number(texto.replace(',', '.'));
                 if (!Number.isFinite(precio) || precio < 0) throw new Error(`Precio no válido para ${c.concepto}`);
-
+                const codigo = codigos[c.concepto];
                 const actual = buscar(c.concepto);
-                const datos = { nombre: c.concepto, precio, tipo: c.tipoCatalogo ?? 0, columnaExcel: String(c.campo) };
+                const datos = { nombre: c.concepto, codigo, tipo: c.tipoCatalogo ?? 0 , columnaExcel: String(c.campo) };
                 if (!actual) await crearAdicional(datos);
-                else if (Number(actual.precio) !== precio) await actualizarAdicional(actual.adicionalId, datos);
+                else{await actualizarAdicional(actual.adicionalId, datos);} 
             }
             onGuardado();
             onCerrar();
@@ -51,6 +54,8 @@ export const PreciosAdicionalesModal = ({ abierto, onCerrar, catalogo, puedeEdit
             setGuardando(false);
         }
     };
+
+
 
     return (
         <Modal isOpen={abierto} onClose={onCerrar} title="Precios de adicionales">
@@ -62,15 +67,31 @@ export const PreciosAdicionalesModal = ({ abierto, onCerrar, catalogo, puedeEdit
 
                 <div className="grid grid-cols-2 gap-3">
                     {CONCEPTOS_ADICIONALES.map((c) => (
-                        <Campo key={c.concepto} label={`${c.concepto} (S/ por unidad)`}>
-                            <Entrada
-                                inputMode="decimal"
-                                value={precios[c.concepto] ?? ''}
-                                disabled={!puedeEditar}
-                                placeholder="Sin precio"
-                                onChange={(e) => setPrecios((p) => ({ ...p, [c.concepto]: e.target.value }))}
-                            />
-                        </Campo>
+                        <>                   
+                            <Campo key={c.concepto} label="codigo del servicio">
+                                <Entrada
+                                    inputMode="text"
+                                    value={codigos[c.concepto] ?? ""}
+                                    disabled={!puedeEditar}
+                                    placeholder="inserte codigo servicio"
+                                    onChange={(e) => {
+                                        const codigoAsignado =  Number(e.target.value);
+                                        setCodigos((p) => ({ ...p, [c.concepto]: Number(e.target.value)}));
+                                        const precio_nuevo = servicios.find( s => s.codigo == codigoAsignado)?.precio;
+                                        setPrecios((p) => ({ ...p, [c.concepto]: String(precio_nuevo ?? "") }))
+                                    }}
+                                />
+                            </Campo>
+                            <Campo key={c.concepto} label={`${c.concepto} (S/ por unidad)`}>
+                                <Entrada
+                                    inputMode="decimal"
+                                    value={precios[c.concepto] ?? ''}
+                                    disabled={false}
+                                    placeholder="Sin precio"
+                                    onChange={(e) => setPrecios((p) => ({ ...p, [c.concepto]: e.target.value }))}
+                                />
+                            </Campo>
+                        </>
                     ))}
                 </div>
 

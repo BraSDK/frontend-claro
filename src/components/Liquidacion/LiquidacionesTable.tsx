@@ -4,7 +4,7 @@ import { temaClaro } from '@/theme/revogrid-theme';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../../types/liquidacion.types';
 import { getLiquidacionesColumns, gridEditors } from './liquidacionesColumns';
 import { calcularTotal, type PreciosAdicionales } from '../../utils/liquidacion.mapper';
-
+import {  useServicios } from '../../hooks/servicio/useServicios';
 const MAX_FILAS_EXCEL = 200;
 
 interface LiquidacionesTableProps {
@@ -26,6 +26,8 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   onDelete,
   precios,
 }) => {
+      // para traer precios de los servicios
+  const { servicios } = useServicios();
   const [gridData, setGridData] = useState<Partial<FilaLiquidacionGrid>[]>([]);
   const gridRef = useRef<HTMLRevoGridElement>(null); // traemos todos los metodos de revogrid
 
@@ -37,6 +39,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
         sot: liq.sot,
         tecnico: liq.nombreTecnico,
         tipoOrden: liq.tipoOrden,
+        codigoServicio: liq.codigoServicio,
         fechaProgramacion: liq.fechaProgramacion,
         subTipoOrden: liq.nombreSubTipoOrden,
         total: liq.precioTotalReal ?? undefined,       // el que guardó el back
@@ -73,7 +76,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
     });
   };
 
-  // Al llegar datos del servidor: servidor + filas nuevas a medio llenar (sin SOT o que aún no se guardaron) + relleno.
+
   // Así, guardar una fila no borra lo que se estaba escribiendo en otra.
   useEffect(() => {
     if (isLoading) return;
@@ -96,6 +99,15 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
       ? Object.keys(d.models).map((i) => Object.assign(d.models[i], d.data?.[i]))   // fila completa + valores pegados
       : [d.model];
 
+    modelos.filter(Boolean).forEach((m) => {
+        // si la fila tiene código de servicio, el costo sale del catálogo
+        const codigo = Number(m.codigoServicio);
+        if (codigo) {
+          const precio = servicios.find((s) => s.codigo === codigo)?.precio;
+          if (precio !== undefined) m.costoServicio = precio;
+        }
+        m.total = calcularTotal(m, precios) || undefined;   // ahora el total ya incluye el costo
+      });
     // el total se ve al instante, sin esperar al guardado (el back lo vuelve a calcular igual)
     modelos.filter(Boolean).forEach((m) => { m.total = calcularTotal(m, precios) || undefined; });
     setGridData((prev) => [...prev]);

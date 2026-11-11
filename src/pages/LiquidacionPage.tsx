@@ -1,8 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLiquidaciones } from '../hooks/liquidacion/useLiquidaciones';
 import { LiquidacionesTable } from '../components/Liquidacion/LiquidacionesTable';
-import { LiquidacionFormDrawer } from '../components/Liquidacion/LiquidacionFormDrawer';    
-    
 import { PreciosAdicionalesModal } from '../components/Liquidacion/PreciosAdicionalesModal';
 import { Campo, Entrada, Selector, RangoFechas } from '@/components/shared/Filtros';
 import { AccionTabla, Boton, BarPaginancion } from '@/components/shared/Tabla';
@@ -13,7 +11,6 @@ import { useAuth } from '../hooks/useAuth';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid, AdicionalDto } from '../types/liquidacion.types';
 import { FilterBar } from '../components/ui/FilterBar';
 import { exportarAExcel } from '../utils/exportarExcel';
-import { Download } from 'lucide-react';
 
 export const LiquidacionPage: React.FC = () => {
     const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
@@ -22,15 +19,22 @@ export const LiquidacionPage: React.FC = () => {
     const [importarAbierto, setImportarAbierto] = useState(false);
     const [liquidacionActiva, setLiquidacionActiva] = useState<ListarRequestLiquidacionesDto | null>(null);
 
+
+
     // Catálogo de precios de DECO, REPETIDOR y DROP: con él se calcula el total de cada fila
     const { rol } = useAuth();
     const [catalogo, setCatalogo] = useState<AdicionalDto[]>([]);
     const [preciosAbierto, setPreciosAbierto] = useState(false);
     const precios = useMemo(() => preciosDesdeCatalogo(catalogo), [catalogo]);
+    const codigos = useMemo(()=> preciosDesdeCatalogo(catalogo),[catalogo]);
+    
     const cargarCatalogo = useCallback(() => {
         getAdicionales().then(setCatalogo).catch(() => setCatalogo([]));
     }, []);
-    useEffect(() => { cargarCatalogo(); }, [cargarCatalogo]);
+
+    useEffect(() => { 
+        cargarCatalogo(); 
+    }, [cargarCatalogo]);
 
     const [textoBusqueda, setTextoBusqueda] = useState(params.buscar || '');
     const [estado, setEstado] = useState<string | number>(params.estado || '');
@@ -139,6 +143,16 @@ export const LiquidacionPage: React.FC = () => {
                         <FileSpreadsheet size={14} className="text-white" />
                         <span>Exportar</span>
                     </button>
+                    <button 
+                        type="button"
+                        className="inline-flex h-[28px] items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+                        title="Traer precios"
+                        onClick={() => setPreciosAbierto(true)}               
+                    >
+                        <span>Precios</span>
+                        
+                    </button>
+
             </FilterBar>
 
             {/* Errores del guardado (por SOT) o de la carga */}
@@ -171,7 +185,6 @@ export const LiquidacionPage: React.FC = () => {
                     />
                 </div>
             </footer>
-
             <PreciosAdicionalesModal
                 abierto={preciosAbierto}
                 onCerrar={() => setPreciosAbierto(false)}
@@ -179,6 +192,7 @@ export const LiquidacionPage: React.FC = () => {
                 puedeEditar={rol === 'ADMIN'}
                 onGuardado={() => { cargarCatalogo(); fetchLiquidaciones(); }}
             />
+
         </div>
     );
 };

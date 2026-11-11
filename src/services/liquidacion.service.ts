@@ -31,7 +31,9 @@ export const deleteLiquidacion =async (sot: number): Promise<any> => {
 // ===== Catálogo de precios de adicionales =====
 export const getAdicionales = async (): Promise<AdicionalDto[]> => {
     const response = await api.get<AdicionalDto[]>('/Adicional');
+    console.log(response.data);
     return response.data;
+
 };
 
 export const crearAdicional = async (adicional: GuardarAdicionalDto) => {
@@ -39,5 +41,6 @@ export const crearAdicional = async (adicional: GuardarAdicionalDto) => {
 };
 
 export const actualizarAdicional = async (id: number, adicional: GuardarAdicionalDto) => {
-    await api.put(`/Adicional/${id}`, adicional);
+    const response = await api.put(`/Adicional/${id}`, adicional);
+    console.log(response.data);
 };

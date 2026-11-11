@@ -53,6 +53,7 @@ export const getLiquidacionesColumns = (
         name: 'Técnico', 
         size: 200,
         cellTemplate: (h: any, props: any) => {
+            
             const tecnico = props.model[props.prop];
             if (!tecnico) return h('span', { class: 'text-gray-400 italic text-xs'}, 'Sin asignar');
             return tecnico;
@@ -75,6 +76,7 @@ export const getLiquidacionesColumns = (
           return h('span', {}, iso ? `${iso[3]}/${iso[2]}/${iso[1]}` : fecha);
         }
     },
+    {prop: 'codigoServicio', name: 'Codigo Servicio', size: 140},
     { prop: 'subTipoOrden', name: 'SubTipo Orden', size: 160},
     
     // --- BAREMOS Y MATERIALES (Cantidades / Precios) ---
