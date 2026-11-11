@@ -7,6 +7,7 @@ import {
 import { MODULOS, type Modulo } from '../components/Layout/modulos';
 import { validarPermiso } from '../utils/permisos';
 import { useAuth } from '../hooks/useAuth';
+import { FondoClaro } from '../components/ui/FondoClaro';
 
 // Ícono, color y una línea de ayuda por módulo (la clave es la ruta del módulo)
 const APARIENCIA: Record<string, { icono: LucideIcon; color: string; descripcion: string }> = {
@@ -119,11 +120,14 @@ export const InicioPage = () => {
     };
 
     return (
-        <div className="mx-auto flex max-w-6xl flex-col gap-6">
-            <div className="flex flex-wrap items-end justify-between gap-3">
+      <FondoClaro>  
+        <div className="mx-auto flex max-w-6xl w-full flex-col gap-6">
+            <div className="flex flex-wrap items-end justify-between gap-3 border-l-4 border-red-600 pl-4">
                 <div>
                     <h1 className="text-2xl font-bold text-ink">¿Qué quieres hacer hoy?</h1>
-                    <p className="mt-1 text-sm text-label">Elige un módulo. Puedes arrastrar los botones para ordenarlos a tu gusto.</p>
+                    <p className="mt-1 text-sm text-label">
+                        Elige un módulo. Puedes arrastrar los botones para ordenarlos a tu gusto.
+                    </p>
                 </div>
                 {orden.length > 0 && (
                     <button
@@ -136,6 +140,7 @@ export const InicioPage = () => {
                 )}
             </div>
 
+            {/* Grilla de módulos */}
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {botones.map((m) => {
                     const ap = APARIENCIA[m.ruta] ?? { icono: LayoutDashboard, color: 'bg-hover text-label', descripcion: '' };
@@ -179,5 +184,6 @@ export const InicioPage = () => {
                 })}
             </ul>
         </div>
+      </FondoClaro>
     );
 };

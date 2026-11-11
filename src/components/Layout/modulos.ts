@@ -10,7 +10,7 @@ export interface Modulo {
 }
 
 export const MODULOS: Modulo[] = [
-    { nombre: 'Inicio', ruta: '/inicio' },          // pantalla principal: botones a cada módulo
+    { nombre: 'Inicio', ruta: '/inicio', pantallaCompleta: true },          // pantalla principal: botones a cada módulo
     { nombre: 'Dashboard', ruta: '/dashboard' },
     { nombre: 'Órdenes de trabajo', ruta: '/ordenes' },
     { nombre: 'Pagos Claro', ruta: '/pagos-claro', permiso:'verPagosClaro'},
@@ -18,7 +18,6 @@ export const MODULOS: Modulo[] = [
     { nombre: 'Auditoría de liquidaciones', ruta: '/auditoria', permiso: 'verAuditoria' },
     { nombre: 'Reportes', ruta: '/reportes' , permiso:'verReportes'},
     { nombre: 'Configuración', ruta: '/configuracion' },
-    { nombre: 'Servicios', ruta: '/servicios', permiso: 'gestionarServicios', grupo: 'Administración' },
     { nombre: 'Usuarios', ruta: '/usuarios', permiso: 'gestionarUsuarios', grupo: 'Administración' },
 ];
 

@@ -1,23 +1,20 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLiquidaciones } from '../hooks/liquidacion/useLiquidaciones';
-import { LiquidacionesTable } from '../components/Liquidacion/LiquidacionesTable';
+import { LiquidacionesTable } from '../components/Liquidacion/LiquidacionesTable';  
+    
 import { PreciosAdicionalesModal } from '../components/Liquidacion/PreciosAdicionalesModal';
 import { Campo, Entrada, Selector, RangoFechas } from '@/components/shared/Filtros';
-import { AccionTabla, Boton, BarPaginancion } from '@/components/shared/Tabla';
-import { FileSpreadsheet, Tags, Search, FilterX } from 'lucide-react';
+import { BarPaginancion } from '@/components/shared/Tabla';
+import { FileSpreadsheet } from 'lucide-react';
 import { mapGridToCrearDto, mapGridToEditarDto, preciosDesdeCatalogo } from '../utils/liquidacion.mapper';
 import { getAdicionales } from '../services/liquidacion.service';
 import { useAuth } from '../hooks/useAuth';
-import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid, AdicionalDto } from '../types/liquidacion.types';
+import type { FilaLiquidacionGrid, AdicionalDto } from '../types/liquidacion.types';
 import { FilterBar } from '../components/ui/FilterBar';
 import { exportarAExcel } from '../utils/exportarExcel';
 
 export const LiquidacionPage: React.FC = () => {
-    const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones } = useLiquidaciones();
-    
-    const [drawerAbierto, setDrawerAbierto] = useState(false);
-    const [importarAbierto, setImportarAbierto] = useState(false);
-    const [liquidacionActiva, setLiquidacionActiva] = useState<ListarRequestLiquidacionesDto | null>(null);
+    const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones, evaluarImportacion, restaurarSot  } = useLiquidaciones();
 
 
 
@@ -37,21 +34,50 @@ export const LiquidacionPage: React.FC = () => {
     }, [cargarCatalogo]);
 
     const [textoBusqueda, setTextoBusqueda] = useState(params.buscar || '');
-    const [estado, setEstado] = useState<string | number>(params.estado || '');
     const [desde, setDesde] = useState(params.desde || '');
     const [hasta, setHasta] = useState(params.hasta || '');
+    const [tabActiva, setTabActiva] = useState< 'activas' | 'rechazadas'>('activas');
+
+    const cambiarTab = (nuevaTab: 'activas' | 'rechazadas') => {
+        setTabActiva(nuevaTab);
+
+        setTextoBusqueda('');
+        setDesde('');
+        setHasta('');
+        setParams(prev => ({
+            ...prev,
+            estado: nuevaTab === 'rechazadas' ? 4 : undefined,
+            pagina:1
+        }));
+    };
+
+    const estado = params.estado || '';
 
     const hayFiltros = Boolean(textoBusqueda || estado || desde || hasta);
 
     const aplicarBusqueda = () => {
         setParams((prev) => ({
-            ...prev, buscar: textoBusqueda, estado, desde, hasta, pagina: 1 
+            ...prev, 
+            buscar: textoBusqueda, 
+            desde, 
+            hasta, 
+            pagina: 1 
+        }));
+    };
+
+    const actualizarFiltroDirecto = (key: string, valor: any) => {
+        setParams(prev => ({
+            ...prev,
+            [key]: valor === '' ? undefined : valor,
+            pagina: 1 // Siempre volvemos a la página 1 al filtrar
         }));
     };
 
     const limpiarFiltros = () => {
-        setTextoBusqueda(''); setEstado(''); setDesde(''); setHasta('');
-        setParams({ pagina: 1, canPagina: 15 });
+        setTextoBusqueda('');
+        setDesde('');
+        setHasta('');
+        setParams({ pagina: 1, canPagina: 20 });
     };
 
     const cambiarFiltro = (setter: React.Dispatch<React.SetStateAction<any>>) => (valor: any) => setter(valor);
@@ -114,21 +140,49 @@ export const LiquidacionPage: React.FC = () => {
     
         exportarAExcel(datosMapeados, 'Liquidaciones');
     };
-
+    console.log("Parámetros actuales que van al hook:", params);
     // Vista tipo hoja (Google Sheets): pegada al header y a los bordes, sin tarjetas.
     // Arriba una barra de herramientas de una línea, en medio la hoja y abajo la barra de estado.
     return (
         <div className="flex h-[calc(100vh-58px)] flex-col bg-white mt-4">
             {/* Barra de herramientas: filtros compactos + acciones */}
 
+            <div className="flex border-b border-gray-200 px-4 pt-2">
+            <button
+                onClick={() => cambiarTab('activas')}
+                className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                    tabActiva === 'activas' 
+                    ? 'border-emerald-600 text-emerald-600' 
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                >
+                    Liquidaciones Activas
+                </button>
+                <button
+                    onClick={() => cambiarTab('rechazadas')}
+                    className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                        tabActiva === 'rechazadas' 
+                        ? 'border-red-600 text-red-600' 
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
+                >
+                    Rechazadas
+                </button>
+            </div>
            <FilterBar onBuscar={aplicarBusqueda} onLimpiar={limpiarFiltros} hayFiltros={hayFiltros}>
                     <Campo label="SOT">
                         <Entrada inputMode="numeric" value={textoBusqueda} onChange={(e)=>setTextoBusqueda(e.target.value) }/>
                     </Campo>
-                    <Selector className="!h-[28px] w-32" value={estado} onChange={(e) => cambiarFiltro(setEstado)(e.target.value === '' ? '' : Number(e.target.value))}>
-                        <option value="">Estado</option>
+                    <Selector 
+                        className="!h-[28px] w-36" 
+                        value={estado} 
+                        onChange={(e) => actualizarFiltroDirecto('estado', e.target.value === '' ? undefined : Number(e.target.value))}
+                    >
+                        <option value="">Todos los estados</option>
                         <option value="1">Ingresada</option>
                         <option value="2">Validada</option>
+                        <option value="3">Importada (Pendiente)</option>
+                        <option value="4">Rechazadas</option> {/* 👈 Agregado */}
                     </Selector>
                     <Campo label="fechaProgramacion">
                         <RangoFechas desde={desde} hasta={hasta} onDesde={cambiarFiltro(setDesde)} onHasta={cambiarFiltro(setHasta)} />
@@ -166,6 +220,9 @@ export const LiquidacionPage: React.FC = () => {
                     onAutoSave={handleAutoSave}
                     onDelete={handleDelete}
                     precios={precios}
+                    onAprobarImportacion={(sot) => evaluarImportacion(sot, true)}
+                    onRechazarImportacion={(sot) => evaluarImportacion(sot, false)}
+                    onRestaurarImportacion={(sot) => restaurarSot(sot)}
                 />
             </div>
 
@@ -180,8 +237,8 @@ export const LiquidacionPage: React.FC = () => {
                         onHandle={(pagina: number) => setParams(prev => ({ ...prev, pagina }))}
                         numeroPagina={params.pagina || 1}
                         totalRegistros={totalRecords}
-                        totalRegistrosPagina={params.canPagina || 15}
-                        totalPaginasTotales={Math.max(1, Math.ceil(totalRecords / (params.canPagina || 15)))}
+                        totalRegistrosPagina={params.canPagina || 20}
+                        totalPaginasTotales={Math.max(1, Math.ceil(totalRecords / (params.canPagina || 20)))}
                     />
                 </div>
             </footer>

@@ -13,6 +13,9 @@ interface LiquidacionesTableProps {
   onAutoSave: (filas: Partial<FilaLiquidacionGrid>[]) => Promise<void>;   // 1 fila (edición) o varias (pegado/autollenado)
   onDelete?: (sot: number) => void;
   precios: PreciosAdicionales;   // precios del catálogo para calcular el total al editar
+  onAprobarImportacion?: (sot: number) => void;
+  onRechazarImportacion?: (sot: number) => void;
+  onRestaurarImportacion?: (sot: number) => void;
 }
 
 // Fila nueva que el usuario ya empezó a llenar (todavía no está en el servidor)
@@ -25,6 +28,9 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   onAutoSave,
   onDelete,
   precios,
+  onAprobarImportacion,     
+  onRechazarImportacion,
+  onRestaurarImportacion,
 }) => {
       // para traer precios de los servicios
   const { servicios } = useServicios();
@@ -80,17 +86,24 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   // Así, guardar una fila no borra lo que se estaba escribiendo en otra.
   useEffect(() => {
     if (isLoading) return;
-    const servidor = aplanarDatos(liquidaciones);
+    const servidor = aplanarDatos(liquidaciones).map((fila) => ({
+      ...fila,
+      miClaseFila: fila.estadoSistema === 3
+        ? 'bg-amber-50 text-amber-900 border-l-4 border-amber-400' // Importada (Pendiente)
+        : fila.estadoSistema === 4 
+          ? 'bg-red-50 text-red-600 border-l-4 border-red-500'     // Rechazada
+          : '', //Normal
+    }));
     const sotsServidor = new Set(servidor.map((f) => f.sot));
 
-    setGridData((prev) => {
-      const pendientes = prev.filter((f) => esFilaPendiente(f) && !sotsServidor.has(Number(f.sot)));
-      const relleno = Math.max(0, MAX_FILAS_EXCEL - servidor.length - pendientes.length);
-      return [...servidor, ...pendientes, ...Array.from({ length: relleno }, () => ({}))];
-    });
+    const relleno = Math.max(0, MAX_FILAS_EXCEL - servidor.length);
+    setGridData([
+      ...servidor,
+      ...Array.from({ length: relleno }, () => ({}))
+    ]);
   }, [liquidaciones, isLoading]);
 
-  const columns = useMemo(() => getLiquidacionesColumns(onDelete, precios), [onDelete, precios]);
+  const columns = useMemo(() => getLiquidacionesColumns(onDelete, onAprobarImportacion, onRechazarImportacion, onRestaurarImportacion,precios), [onDelete, onAprobarImportacion, onRechazarImportacion, precios]);
 
   // Edición simple → detail.model (1 fila) | Pegado o autollenado → detail.models + detail.data (varias filas)
   const handleAfterEdit = async (e: CustomEvent) => {
@@ -136,6 +149,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
         onAfteredit={handleAfterEdit}
         resize={true}
         useClipboard={true}
+        rowClass="miClaseFila"
       />
     </div>
   );

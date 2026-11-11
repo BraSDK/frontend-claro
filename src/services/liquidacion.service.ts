@@ -44,3 +44,14 @@ export const actualizarAdicional = async (id: number, adicional: GuardarAdiciona
     const response = await api.put(`/Adicional/${id}`, adicional);
     console.log(response.data);
 };
+
+export const cambiarEstadoImportacion = async (sot: number, aprobar: boolean): Promise<any> => {
+    // Enviamos el prametro 'aprobar' por Qery String (como lo definimos en el controlador)
+    const response = await api.put(`/Liquidacion/${sot}/estado-importacion?aprobar=${aprobar}`);
+    return response.data;
+};
+
+export const restaurarLiquidacion = async (sot: number): Promise<any> => {
+    const response = await api.put(`/Liquidacion/${sot}/restaurar`);
+    return response.data;
+}
