@@ -47,3 +47,8 @@ export const cambiarEstadoImportacion = async (sot: number, aprobar: boolean): P
     const response = await api.put(`/Liquidacion/${sot}/estado-importacion?aprobar=${aprobar}`);
     return response.data;
 };
+
+export const restaurarLiquidacion = async (sot: number): Promise<any> => {
+    const response = await api.put(`/Liquidacion/${sot}/restaurar`);
+    return response.data;
+}

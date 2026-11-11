@@ -5,6 +5,7 @@ import {
     updateLiquidacion,
     deleteLiquidacion,
     cambiarEstadoImportacion,
+    restaurarLiquidacion,
 } from '../../services/liquidacion.service';
 
 import type { 
@@ -77,6 +78,15 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
         }
     }
 
+    const restaurarSot = async (sot:number) => {
+        try{
+            await restaurarLiquidacion(sot);
+            await fetchLiquidaciones(); 
+        }catch(err: any){
+            setError(err.response?.data?.error || "Error Inesperado en Restaurar la SOT");
+        }
+    }
+
     const eliminarLiquidacion = async (sot: number) => {
         setLoading(true);
         setError(null);
@@ -91,5 +101,5 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
         }
     }
 
-    return {data, totalRecords, loading, error, setError, params, setParams, fetchLiquidaciones, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, evaluarImportacion};
+    return {data, totalRecords, loading, error, setError, params, setParams, fetchLiquidaciones, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, evaluarImportacion, restaurarSot};
 };

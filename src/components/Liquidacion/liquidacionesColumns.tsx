@@ -35,8 +35,9 @@ export const gridEditors: Editors = {
 
 export const getLiquidacionesColumns = (
     onDelete?: (sot: number) => void,
-    onAprobarImportacion?: (sot: number) => void,   // 👈 Agrega
+    onAprobarImportacion?: (sot: number) => void,  
     onRechazarImportacion?: (sot: number) => void,
+    onRestaurarImportacion?: (sot: number) => void,
     precios: PreciosAdicionales = {}
   ): ColumnRegular[] => [
     { 
@@ -143,14 +144,31 @@ export const getLiquidacionesColumns = (
                       type: 'button',
                       class: 'text-green-600 hover:bg-green-50 px-2 py-1 rounded font-bold transition-colors',
                       title: 'Aprobar SOT',
-                      onClick: () => onAprobarImportacion && onAprobarImportacion(row.sot!)
+                      onClick: () => onAprobarImportacion && onAprobarImportacion?.(row.sot!)
                   }, '✓'),
                   h('button', {
                       type: 'button',
                       class: 'text-red-600 hover:bg-red-50 px-2 py-1 rounded font-bold transition-colors',
                       title: 'Rechazar SOT',
-                      onClick: () => onRechazarImportacion && onRechazarImportacion(row.sot!)
+                      onClick: () => onRechazarImportacion && onRechazarImportacion?.(row.sot!)
                   }, '✕')
+              ]);
+          }
+
+          // Si es RECHAZADA (4) -> Botón de Restaurar y opcionalmente Eliminar
+          if (row.estadoSistema === 4) {
+            return h('div', { class: 'flex items-center justify-center gap-2 w-full h-full'}, [
+              h('button', {
+                class: 'text-blue-600 hover:bg-blue-50 px-2 py-1 rounded font-bold transition-colors',
+                title: 'Restaurar a Pendiente',
+                onClick: () => onRestaurarImportacion?.(row.sot!)
+          }, '↺'),
+
+          // Puedes dejar el tacho de basura si quieres que también se pueda borrar definitivamente
+          h('button', {
+            class: 'text-gray-400 hover:text-red-600 p-1 rounded',
+            onClick: () => onDelete?.(row.sot!)
+                  }, '🗑️')
               ]);
           }
 

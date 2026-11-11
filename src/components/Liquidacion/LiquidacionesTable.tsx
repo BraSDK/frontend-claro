@@ -15,6 +15,7 @@ interface LiquidacionesTableProps {
   precios: PreciosAdicionales;   // precios del catálogo para calcular el total al editar
   onAprobarImportacion?: (sot: number) => void;
   onRechazarImportacion?: (sot: number) => void;
+  onRestaurarImportacion?: (sot: number) => void;
 }
 
 // Fila nueva que el usuario ya empezó a llenar (todavía no está en el servidor)
@@ -29,6 +30,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   precios,
   onAprobarImportacion,     
   onRechazarImportacion,
+  onRestaurarImportacion,
 }) => {
   const [gridData, setGridData] = useState<Partial<FilaLiquidacionGrid>[]>([]);
   const gridRef = useRef<HTMLRevoGridElement>(null); // traemos todos los metodos de revogrid
@@ -86,19 +88,19 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
       miClaseFila: fila.estadoSistema === 3
         ? 'bg-amber-50 text-amber-900 border-l-4 border-amber-400' // Importada (Pendiente)
         : fila.estadoSistema === 4 
-          ? 'bg-red-50 text-red-900 opacity-75'                    // Rechazada
+          ? 'bg-red-50 text-red-600 border-l-4 border-red-500'     // Rechazada
           : '', //Normal
     }));
     const sotsServidor = new Set(servidor.map((f) => f.sot));
 
-    setGridData((prev) => {
-      const pendientes = prev.filter((f) => esFilaPendiente(f) && !sotsServidor.has(Number(f.sot)));
-      const relleno = Math.max(0, MAX_FILAS_EXCEL - servidor.length - pendientes.length);
-      return [...servidor, ...pendientes, ...Array.from({ length: relleno }, () => ({}))];
-    });
+    const relleno = Math.max(0, MAX_FILAS_EXCEL - servidor.length);
+    setGridData([
+      ...servidor,
+      ...Array.from({ length: relleno }, () => ({}))
+    ]);
   }, [liquidaciones, isLoading]);
 
-  const columns = useMemo(() => getLiquidacionesColumns(onDelete, onAprobarImportacion, onRechazarImportacion, precios), [onDelete, onAprobarImportacion, onRechazarImportacion, precios]);
+  const columns = useMemo(() => getLiquidacionesColumns(onDelete, onAprobarImportacion, onRechazarImportacion, onRestaurarImportacion,precios), [onDelete, onAprobarImportacion, onRechazarImportacion, precios]);
 
   // Edición simple → detail.model (1 fila) | Pegado o autollenado → detail.models + detail.data (varias filas)
   const handleAfterEdit = async (e: CustomEvent) => {
