@@ -3,7 +3,9 @@ import { FileSpreadsheet } from 'lucide-react';
 import { Modal } from '../shared/Modal';
 import { Campo, Selector } from '../shared/Filtros';
 import { Boton, AccionTabla, claseTabla, claseTh, claseTd, claseFila } from '../shared/Tabla';
-import { leerExcel, letraColumna, aNumero, type TablaExcel } from '../../utils/leerExcel';
+
+import { leerHojasExcel, leerHojaEspecifica, leerExcel, letraColumna, aNumero, type TablaExcel, type HojaExcelInfo } from '../../utils/leerExcel';
+
 import { previsualizarPagos, auditarLiquidaciones } from '../../services/auditoria.service';
 import { ESTADOS_PAGO_LIQ, etiquetaPago, type PrevisualizarAuditoriaResponse } from '../../types/auditoria.types';
 import { formatoSoles } from '../../utils/formato';
@@ -19,6 +21,10 @@ const adivinar = (titulos: string[], patron: RegExp) => Math.max(0, titulos.find
 
 // Pasos: 1) subir archivo  2) elegir columnas  3) comparar (vista previa)  4) confirmar
 export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) => {
+    const [archivoActual, setArchivoActual] = useState<File | null>(null);
+    const [hojas, setHojas] = useState<HojaExcelInfo[]>([]);
+    const [hojaSeleccionada, setHojaSeleccionada] = useState<string>('');
+
     const [nombreArchivo, setNombreArchivo] = useState('');
     const [tabla, setTabla] = useState<TablaExcel | null>(null);
     const [conTitulos, setConTitulos] = useState(true);
@@ -31,6 +37,7 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
 
     const cerrar = () => {
         setNombreArchivo(''); setTabla(null); setVista(null); setEstados({}); setError(null);
+        setArchivoActual(null); setHojas([]); setHojaSeleccionada(''); // Limpiar nuevos estados
         onCerrar();
     };
 
@@ -45,20 +52,52 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
         .map((f) => ({ sot: Math.trunc(aNumero(f[colSot]) ?? 0), montoPagado: aNumero(f[colMonto]) ?? 0 }))
         .filter((f) => f.sot > 0), [tabla, conTitulos, colSot, colMonto]);
 
-    const alElegirArchivo = async (archivo?: File) => {
-        if (!archivo) return;
+    // ===== LÓGICA DE EXCEL MULTI-HOJA =====
+    const procesarHoja = async (archivo: File, rutaHoja: string) => {
         setError(null); setVista(null);
         try {
-            const datos = await leerExcel(archivo);
-            if (datos.length === 0) throw new Error('El archivo está vacío');
+            const datos = await leerHojaEspecifica(archivo, rutaHoja);
+            if (datos.length === 0) throw new Error('La hoja seleccionada está vacía');
             const encabezado = datos[0].map((c) => String(c));
             setTabla(datos);
-            setNombreArchivo(archivo.name);
             setColSot(adivinar(encabezado, /sot/));
             setColMonto(adivinar(encabezado, /monto|pag|importe|total/));
         } catch (e: any) {
             setTabla(null);
+            setError(e?.message ?? 'No se pudo leer la hoja');
+        }
+    };
+
+    const alElegirArchivo = async (archivo?: File) => {
+        if (!archivo) return;
+        setError(null); setVista(null); setTabla(null); setCargando(true);
+        try {
+            // 1. Extraemos solo los nombres de las pestañas
+            const listaHojas = await leerHojasExcel(archivo);
+            if (listaHojas.length === 0) throw new Error('El archivo está vacío o no es válido');
+            
+            setArchivoActual(archivo);
+            setNombreArchivo(archivo.name);
+            setHojas(listaHojas);
+            
+            // 2. Por defecto, procesamos inmediatamente la primera hoja
+            const rutaPrimera = listaHojas[0].rutaHoja;
+            setHojaSeleccionada(rutaPrimera);
+            await procesarHoja(archivo, rutaPrimera);
+        } catch (e: any) {
+            setTabla(null);
             setError(e?.message ?? 'No se pudo leer el archivo');
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    const alCambiarHoja = async (rutaHoja: string) => {
+        setHojaSeleccionada(rutaHoja);
+        if (archivoActual) {
+            setCargando(true);
+            await procesarHoja(archivoActual, rutaHoja);
+            setCargando(false);
         }
     };
 
@@ -116,6 +155,21 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                     <input type="file" accept=".xlsx,.csv" className="hidden" onChange={(e) => { alElegirArchivo(e.target.files?.[0]); e.target.value = ''; }} />
                 </label>
 
+                {/* 1.5. Selector de hojas (Solo aparece si el Excel tiene 2 o más pestañas) */}
+                {hojas.length > 1 && (
+                    <Campo label="Hoja de Excel a importar">
+                        <Selector 
+                            value={hojaSeleccionada} 
+                            onChange={(e) => alCambiarHoja(e.target.value)}
+                            disabled={cargando}
+                        >
+                            {hojas.map((h, i) => (
+                                <option key={i} value={h.rutaHoja}>{h.nombre}</option>
+                            ))}
+                        </Selector>
+                    </Campo>
+                )}
+
                 {/* 2. Columnas */}
                 {tabla && (
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -141,7 +195,6 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
 
                 {error && <div className="rounded-control bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
 
-                {/* 3. Vista previa */}
                 {vista && (
                     <>
                         <div className="flex flex-wrap gap-4 text-sm">
@@ -152,7 +205,7 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                             <table className={claseTabla}>
                                 <thead>
                                     <tr>
-                                        {['SOT', 'Técnico', 'Total a cobrar', 'Pagado', 'Diferencia', 'Estado actual', 'Nuevo estado'].map((t) => <th key={t} className={claseTh}>{t}</th>)}
+                                        {['SOT', 'Técnico', 'Cód. Servicio', 'Total a cobrar', 'Pagado', 'Diferencia', 'Estado actual', 'Nuevo estado'].map((t) => <th key={t} className={claseTh}>{t}</th>)}
                                     </tr>
                                 </thead>
                                 <tbody>

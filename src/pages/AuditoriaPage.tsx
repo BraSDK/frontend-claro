@@ -20,6 +20,7 @@ const CAN_PAGINA = 50;   // máximo que acepta el back
 const aFila = (l: LiquidacionAuditoriaDto): FilaAuditoria => ({
     sot: l.sot,
     tecnico: l.nombreTecnico,
+    codigoServicio: l.codigoServicio,
     fechaProgramacion: l.fechaProgramacion,
     precioTotalReal: l.precioTotalReal ?? 0,
     precioEditado: l.precioTotalEditable ?? null,

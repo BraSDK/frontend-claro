@@ -62,6 +62,12 @@ export const getLiquidacionesColumns = (
             return tecnico;
         }
     },
+    { 
+      prop: 'codigoServicio', 
+      name: 'Cód. Servicio', 
+      size: 110,
+      
+  },
     { prop: 'tipoOrden', name: 'Tipo Orden', size: 120 },
     { 
         prop: 'fechaProgramacion', 
@@ -79,7 +85,6 @@ export const getLiquidacionesColumns = (
           return h('span', {}, iso ? `${iso[3]}/${iso[2]}/${iso[1]}` : fecha);
         }
     },
-    {prop: 'codigoServicio', name: 'Codigo Servicio', size: 140},
     { prop: 'subTipoOrden', name: 'SubTipo Orden', size: 160},
     
     // --- BAREMOS Y MATERIALES (Cantidades / Precios) ---

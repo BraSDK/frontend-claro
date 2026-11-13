@@ -58,6 +58,7 @@ export interface ParamsAuditoria {
 export interface FilaAuditoria {
     sot: number;
     tecnico?: string;
+    codigoServicio?: number;
     fechaProgramacion?: string;
     precioTotalReal?: number | null;            // calculado por el sistema (no se edita aquí)
     precioEditado?: number | string | null;     // el que se cobra si existe (PrecioTotalEditable)
