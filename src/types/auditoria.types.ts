@@ -36,6 +36,8 @@ export interface LiquidacionAuditoriaDto extends ListarRequestLiquidacionesDto {
     montoPagado?: number | null;
     estadoPago?: number;
     fechaValidacion?: string | null;
+    mesPago?: string | null;
+    semanaPago?: string | null;
 }
 
 export interface PagedResponse<T> {
@@ -52,6 +54,8 @@ export interface ParamsAuditoria {
     buscar?: string;
     estadoPago?: number;
     auditada?: boolean;
+    mesPago?: string;
+    semanaPago?: string;
 }
 
 // Fila plana de la grilla de auditoría
@@ -60,6 +64,8 @@ export interface FilaAuditoria {
     tecnico?: string;
     codigoServicio?: number;
     fechaProgramacion?: string;
+    mesPago?: string | null;
+    semanaPago?: string | null;
     precioTotalReal?: number | null;            // calculado por el sistema (no se edita aquí)
     precioEditado?: number | string | null;     // el que se cobra si existe (PrecioTotalEditable)
     montoPagado?: number | string | null;
@@ -70,18 +76,25 @@ export interface FilaAuditoria {
 export interface FilaPagoExcel {
     sot: number;
     montoPagado: number;
+    mesPago?: string;
+    semanaPago?: string;
+    observacion?: string;
 }
 
 export interface FilaAuditoriaPreview {
     sot: number;
     existe: boolean;
     nombreTecnico?: string | null;
+    codigoServicio?: number;
     precioTotalReal?: number | null;
     precioTotalEditable?: number | null;
     totalACobrar: number;
     montoPagado: number;
     diferencia: number;
     filasEnExcel: number;
+    mesPago?: string | null;
+    semanaPago?: string | null;
+    observacionExcel?: string | null;
     estadoActual: number;
     estadoSugerido: number;
 }
@@ -97,6 +110,9 @@ export interface AuditarLiquidacionItem {
     estadoPago: number;
     montoPagado: number | null;
     precioTotalEditable: number | null;
+    mesPago?: string | null;
+    semanaPago?: string | null;
+    observacionExcel?: string | null;
 }
 
 export interface AuditarLiquidacionesResponse {

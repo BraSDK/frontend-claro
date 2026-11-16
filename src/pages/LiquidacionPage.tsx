@@ -12,6 +12,7 @@ import { useAuth } from '../hooks/useAuth';
 import type { FilaLiquidacionGrid, AdicionalDto } from '../types/liquidacion.types';
 import { FilterBar } from '../components/ui/FilterBar';
 import { exportarAExcel } from '../utils/exportarExcel';
+import { api } from '../api/api';
 
 export const LiquidacionPage: React.FC = () => {
     const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones, evaluarImportacion, restaurarSot  } = useLiquidaciones();
@@ -208,6 +209,23 @@ export const LiquidacionPage: React.FC = () => {
                     </button>
 
             </FilterBar>
+
+            <button
+                type="button"
+                onClick={async () => {
+                    if (!confirm('⚠️ ¿Eliminar TODAS las SOTs en estado IMPORTADA?\n\nEsta acción no se puede deshacer.')) return;
+                    try {
+                        const res = await api.delete('/Liquidacion/EliminarImportadas');
+                        alert(`✅ ${res.data.eliminadas} SOTs eliminadas`);
+                        fetchLiquidaciones();   // ✅ ya existe en este scope
+                    } catch (e: any) {
+                        alert('Error: ' + (e?.response?.data?.mensaje ?? e.message));
+                    }
+                }}
+                className="rounded-control bg-danger px-3 py-2 text-sm text-white hover:bg-danger/90"
+            >
+                Eliminar Importadas (temporal)
+            </button>
 
             {/* Errores del guardado (por SOT) o de la carga */}
             {error && <div className="border-b border-danger/30 bg-danger-soft px-3 py-1 text-sm text-danger">{error}</div>}

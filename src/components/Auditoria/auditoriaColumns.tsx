@@ -34,6 +34,21 @@ export const getAuditoriaColumns = (): ColumnRegular[] => [
             return h('span', {}, iso ? `${iso[3]}/${iso[2]}/${iso[1]}` : '');
         },
     },
+
+    {
+        prop: 'semanaPago',
+        name: 'Periodo',
+        size: 115,
+        readonly: true,
+        cellTemplate: (h: any, props: any) => {
+            const mes = props.model.mesPago;
+            const sem = props.model.semanaPago;
+            if (!mes && !sem) return h('span', { class: 'text-gray-400 text-xs' }, '-');
+            const mesFmt = mes?.length === 6 ? `${mes.slice(0, 4)}-${mes.slice(4)}` : (mes ?? '');
+            return h('span', { class: 'font-mono text-xs text-ink' }, [mesFmt, sem].filter(Boolean).join(' · '));
+        },
+    },
+
     {
         // Se edita el precio a cobrar; el calculado por el sistema no se toca.
         // Si son distintos: el editado grande arriba y el calculado tachado abajo.

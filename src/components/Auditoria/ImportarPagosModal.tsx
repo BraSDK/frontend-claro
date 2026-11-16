@@ -3,9 +3,8 @@ import { FileSpreadsheet } from 'lucide-react';
 import { Modal } from '../shared/Modal';
 import { Campo, Selector } from '../shared/Filtros';
 import { Boton, AccionTabla, claseTabla, claseTh, claseTd, claseFila } from '../shared/Tabla';
-
 import { leerHojasExcel, leerHojaEspecifica, leerExcel, letraColumna, aNumero, type TablaExcel, type HojaExcelInfo } from '../../utils/leerExcel';
-
+import type { FilaPagoExcel } from '../../types/auditoria.types';
 import { previsualizarPagos, auditarLiquidaciones } from '../../services/auditoria.service';
 import { ESTADOS_PAGO_LIQ, etiquetaPago, type PrevisualizarAuditoriaResponse } from '../../types/auditoria.types';
 import { formatoSoles } from '../../utils/formato';
@@ -16,8 +15,15 @@ interface Props {
     onConfirmado: (actualizadas: number, nuevas: number) => void;
 }
 
-// Adivina la columna por su título (ej. "SOT", "Monto pagado")
-const adivinar = (titulos: string[], patron: RegExp) => Math.max(0, titulos.findIndex((t) => patron.test(t.toLowerCase())));
+// Devuelve -1 si no encuentra el patrón (para columnas opcionales)
+const adivinar = (titulos: string[], patron: RegExp): number =>
+    titulos.findIndex((t) => patron.test(String(t ?? '').trim().toLowerCase()));
+
+// Para columnas obligatorias (SOT, Monto): si no encuentra, cae en 0
+const adivinarObligatorio = (titulos: string[], patron: RegExp): number => {
+    const i = adivinar(titulos, patron);
+    return i >= 0 ? i : 0;
+};
 
 // Pasos: 1) subir archivo  2) elegir columnas  3) comparar (vista previa)  4) confirmar
 export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) => {
@@ -30,6 +36,9 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
     const [conTitulos, setConTitulos] = useState(true);
     const [colSot, setColSot] = useState(0);
     const [colMonto, setColMonto] = useState(1);
+    const [colMes, setColMes] = useState(-1);       // 🆕
+    const [colSemana, setColSemana] = useState(-1); // 🆕
+    const [colObservacion, setColObservacion] = useState(-1);
     const [vista, setVista] = useState<PrevisualizarAuditoriaResponse | null>(null);
     const [estados, setEstados] = useState<Record<number, number>>({});   // SOT → estado elegido
     const [cargando, setCargando] = useState(false);
@@ -48,9 +57,19 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
         return titulo ? `${letraColumna(i)} · ${titulo}` : `Columna ${letraColumna(i)}`;
     }), [tabla, conTitulos, totalColumnas]);
 
-    const filasPago = useMemo(() => (tabla ?? []).slice(conTitulos ? 1 : 0)
-        .map((f) => ({ sot: Math.trunc(aNumero(f[colSot]) ?? 0), montoPagado: aNumero(f[colMonto]) ?? 0 }))
-        .filter((f) => f.sot > 0), [tabla, conTitulos, colSot, colMonto]);
+    const filasPago = useMemo<FilaPagoExcel[]>(
+        () => (tabla ?? [])
+            .slice(conTitulos ? 1 : 0)
+            .map((f) => ({
+                sot: Math.trunc(aNumero(f[colSot]) ?? 0),
+                montoPagado: aNumero(f[colMonto]) ?? 0,
+                mesPago:     colMes >= 0        ? (String(f[colMes]        ?? '').trim() || undefined) : undefined,
+                semanaPago:  colSemana >= 0     ? (String(f[colSemana]     ?? '').trim() || undefined) : undefined,
+                observacion: colObservacion >= 0? (String(f[colObservacion]?? '').trim() || undefined) : undefined,
+            }))
+            .filter((f) => f.sot > 0),
+        [tabla, conTitulos, colSot, colMonto, colMes, colSemana, colObservacion]
+    );
 
     // ===== LÓGICA DE EXCEL MULTI-HOJA =====
     const procesarHoja = async (archivo: File, rutaHoja: string) => {
@@ -60,8 +79,14 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
             if (datos.length === 0) throw new Error('La hoja seleccionada está vacía');
             const encabezado = datos[0].map((c) => String(c));
             setTabla(datos);
-            setColSot(adivinar(encabezado, /sot/));
-            setColMonto(adivinar(encabezado, /monto|pag|importe|total/));
+    
+            // Auto-detección con regex (más específico primero)
+            setColSot(adivinarObligatorio(encabezado, /nro\s*sot|^sot$|sot/i));
+            setColMonto(adivinarObligatorio(encabezado, /preciario|monto|pag|importe|total/i));
+            
+            setColMes(adivinar(encabezado, /mes\s*pago|^mes$|mes/i));
+            setColSemana(adivinar(encabezado, /semana\s*pago|^semana$|semana/i));
+            setColObservacion(adivinar(encabezado, /observ/i));
         } catch (e: any) {
             setTabla(null);
             setError(e?.message ?? 'No se pudo leer la hoja');
@@ -178,15 +203,39 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                                 {titulos.map((t, i) => <option key={i} value={i}>{t}</option>)}
                             </Selector>
                         </Campo>
+
                         <Campo label="Columna del monto pagado">
                             <Selector value={colMonto} onChange={(e) => { setColMonto(Number(e.target.value)); setVista(null); }}>
                                 {titulos.map((t, i) => <option key={i} value={i}>{t}</option>)}
                             </Selector>
                         </Campo>
+
+                        <Campo label="Columna Mes de pago">
+                            <Selector value={colMes} onChange={(e) => { setColMes(Number(e.target.value)); setVista(null); }}>
+                                <option value={-1}>— Ninguna —</option>
+                                {titulos.map((t, i) => <option key={i} value={i}>{t}</option>)}
+                            </Selector>
+                        </Campo>
+
+                        <Campo label="Columna Semana de pago">
+                            <Selector value={colSemana} onChange={(e) => { setColSemana(Number(e.target.value)); setVista(null); }}>
+                                <option value={-1}>— Ninguna —</option>
+                                {titulos.map((t, i) => <option key={i} value={i}>{t}</option>)}
+                            </Selector>
+                        </Campo>
+
+                        <Campo label="Columna Observación">
+                            <Selector value={colObservacion} onChange={(e) => { setColObservacion(Number(e.target.value)); setVista(null); }}>
+                                <option value={-1}>— Ninguna —</option>
+                                {titulos.map((t, i) => <option key={i} value={i}>{t}</option>)}
+                            </Selector>
+                        </Campo>
+
                         <label className="flex items-end gap-2 pb-1.5 text-sm text-ink">
                             <input type="checkbox" checked={conTitulos} onChange={(e) => { setConTitulos(e.target.checked); setVista(null); }} />
                             La primera fila tiene títulos
                         </label>
+
                         <p className="text-sm text-muted sm:col-span-3">
                             {filasPago.length} filas con SOT en el archivo. Si una SOT aparece varias veces, se suman sus pagos.
                         </p>
@@ -199,13 +248,13 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                     <>
                         <div className="flex flex-wrap gap-4 text-sm">
                             <span><b className="text-success">{vista.encontradas}</b> SOT encontradas</span>
-                            <span><b className="text-warning">{vista.noEncontradas}</b>nuevas (se importarán como IMPORTADA) (no se guardan)</span>
+                            <span><b className="text-warning">{vista.noEncontradas}</b> nuevas (se importarán como IMPORTADA) (no se guardan)</span>
                         </div>
                         <div className="max-h-[45vh] overflow-auto rounded-md border border-gray-200">
                             <table className={claseTabla}>
                                 <thead>
                                     <tr>
-                                        {['SOT', 'Técnico', 'Cód. Servicio', 'Total a cobrar', 'Pagado', 'Diferencia', 'Estado actual', 'Nuevo estado'].map((t) => <th key={t} className={claseTh}>{t}</th>)}
+                                        {['SOT', 'Técnico', 'Cód. Servicio', 'Total a cobrar', 'Pagado', 'Diferencia', 'Obs. Excel', 'Estado actual', 'Nuevo estado'].map((t) => <th key={t} className={claseTh}>{t}</th>)}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -213,6 +262,7 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                                         <tr key={f.sot} className={f.existe ? claseFila : 'bg-yellow-soft'}>
                                             <td className={`${claseTd} font-mono`}>{f.sot}</td>
                                             <td className={`${claseTd} text-left`}>{f.existe ? f.nombreTecnico : <span className="text-warning">Nueva (se importará)</span>}</td>
+                                            <td className={`${claseTd} font-mono text-center`}>{f.codigoServicio || '-'}</td>
                                             <td className={`${claseTd} text-right`}>{f.existe ? formatoSoles(f.totalACobrar) : ''}</td>
                                             <td className={`${claseTd} text-right`}>
                                                 {formatoSoles(f.montoPagado)}
@@ -220,6 +270,15 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                                             </td>
                                             <td className={`${claseTd} text-right ${!f.existe ? '' : Math.abs(f.diferencia) < 0.01 ? 'text-muted' : f.diferencia < 0 ? 'text-danger font-semibold' : 'text-success font-semibold'}`}>
                                                 {f.existe ? formatoSoles(f.diferencia) : ''}
+                                            </td>
+                                            <td className={`${claseTd} text-left text-xs`}>
+                                                {f.observacionExcel ? (
+                                                    <span className={/ok\s*pago/i.test(f.observacionExcel) ? 'text-success font-medium' : 'text-danger font-medium'}>
+                                                        {f.observacionExcel}
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-muted">-</span>
+                                                )}
                                             </td>
                                             <td className={claseTd}>{f.existe ? etiquetaPago(f.estadoActual) : ''}</td>
                                             <td className={claseTd}>
