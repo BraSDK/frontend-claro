@@ -33,7 +33,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
   onRestaurarImportacion,
 }) => {
       // para traer precios de los servicios
-  const { servicios } = useServicios();
+  const { servicios } = useServicios({ cantidadPorPagina: 1000 });   // todo el tarifario, para llenar el costo al escribir el código
   const [gridData, setGridData] = useState<Partial<FilaLiquidacionGrid>[]>([]);
   const gridRef = useRef<HTMLRevoGridElement>(null); // traemos todos los metodos de revogrid
 

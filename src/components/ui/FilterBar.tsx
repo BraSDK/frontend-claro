@@ -11,8 +11,8 @@ const leerFijo = () => {
 // Panel de filtros a todo el ancho (se sale del padding del <main>): grilla de 4 columnas
 // (2 en tablet, 1 en móvil); Buscar y Limpiar ocupan cada uno una celda de la grilla, a continuación de los filtros.
 // El botón con el pin, sobre la línea inferior, colapsa o fija el panel (se recuerda por navegador).
-export const FilterBar = ({ children, onBuscar, onLimpiar, hayFiltros = false }: {
-    children: ReactNode; onBuscar: () => void; onLimpiar: () => void; hayFiltros?: boolean;
+export const FilterBar = ({ children, onBuscar, onLimpiar, hayFiltros = false, pegado = false }: {
+    children: ReactNode; onBuscar: () => void; onLimpiar: () => void; hayFiltros?: boolean; pegado?:boolean
 }) => {
     const [fijo, setFijo] = useState(leerFijo);
 
@@ -24,7 +24,7 @@ export const FilterBar = ({ children, onBuscar, onLimpiar, hayFiltros = false }:
     };
 
     return (
-        <section className="relative -mx-4 mb-2 bg-filters first:-mt-6 md:-mx-10 xl:-mx-20">
+        <section className={`relative mb-2 bg-filters ${pegado ? '' : '-mx-4 first:-mt-6 md:-mx-10 xl:-mx-20'}`}>
             {fijo && (
                 <form
                     onSubmit={(e) => { e.preventDefault(); onBuscar(); }}

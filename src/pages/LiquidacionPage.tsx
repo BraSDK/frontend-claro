@@ -12,9 +12,30 @@ import { useAuth } from '../hooks/useAuth';
 import type { FilaLiquidacionGrid, AdicionalDto } from '../types/liquidacion.types';
 import { FilterBar } from '../components/ui/FilterBar';
 import { exportarAExcel } from '../utils/exportarExcel';
+import { useHojas } from '../hooks/liquidacion/useHojas';
+import { PestanasHojas } from '../components/Liquidacion/PestanasHojas';
 
 export const LiquidacionPage: React.FC = () => {
     const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones, evaluarImportacion, restaurarSot  } = useLiquidaciones();
+
+    // ===== Hojas (una por mes) =====
+    // La grilla muestra solo la hoja activa (params.hojaId). Al entrar se abre la del mes actual.
+    const { hojas, error: errorHojas, recargar: recargarHojas, renombrar: renombrarHoja } = useHojas();
+    // si las hojas no cargan (back sin el endpoint, sin conexión...) la grilla muestra todo, como antes
+    const esperandoHoja = !params.hojaId && !errorHojas;
+    const hoy = new Date();
+    const hojaDelMes = hojas.find((h) => h.anio === hoy.getFullYear() && h.mes === hoy.getMonth() + 1);
+    const hojaActiva = hojas.find((h) => h.hojaId === params.hojaId);
+
+    useEffect(() => {
+        if (params.hojaId || hojas.length === 0) return;
+        const inicial = hojaDelMes ?? hojas[0];
+        setParams((prev) => ({ ...prev, hojaId: inicial.hojaId, pagina: 1 }));
+    }, [hojas, hojaDelMes, params.hojaId, setParams]);
+
+    const seleccionarHoja = (hojaId: number) => {
+        setParams((prev) => ({ ...prev, hojaId, pagina: 1 }));
+    };
     // Catálogo de precios de DECO, REPETIDOR y DROP: con él se calcula el total de cada fila
     const { rol } = useAuth();
     const [catalogo, setCatalogo] = useState<AdicionalDto[]>([]);
@@ -74,7 +95,7 @@ export const LiquidacionPage: React.FC = () => {
         setTextoBusqueda('');
         setDesde('');
         setHasta('');
-        setParams({ pagina: 1, canPagina: 20 });
+        setParams((prev) => ({ pagina: 1, canPagina: 20, hojaId: prev.hojaId }));   // limpiar filtros no cambia de hoja
     };
 
     const cambiarFiltro = (setter: React.Dispatch<React.SetStateAction<any>>) => (valor: any) => setter(valor);
@@ -108,12 +129,14 @@ export const LiquidacionPage: React.FC = () => {
 
         setError(errores.length ? errores.join(' · ') : null);
         await fetchLiquidaciones();
+        recargarHojas();   // actualiza el contador de cada pestaña (una SOT nueva puede caer en otra hoja)
     };
 
     const handleDelete = async (sot: number) => {
         if (!window.confirm(`¿Seguro que deseas eliminar la liquidación SOT: ${sot}?`)) return;
         try {
             await eliminarLiquidacion(sot);   // DELETE /Liquidacion/{sot}/delete y recarga
+            recargarHojas();
         } catch {
             // el hook ya deja el mensaje en `error`
         }
@@ -166,54 +189,63 @@ export const LiquidacionPage: React.FC = () => {
                     Rechazadas
                 </button>
             </div>
-           <FilterBar onBuscar={aplicarBusqueda} onLimpiar={limpiarFiltros} hayFiltros={hayFiltros}>
-                    <Campo label="SOT">
-                        <Entrada inputMode="numeric" value={textoBusqueda} onChange={(e)=>setTextoBusqueda(e.target.value) }/>
-                    </Campo>
-                    <Selector 
-                        className="!h-[28px] w-36" 
-                        value={estado} 
-                        onChange={(e) => actualizarFiltroDirecto('estado', e.target.value === '' ? undefined : Number(e.target.value))}
-                    >
-                        <option value="">Todos los estados</option>
-                        <option value="1">Ingresada</option>
-                        <option value="2">Validada</option>
-                        <option value="3">Importada (Pendiente)</option>
-                        <option value="4">Rechazadas</option> {/* 👈 Agregado */}
-                    </Selector>
-                    <Campo label="fechaProgramacion">
-                        <RangoFechas desde={desde} hasta={hasta} onDesde={cambiarFiltro(setDesde)} onHasta={cambiarFiltro(setHasta)} />
-                    </Campo>
-                    {/* Botón de Exportar Excel */}
-                    <button
-                        type="button"
-                        onClick={handleExportar}
-                        className="inline-flex h-[28px] items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
-                        title="Exportar liquidaciones a Excel"
-                    >
-                        <FileSpreadsheet size={14} className="text-white" />
-                        <span>Exportar</span>
-                    </button>
-                    <button 
-                        type="button"
-                        className="inline-flex h-[28px] items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
-                        title="Traer precios"
-                        onClick={() => setPreciosAbierto(true)}               
-                    >
-                        <span>Precios</span>
-                        
-                    </button>
+            <FilterBar pegado={true} onBuscar={aplicarBusqueda} onLimpiar={limpiarFiltros} hayFiltros={hayFiltros}>
+                        <Campo label="SOT">
+                            <Entrada inputMode="numeric" value={textoBusqueda} onChange={(e)=>setTextoBusqueda(e.target.value) }/>
+                        </Campo>
+                        <Selector 
+                            className="!h-[28px] w-36" 
+                            value={estado} 
+                            onChange={(e) => actualizarFiltroDirecto('estado', e.target.value === '' ? undefined : Number(e.target.value))}
+                        >
+                            <option value="">Todos los estados</option>
+                            <option value="1">Ingresada</option>
+                            <option value="2">Validada</option>
+                            <option value="3">Importada (Pendiente)</option>
+                            <option value="4">Rechazadas</option> {/* 👈 Agregado */}
+                        </Selector>
+                        <Campo label="fechaProgramacion">
+                            <RangoFechas desde={desde} hasta={hasta} onDesde={cambiarFiltro(setDesde)} onHasta={cambiarFiltro(setHasta)} />
+                        </Campo>
+                        {/* Botón de Exportar Excel */}
+                        <button
+                            type="button"
+                            onClick={handleExportar}
+                            className="inline-flex h-[28px] items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+                            title="Exportar liquidaciones a Excel"
+                        >
+                            <FileSpreadsheet size={14} className="text-white" />
+                            <span>Exportar</span>
+                        </button>
+                        <button 
+                            type="button"
+                            className="inline-flex h-[28px] items-center gap-1.5 rounded-md bg-emerald-600 px-2.5 text-xs font-medium text-white shadow-sm transition-colors hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1"
+                            title="Traer precios"
+                            onClick={() => setPreciosAbierto(true)}               
+                        >
+                            <span>Precios</span>
+                            
+                        </button>
 
             </FilterBar>
+
+
 
             {/* Errores del guardado (por SOT) o de la carga */}
             {error && <div className="border-b border-danger/30 bg-danger-soft px-3 py-1 text-sm text-danger">{error}</div>}
 
+            {/* La hoja de cada SOT la decide su mes de creación: en una hoja pasada, las nuevas se van a la del mes actual */}
+            {hojaActiva && hojaDelMes && hojaActiva.hojaId !== hojaDelMes.hojaId && (
+                <div className="border-b border-amber-200 bg-amber-50 px-3 py-1 text-xs text-amber-800">
+                    Estás viendo <b>{hojaActiva.nombre}</b>. Las SOT nuevas se guardan en la hoja <b>{hojaDelMes.nombre}</b>.
+                </div>
+            )}
+
             {/* La hoja ocupa todo el espacio libre */}
             <div className="min-h-0 flex-1">
                 <LiquidacionesTable
-                    liquidaciones={data}
-                    isLoading={loading}
+                    liquidaciones={esperandoHoja ? [] : data}
+                    isLoading={loading || esperandoHoja}   /* hasta elegir la hoja no se muestra nada (evita ver todas por un instante) */
                     onAutoSave={handleAutoSave}
                     onDelete={handleDelete}
                     precios={precios}
@@ -222,6 +254,14 @@ export const LiquidacionPage: React.FC = () => {
                     onRestaurarImportacion={(sot) => restaurarSot(sot)}
                 />
             </div>
+
+            {/* Pestañas de hojas (una por mes), como en Sheets */}
+            <PestanasHojas
+                hojas={hojas}
+                hojaActivaId={params.hojaId}
+                onSeleccionar={seleccionarHoja}
+                onRenombrar={renombrarHoja}
+            />
 
             {/* Barra de estado (como la de Sheets): resumen de la página y paginación */}
             <footer className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-gray-300 bg-gray-50 px-3 py-1 text-xs text-gray-600">

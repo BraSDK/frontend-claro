@@ -22,7 +22,9 @@ export interface DetalleResponseDto {
     cantidad: number;
     precioTotal: number;
     tipo: number | string;
-} 
+    codigoServicio?: number | null;     // servicio del tarifario (detalle COSTO DE SERVICIO)
+    codigoTarifario?: number | null;    // código con el que se cobró: servicio o adicional (lo pone el back)
+}
   
 // Igual que CrearObservacionDto del back
 export interface CrearObservacionDto {
@@ -50,6 +52,7 @@ export interface CrearObservacionDto {
   // 2. PARÁMETROS DE BÚSQUEDA (GET)
   // ==========================================
   export interface ListParamsLiquidacionesDto {
+    hojaId?: number;      // pestaña (mes) activa; sin hojaId el back devuelve todas
     pagina?: number;      // Por defecto en C# es 1
     canPagina?: number;   // Por defecto en C# es 15
     buscar?: string;
@@ -66,7 +69,7 @@ export interface CrearObservacionDto {
     sot: number;
     tipoOrden?: string;
     nombreSubTipoOrden: string;
-    servicioCodigo?: number;
+    servicioCodigo?: number | null;
     fechaProgramacion: string;
     nombreTecnico?: string;
     estadoSistema: number | string;
@@ -105,6 +108,7 @@ export interface CrearObservacionDto {
     sot: number;
     tipoOrden?: string;
     codigoServicio?: number;
+    hojaId?: number;                      // hoja (mes) a la que pertenece
     nombreSubTipoOrden: string;
     fechaProgramacion: string;
     nombreTecnico?: string;

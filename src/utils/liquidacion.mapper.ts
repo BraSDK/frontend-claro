@@ -106,7 +106,7 @@ import type {
   export const mapGridToCrearDto = (fila: Partial<FilaLiquidacionGrid>): CrearLiquidacionRequest => ({
     sot: Number(fila.sot),
     tipoOrden: fila.tipoOrden || 'ORDEN',
-    servicioCodigo: Number(fila.codigoServicio),
+    servicioCodigo: fila.codigoServicio ? Number(fila.codigoServicio) : null,   // celda vacía → null (Number("") daba 0 y rompía la FK)
     nombreSubTipoOrden: fila.subTipoOrden || 'INSTALACION',
     fechaProgramacion: normalizarFecha(fila.fechaProgramacion),
     nombreTecnico: fila.tecnico || '',

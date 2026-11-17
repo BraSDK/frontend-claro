@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getServicios, updateServicios, postServicios, deleteServicios } from '../../services/servicio.service';
-import type { Servicio } from '../../types/servicio';
+import type { Servicio, ListServiciosRequest } from '../../types/servicio';
 
-export const useServicios = () => {
+// params opcional: la grilla de liquidaciones pide todo el tarifario (el back pagina de 10 en 10 por defecto)
+export const useServicios = (params?: ListServiciosRequest) => {
     const [servicios, setServicios] = useState<Servicio[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -10,7 +11,7 @@ export const useServicios = () => {
     const fetchServicios = async () => {
         try {
             setIsLoading(true);
-            const data = await getServicios();
+            const data = await getServicios(params);
             setServicios(data);
         }catch (err: any){
             setError('Error al cargar servicios.');
