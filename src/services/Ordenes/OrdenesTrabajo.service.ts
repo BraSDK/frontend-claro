@@ -1,6 +1,6 @@
 import { api } from '../../api/api';
 import type { PagedResponse } from '../../types/paginacion';
-import type { ArchivoOrden, CrearOrdenRequest, EdicionRapidaRequest, ListarOrdenesParams, OrdenTrabajo } from '../../types/Ordenes';
+import type { ArchivoOrden, CrearOrdenRequest, EdicionRapidaRequest, ListarOrdenesParams, OrdenTrabajo, validarImagen } from '../../types/Ordenes';
 
 // Un método por endpoint de OrdenTrabajoController (api/OrdenTrabajo). Entre paréntesis, los roles que acepta el back.
 
@@ -63,3 +63,10 @@ export const mensajeError = (err: unknown, porDefecto: string): string => {
     if (e.response.status === 403) return 'No tienes permisos para esta acción.';
     return e.response.data?.error ?? e.response.data?.mensaje ?? porDefecto;
 };
+
+export const verificarImagenes = async (ordenId: number, request: validarImagen):Promise<OrdenTrabajo> => {
+
+    const response = await api.patch<OrdenTrabajo>(`/OrdenTrabajo/${ordenId}/verificar-imagenes`, request);
+    return response.data;
+
+}

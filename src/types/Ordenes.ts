@@ -11,6 +11,23 @@ export const EstadoClaro = {
 } as const;
 export type EstadoClaro = typeof EstadoClaro[keyof typeof EstadoClaro];
 
+export const EstadoFotos =
+{
+    PENDIENTE: 0,   // el técnico subió (o volvió a subir) y almacén no ha revisado
+    CORRECTO: 1,    // almacén las aprobó
+    OBSERVADO: 2    // almacén encontró algo mal → hay texto de observación
+} as const;
+export type EstadoFotos = typeof EstadoFotos[keyof typeof EstadoFotos];
+
+//para validar solo la imagen
+
+export interface validarImagen{
+    estadoAlmacen: EstadoFotos ;
+    observacion?: string;
+}
+
+
+
 // ArchivoResponse
 export interface ArchivoOrden {
     archivoId: number;
@@ -27,7 +44,9 @@ export interface OrdenTrabajo {
     trabajoRealizado: string;
     estadoCampo: EstadoClaro;
     archivos: ArchivoOrden[];
-    usuarioId: number;  // Usuario.Id (perfil) del técnico
+    usuarioId: number;
+    estadoAlmacen: EstadoFotos ;
+    observacion?: string;// Usuario.Id (perfil) del técnico
 }
 
 // ListRequestOrdenesDto (query de GET OrdenTrabajo/List)

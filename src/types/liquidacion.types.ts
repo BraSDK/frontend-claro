@@ -82,7 +82,7 @@ export interface CrearObservacionDto {
     sot: number;
     tipoOrden?: string;
     nombreSubTipoOrden: string;
-    servicioCodigo?: number;
+    servicioCodigo?: number | null;
     fechaProgramacion: string;
     nombreTecnico?: string;
     estadoSistema: number | string;

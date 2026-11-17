@@ -15,6 +15,7 @@ import { AuditoriaPage } from './pages/AuditoriaPage';
 import { PagosClaroPage } from './pages/PagosClaroPage';
 import { ReportesPage } from './pages/ReportesPage';
 import { RutaProtegida } from './components/Auth/RutaProtegida';
+import { ServiciosPage } from './pages/ServiciosPage';
 function App() {
   return (
     <BrowserRouter>
@@ -45,6 +46,9 @@ function App() {
           <Route element={<RutaProtegida permiso="verPagosClaro"/>}>
             <Route path="/pagos-claro" element={<PagosClaroPage />} />
           </Route>
+
+          <Route path="/servicios" element={<ServiciosPage />} />
+
           <Route path="/ordenes" element={<OrdenesPage />} />
           <Route path="/ordenes/nueva" element={<OrdenesCrearPage />} />
           <Route path="/ordenes/:sot/editar" element={<OrdenEditarPage />} />

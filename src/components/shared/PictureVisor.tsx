@@ -1,10 +1,11 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 import { urlArchivo } from "../../services/Ordenes/OrdenesTrabajo.service";
 import type { ArchivoOrden } from "../../types/Ordenes";
 
+
 // Visor de imágenes de una orden: imagen grande, flechas y miniaturas
-export const PictureVisor = ({ imgs, inicial = 0 }: { imgs: ArchivoOrden[]; inicial?: number }) => {
+export const PictureVisor = ({ imgs, inicial = 0 , children}: { imgs: ArchivoOrden[]; inicial?: number,children?:React.ReactNode }) => {
     const [activa, setActiva] = useState(inicial);
 
     if (imgs.length === 0) {
@@ -52,6 +53,11 @@ export const PictureVisor = ({ imgs, inicial = 0 }: { imgs: ArchivoOrden[]; inic
                     </button>
                 ))}
             </div>
+          
+            {children}
+            
+
+
         </div>
     );
 };

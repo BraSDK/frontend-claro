@@ -19,6 +19,8 @@ export const MODULOS: Modulo[] = [
     { nombre: 'Reportes', ruta: '/reportes' , permiso:'verReportes'},
     { nombre: 'Configuración', ruta: '/configuracion' },
     { nombre: 'Usuarios', ruta: '/usuarios', permiso: 'gestionarUsuarios', grupo: 'Administración' },
+    { nombre: 'Servicios', ruta: '/servicios', permiso: 'gestionarServicios' },
+    
 ];
 
 // Pantallas que no son un módulo del menú pero tienen su propio título

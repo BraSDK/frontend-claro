@@ -121,7 +121,7 @@ import type {
     liquidacionId: Number(fila.liquidacionId ?? 0),
     sot: Number(fila.sot),
     tipoOrden: fila.tipoOrden || '',
-    servicioCodigo: Number(fila.codigoServicio), // si es null lo evita
+    servicioCodigo: fila.codigoServicio ? Number(fila.codigoServicio) : null, // si es null lo evita
     nombreSubTipoOrden: fila.subTipoOrden || '',
     fechaProgramacion: normalizarFecha(fila.fechaProgramacion),
     nombreTecnico: fila.tecnico || '',

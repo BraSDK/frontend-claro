@@ -1,12 +1,22 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { listarOrdenes, mensajeError } from '../../services/Ordenes/OrdenesTrabajo.service';
+import { listarOrdenes, mensajeError,verificarImagenes} from '../../services/Ordenes/OrdenesTrabajo.service';
 import { getUsuarios } from '../../services/usuario.service';
 import { useAuth } from '../useAuth';
 import type { PagedResponse } from '../../types/paginacion';
-import type { ListarOrdenesParams, OrdenTrabajo } from '../../types/Ordenes';
+import type { ListarOrdenesParams, OrdenTrabajo ,validarImagen} from '../../types/Ordenes';
 
 // Listado paginado de órdenes de trabajo; se vuelve a pedir cuando cambian los parámetros
 // (mientras llega la nueva respuesta se siguen mostrando los datos anteriores)
+
+export const validarImagenes =async(idOrden:number,request:validarImagen) : Promise<OrdenTrabajo | null>=> {
+            try{
+              const orden =  await verificarImagenes(idOrden,request);
+              return orden;
+            }catch{
+                console.log("no se pudo editar ");
+                return null;
+            }    
+}
 export function useOrdenes(params: ListarOrdenesParams) {
     const clave = JSON.stringify(params);
     const [version, setVersion] = useState(0);
@@ -26,6 +36,7 @@ export function useOrdenes(params: ListarOrdenesParams) {
 
     const recargar = useCallback(() => setVersion((v) => v + 1), []);
     const pagina = respuesta?.pagina ?? null;
+
     return {
         ordenes: pagina?.listaGenerica ?? [],
         pagina,
@@ -34,6 +45,7 @@ export function useOrdenes(params: ListarOrdenesParams) {
         recargar,
     };
 }
+
 
 // Qué puede hacer cada rol, según los [Authorize(Roles = ...)] de OrdenTrabajoController
 export function usePermisosOrden() {

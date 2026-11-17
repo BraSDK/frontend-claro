@@ -24,6 +24,12 @@ const COLOR_ESTADO : Record<string,string>= {
     'En progreso':"bg-warning",
     'No completado':"bg-danger"
 } 
+
+const COLOR_VALIDACION_FOTOS : Record<string,string> = {
+    'sin validacion':"bg-muted",
+    'correcto':"bg-success",
+    'observado':"bg-warning"
+}
 const celdaArchivo = ({ model, onVer }:ColumnDataSchemaModel & { onVer?: (o: OrdenTrabajo) => void } ) => {
         const orden = model as OrdenTrabajo & { cantArchivos: number };
         return(
@@ -46,7 +52,9 @@ export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes }: Props) =
         ...o,
         cantArchivos: o.archivos?.length ?? 0,
         estado: MAPEO_ESTADOS.campo[o.estadoCampo]?.label,
-        tecnico: nombreTecnico?.(o.docTecnico) ?? o.docTecnico,   // NUEVO: nombre del técnico cruzando docTecnico ↔ documentoIdentidad; si no lo encuentra, muestra el documento
+        tecnico: nombreTecnico?.(o.docTecnico) ?? o.docTecnico, 
+        validacion: MAPEO_ESTADOS.validacion[o.estadoAlmacen]?.label,
+        // NUEVO: nombre del técnico cruzando docTecnico ↔ documentoIdentidad; si no lo encuentra, muestra el documento
     }));
     const filasOrdenadas = [...filas].sort( (a,b) => a.ordenTrabajoId - b.ordenTrabajoId);
     const columnas : ColumnRegular[] = [
@@ -57,7 +65,12 @@ export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes }: Props) =
         { prop: 'tecnico', name: 'Técnico', size: 240, readonly: true },   // NUEVO: lee el campo 'tecnico' armado en filas; readonly porque es un dato calculado, no editable
         { prop: 'trabajoRealizado', name: 'Trabajo realizado', size: 320 },
         { prop: 'estadoCampo', name: 'Estado Campo', size: 140,readonly:true, cellTemplate: (h,props) => h('span', { class: `${BASE} ${COLOR_ESTADO[props.model.estado] ?? 'bg-gray-400'}` },props.model.estado)},
-        { prop: 'cantArchivos', name: 'Archivos', size: 140 , cellTemplate: Template(((props: any) => celdaArchivo({ ...props, onVer: onVerImagenes })) as any) },
+        { prop: 'cantArchivos', name: 'Archivos', size: 140 , cellTemplate: (h, props) => h('button', {class: 'inline-flex items-center gap-1.5 text-gray-600 hover:text-red-600 disabled:opacity-40',
+            disabled: props.model.cantArchivos === 0,
+        onClick: () => onVerImagenes?.(props.model as OrdenTrabajo),
+        }, `🖼 ${props.model.cantArchivos}`) },
+        { prop: 'validacion', name: 'Validacion', size:140, cellTemplate: (h,props)=> h('span',{ class: `${BASE} ${COLOR_VALIDACION_FOTOS[props.model.validacion] ?? 'bg-gray-400'}`},props.model.validacion),readonly:true}
+
     ];
 
    

@@ -10,7 +10,9 @@ import { ModalData } from '../../components/shared/ModalData';
 import { PictureVisor } from '../../components/shared/PictureVisor';
 import { useOrdenes, usePermisosOrden, useTecnicos } from '../../hooks/ordenes/useOrden';
 import { eliminarOrden, mensajeError } from '../../services/Ordenes/OrdenesTrabajo.service';
-import type { OrdenTrabajo } from '../../types/Ordenes';
+import { type OrdenTrabajo ,type validarImagen, EstadoFotos} from '../../types/Ordenes';
+import { RevisionFotos } from "../../components/Ordenes/RevisionFotos";
+import { CheckGuardado } from "../../components/shared/Check";
 
 const TAMANO_PAGINA = 15;
 
@@ -29,6 +31,15 @@ export const OrdenesPage = () => {
     const [aplicados, setAplicados] = useState({ buscar: inicial, desde: '', hasta: '' });
     const [pagina, setPagina] = useState(1);
 
+    const [exito, setExito] = useState<EstadoFotos | null>(null);
+
+    /* */
+
+    const onSave = (orden: OrdenTrabajo) => {
+        setExito(orden.estadoAlmacen);
+        setTimeout( () => setExito(null),1200)
+        recargar();
+    }
     // búsqueda desde la barra superior (?buscar=): cuando cambia la URL se aplica como filtro
     const buscarUrl = searchParams.get('buscar');
     const [buscarUrlPrevio, setBuscarUrlPrevio] = useState(buscarUrl);
@@ -142,7 +153,21 @@ export const OrdenesPage = () => {
                 subtitle={visor ? `SOT ${visor.sot}` : undefined}
                 icon={<Images size={20} strokeWidth={1.75} />}
             >
-                {visor && <PictureVisor imgs={visor.archivos} />}
+                {visor && 
+                    <div className="relative">
+                        <PictureVisor imgs={visor.archivos} >
+                            <RevisionFotos onSave= {onSave} ordenId={visor.ordenTrabajoId} />
+                        </PictureVisor>
+                        { exito && 
+                        
+                            <CheckGuardado 
+                                texto={ exito == EstadoFotos.CORRECTO ? 'Fotos aprobadas' : 'Fotos observadas ' }
+                                color={ exito == EstadoFotos.CORRECTO ? 'success':'warning' }
+                            >
+                            </CheckGuardado>
+                        }
+                    </div>
+                }
             </ModalData>
         </div>
     );

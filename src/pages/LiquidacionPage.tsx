@@ -15,9 +15,6 @@ import { exportarAExcel } from '../utils/exportarExcel';
 
 export const LiquidacionPage: React.FC = () => {
     const { data, loading, error, setError, params, setParams, totalRecords, crearLiquidacion, editarLiquidacion, eliminarLiquidacion, fetchLiquidaciones, evaluarImportacion, restaurarSot  } = useLiquidaciones();
-
-
-
     // Catálogo de precios de DECO, REPETIDOR y DROP: con él se calcula el total de cada fila
     const { rol } = useAuth();
     const [catalogo, setCatalogo] = useState<AdicionalDto[]>([]);

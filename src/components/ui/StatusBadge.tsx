@@ -38,6 +38,11 @@ export const MAPEO_ESTADOS = {
         2: { label: "No pagada", tono: "danger" },
         3: { label: "Por auditar", tono: "info" },
     },
+    validacion : {
+        0:{label: "sin validacion", tono:"info"},
+        1:{label: "correcto", tono:"success"},
+        2:{label: "observacion", tono:"warning"}
+    }
 } satisfies Record<string, Record<number, { label: string; tono: Tono }>>;
 
 export const StatusBadge = ({ tono, children }: { tono: Tono; children: React.ReactNode }) => (

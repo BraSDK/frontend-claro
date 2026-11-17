@@ -22,7 +22,7 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
     const [error, setError] = useState<string | null>(null);
 
     const [params, setParams] = useState<ListParamsLiquidacionesDto>(
-        initialParams || { pagina: 1, canPagina:20 }
+        initialParams || { pagina: 1, canPagina:50 }
     );
 
     const fetchLiquidaciones = useCallback(async () => {
