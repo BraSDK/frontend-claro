@@ -20,7 +20,10 @@ const CAN_PAGINA = 50;   // máximo que acepta el back
 const aFila = (l: LiquidacionAuditoriaDto): FilaAuditoria => ({
     sot: l.sot,
     tecnico: l.nombreTecnico,
+    codigoServicio: l.codigoServicio,
     fechaProgramacion: l.fechaProgramacion,
+    mesPago: l.mesPago,
+    semanaPago: l.semanaPago,
     precioTotalReal: l.precioTotalReal ?? 0,
     precioEditado: l.precioTotalEditable ?? null,
     montoPagado: l.montoPagado ?? null,
@@ -38,7 +41,9 @@ export const AuditoriaPage = () => {
     const [buscar, setBuscar] = useState('');
     const [estadoPago, setEstadoPago] = useState('');
     const [auditada, setAuditada] = useState('');
-    const hayFiltros = Boolean(buscar || estadoPago || auditada);
+    const [mesPago, setMesPago] = useState('');
+    const [semanaPago, setSemanaPago] = useState('');
+    const hayFiltros = Boolean(buscar || estadoPago || auditada || mesPago || semanaPago);
 
     const columnas = useMemo(() => getAuditoriaColumns(), []);
     const tiposColumna = useMemo(() => ({ select: new ColumnSelect() }), []);
@@ -62,10 +67,16 @@ export const AuditoriaPage = () => {
         buscar: buscar.trim() || undefined,
         estadoPago: estadoPago === '' ? undefined : Number(estadoPago),
         auditada: auditada === '' ? undefined : auditada === 'true',
+        mesPago: mesPago ? mesPago.replace('-', '') : undefined, // "2026-11" -> "202611"
+        semanaPago: semanaPago || undefined,
     });
 
     const limpiarFiltros = () => {
-        setBuscar(''); setEstadoPago(''); setAuditada('');
+        setBuscar(''); 
+        setEstadoPago(''); 
+        setAuditada('');
+        setMesPago('');
+        setSemanaPago('');
         setParams({ pagina: 1, canPagina: CAN_PAGINA });
     };
 
@@ -122,6 +133,19 @@ export const AuditoriaPage = () => {
                         <option value="">Todas</option>
                         <option value="true">Sí</option>
                         <option value="false">No</option>
+                    </Selector>
+                </Campo>
+                <Campo label="Mes de pago">
+                    <Entrada type="month" value={mesPago} onChange={(e) => setMesPago(e.target.value)} />
+                </Campo>
+                <Campo label="Semana de pago">
+                    <Selector value={semanaPago} onChange={(e) => setSemanaPago(e.target.value)}>
+                        <option value="">Todas</option>
+                        <option value="S1">Semana 1 (S1)</option>
+                        <option value="S2">Semana 2 (S2)</option>
+                        <option value="S3">Semana 3 (S3)</option>
+                        <option value="S4">Semana 4 (S4)</option>
+                        <option value="S5">Semana 5 (S5)</option>
                     </Selector>
                 </Campo>
             </FilterBar>

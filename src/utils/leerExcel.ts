@@ -55,23 +55,56 @@ const leerCsv = (contenido: string): TablaExcel => {
     return lineas.map((l) => l.split(separador).map((c) => c.trim().replace(/^"|"$/g, '')));
 };
 
-export const leerExcel = async (archivo: File): Promise<TablaExcel> => {
-    if (archivo.name.toLowerCase().endsWith('.csv')) return leerCsv(await archivo.text());
+export interface HojaExcelInfo {
+    nombre: string;
+    rutaHoja:string;
+}
 
-    const leer = abrirZip(await archivo.arrayBuffer()); 
-
-    // la primera hoja del libro (workbook.xml dice cuál es; sus rels dicen en qué archivo está)
-    let rutaHoja = 'xl/worksheets/sheet1.xml';
-
-    const [libro, rels] = await Promise.all([leer('xl/workbook.xml'), leer('xl/_rels/workbook.xml.rels')]);
-    if (libro && rels) {
-        const id = etiquetas(xml(libro), 'sheet')[0]?.getAttribute('r:id');
-        const destino = etiquetas(xml(rels), 'Relationship').find((r) => r.getAttribute('Id') === id)?.getAttribute('Target');
-        if (destino) rutaHoja = destino.startsWith('/') ? destino.slice(1) : `xl/${destino}`;
+// 1. NUEVA FUNCIÓN: Obtiene la lista de hojas disponibles en el Excel
+export const leerHojasExcel = async (archivo: File): Promise<HojaExcelInfo[]> => {
+    if (archivo.name.toLowerCase().endsWith('.csv')) {
+        return [{ nombre: 'CSV (Única hoja)', rutaHoja: 'csv' }];
     }
 
+    const leer = abrirZip(await archivo.arrayBuffer());
+    const [libro, rels] = await Promise.all([leer('xl/workbook.xml'), leer('xl/_rels/workbook.xml.rels')]);
+    
+    const hojas: HojaExcelInfo[] = [];
+
+    if (libro && rels) {
+        const etiquetasSheet = etiquetas(xml(libro), 'sheet');
+        const etiquetasRels = etiquetas(xml(rels), 'Relationship');
+
+        for (const sheet of etiquetasSheet) {
+            const nombre = sheet.getAttribute('name') ?? 'Hoja desconocida';
+            const id = sheet.getAttribute('r:id');
+            const destino = etiquetasRels.find((r) => r.getAttribute('Id') === id)?.getAttribute('Target');
+            
+            if (destino) {
+                const rutaHoja = destino.startsWith('/') ? destino.slice(1) : `xl/${destino}`;
+                hojas.push({ nombre, rutaHoja });
+            }
+        }
+    }
+
+    // Si por alguna razón no encuentra hojas, devuelve la ruta por defecto
+    if (hojas.length === 0) {
+        hojas.push({ nombre: 'Sheet1', rutaHoja: 'xl/worksheets/sheet1.xml' });
+    }
+
+    return hojas;
+};
+
+// 2. FUNCIÓN MODIFICADA: Lee una hoja específica usando su ruta interna
+export const leerHojaEspecifica = async (archivo: File, rutaHoja: string): Promise<TablaExcel> => {
+    if (archivo.name.toLowerCase().endsWith('.csv') || rutaHoja === 'csv') {
+        return leerCsv(await archivo.text());
+    }
+
+    const leer = abrirZip(await archivo.arrayBuffer()); 
     const hoja = await leer(rutaHoja);
-    if (!hoja) throw new Error('No se encontró la hoja en el Excel');
+    
+    if (!hoja) throw new Error(`No se encontró la hoja en la ruta: ${rutaHoja}`);
 
     // los textos se guardan una sola vez en sharedStrings y las celdas apuntan a su índice
     const compartidos = await leer('xl/sharedStrings.xml');
@@ -95,6 +128,17 @@ export const leerExcel = async (archivo: File): Promise<TablaExcel> => {
     return filas.filter((f) => f.some((x) => x !== ''));
 };
 
+// 3. FUNCIÓN DE COMPATIBILIDAD: Mantiene el comportamiento original para no romper otros componentes
+export const leerExcel = async (archivo: File): Promise<TablaExcel> => {
+    const hojas = await leerHojasExcel(archivo);
+    
+    if (hojas.length === 0) {
+        throw new Error('El archivo Excel no tiene hojas legibles.');
+    }
+
+    // Por defecto, lee la primera hoja que encuentre (comportamiento original)
+    return leerHojaEspecifica(archivo, hojas[0].rutaHoja);
+};
 // "S/ 1,234.50" | "1.234,50" | 1234.5 → 1234.5 ; vacío o inválido → null
 export const aNumero = (valor: unknown): number | null => {
     if (typeof valor === 'number') return Number.isFinite(valor) ? valor : null;
