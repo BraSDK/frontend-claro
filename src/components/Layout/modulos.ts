@@ -13,7 +13,6 @@ export const MODULOS: Modulo[] = [
     { nombre: 'Inicio', ruta: '/inicio', pantallaCompleta: true },          // pantalla principal: botones a cada módulo
     { nombre: 'Dashboard', ruta: '/dashboard' },
     { nombre: 'Órdenes de trabajo', ruta: '/ordenes' },
-    { nombre: 'Pagos Claro', ruta: '/pagos-claro', permiso:'verPagosClaro'},
     { nombre: 'Liquidacion', ruta: '/liquidacion',permiso:'verLiquidacion', pantallaCompleta: true },
     { nombre: 'Auditoría de liquidaciones', ruta: '/auditoria', permiso: 'verAuditoria' },
     { nombre: 'Reportes', ruta: '/reportes' , permiso:'verReportes'},

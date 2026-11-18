@@ -149,6 +149,9 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                 estadoPago: estados[f.sot] ?? f.estadoSugerido,
                 montoPagado: f.montoPagado,
                 precioTotalEditable: f.precioTotalEditable ?? null,   // se conserva el precio editado que ya tenía
+                observacionExcel: f.observacionExcel,
+                mesPago : f.mesPago,
+                semanaPago: f.semanaPago 
             }));
             const res = await auditarLiquidaciones(items);
             if (res.enPago?.length) {

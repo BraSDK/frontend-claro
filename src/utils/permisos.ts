@@ -2,7 +2,6 @@ export type Rol = "ADMIN"|"TECNICO"|"ALMACEN";
 
 export const PERMISOS = {
     verLiquidacion:     ['ADMIN', 'ALMACEN' ],
-    verPagosClaro:   ['ADMIN', 'ALMACEN'],
     verReportes:     ['ADMIN', 'ALMACEN'],
     verAuditoria:       ['ADMIN', 'ALMACEN'],
     gestionarServicios: ['ADMIN', 'ALMACEN'],

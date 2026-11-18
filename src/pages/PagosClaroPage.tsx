@@ -79,6 +79,7 @@ export const PagosClaroPage = () => {
                 <Campo label={pestana === 'pagos' ? 'Fecha de pago' : 'Fecha de la multa'}>
                     <RangoFechas desde={desde} hasta={hasta} onDesde={setDesde} onHasta={setHasta} />
                 </Campo>
+
             </FilterBar>
 
             {error && <div className="rounded-control bg-danger-soft px-4 py-2 text-sm text-danger">{error}</div>}
@@ -110,7 +111,7 @@ export const PagosClaroPage = () => {
                 <DataTable
                     titulo="Pagos de Claro"
                     cantidad={pagos.length}
-                    acciones={<Boton icono={<Plus size={16} />} onClick={() => setRegistrarAbierto(true)}>Registrar pago</Boton>}
+                    
                 >
                     <table className={claseTabla}>
                         <thead>
@@ -148,7 +149,6 @@ export const PagosClaroPage = () => {
                 <DataTable
                     titulo="Multas de Claro"
                     cantidad={multas.length}
-                    acciones={<Boton icono={<Plus size={16} />} onClick={() => abrirMulta(null)}>Nueva multa</Boton>}
                 >
                     <table className={claseTabla}>
                         <thead>

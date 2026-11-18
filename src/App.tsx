@@ -43,10 +43,10 @@ function App() {
           <Route element={<RutaProtegida permiso='verReportes'/>}>
             <Route path="/reportes" element={<ReportesPage />} />
           </Route>
-          <Route element={<RutaProtegida permiso="verPagosClaro"/>}>
+        {/*  <Route element={<RutaProtegida permiso="verPagosClaro"/>}>
             <Route path="/pagos-claro" element={<PagosClaroPage />} />
           </Route>
-
+        */}
           <Route path="/servicios" element={<ServiciosPage />} />
 
           <Route path="/ordenes" element={<OrdenesPage />} />
