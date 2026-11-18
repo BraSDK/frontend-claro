@@ -148,8 +148,6 @@ export const ImportarPagosModal = ({ abierto, onCerrar, onConfirmado }: Props) =
                 sot: f.sot,
                 estadoPago: estados[f.sot] ?? f.estadoSugerido,
                 montoPagado: f.montoPagado,
-                mesPago: f.mesPago ?? null,
-                semanaPago: f.semanaPago ?? null,
                 precioTotalEditable: f.precioTotalEditable ?? null,   // se conserva el precio editado que ya tenía
                 observacionExcel: f.observacionExcel,
                 mesPago : f.mesPago,
