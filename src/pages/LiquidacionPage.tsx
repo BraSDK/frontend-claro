@@ -1,10 +1,9 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { useLiquidaciones } from '../hooks/liquidacion/useLiquidaciones';
+import { useLiquidaciones, HOJA_COMPLETA } from '../hooks/liquidacion/useLiquidaciones';
 import { LiquidacionesTable } from '../components/Liquidacion/LiquidacionesTable';  
     
 import { PreciosAdicionalesModal } from '../components/Liquidacion/PreciosAdicionalesModal';
 import { Campo, Entrada, Selector, RangoFechas } from '@/components/shared/Filtros';
-import { BarPaginancion } from '@/components/shared/Tabla';
 import { FileSpreadsheet } from 'lucide-react';
 import { mapGridToCrearDto, mapGridToEditarDto, preciosDesdeCatalogo } from '../utils/liquidacion.mapper';
 import { getAdicionales } from '../services/liquidacion.service';
@@ -96,7 +95,7 @@ export const LiquidacionPage: React.FC = () => {
         setTextoBusqueda('');
         setDesde('');
         setHasta('');
-        setParams((prev) => ({ pagina: 1, canPagina: 20, hojaId: prev.hojaId }));   // limpiar filtros no cambia de hoja
+        setParams((prev) => ({ pagina: 1, canPagina: HOJA_COMPLETA, hojaId: prev.hojaId }));   // limpiar filtros no cambia de hoja
     };
 
     const cambiarFiltro = (setter: React.Dispatch<React.SetStateAction<any>>) => (valor: any) => setter(valor);
@@ -279,21 +278,18 @@ export const LiquidacionPage: React.FC = () => {
                 onRenombrar={renombrarHoja}
             />
 
-            {/* Barra de estado (como la de Sheets): resumen de la página y paginación */}
+            {/* Barra de estado (como la de Sheets): resumen de la hoja. Sin paginación: la hoja se carga completa y se recorre con scroll */}
             <footer className="flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-gray-300 bg-gray-50 px-3 py-1 text-xs text-gray-600">
                 <span><b className="text-gray-800">{metricas.totalLiquidaciones}</b> liquidaciones</span>
                 <span>Monto: <b className="text-gray-800">S/ {metricas.montoTotal.toFixed(2)}</b></span>
                 <span>Ingresadas: <b className="text-gray-800">{metricas.ingresadas}</b></span>
                 <span>Validadas: <b className="text-gray-800">{metricas.validadas}</b></span>
-                <div className="ml-auto">
-                    <BarPaginancion
-                        onHandle={(pagina: number) => setParams(prev => ({ ...prev, pagina }))}
-                        numeroPagina={params.pagina || 1}
-                        totalRegistros={totalRecords}
-                        totalRegistrosPagina={params.canPagina || 20}
-                        totalPaginasTotales={Math.max(1, Math.ceil(totalRecords / (params.canPagina || 20)))}
-                    />
-                </div>
+                {/* solo si una hoja pasara el tope del back (HOJA_COMPLETA): avisa en vez de esconder filas en silencio */}
+                {data.length < totalRecords && (
+                    <span className="ml-auto font-medium text-amber-700">
+                        Mostrando {data.length} de {totalRecords}: usa el filtro de SOT para encontrar el resto
+                    </span>
+                )}
             </footer>
             <PreciosAdicionalesModal
                 abierto={preciosAbierto}

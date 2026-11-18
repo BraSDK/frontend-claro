@@ -15,6 +15,10 @@ import type {
     EditarLiquidacionRequestDto 
 } from '../../types/liquidacion.types';
 
+// La grilla carga la hoja (mes) completa y se recorre con scroll, como en Sheets.
+// Debe coincidir con CanMaxPag del back (ListParamsLiquidacionesDto).
+export const HOJA_COMPLETA = 2000;
+
 export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => {
     const [data, setData] = useState<ListarRequestLiquidacionesDto[]>([]);
     const [totalRecords, setTotalRecords] = useState<number>(0)
@@ -22,16 +26,16 @@ export const useLiquidaciones = (initialParams?: ListParamsLiquidacionesDto) => 
     const [error, setError] = useState<string | null>(null);
 
     const [params, setParams] = useState<ListParamsLiquidacionesDto>(
-        initialParams || { pagina: 1, canPagina:50 }
+        initialParams || { pagina: 1, canPagina: HOJA_COMPLETA }
     );
 
     const fetchLiquidaciones = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
-            const result = await getLiquidaciones(params);
-            setData(Array.isArray(result) ? result : []);
-            setTotalRecords(Array.isArray(result) ? result.length : 0);
+            const { items, total } = await getLiquidaciones(params);
+            setData(Array.isArray(items) ? items : []);
+            setTotalRecords(total);   // el total que cuenta el back, no el largo de la página
         }catch(err: any){
             const msg = err.response?.data?.error || err.response?.data?.mensaje || "Error al cargar liquidaciones";
             setError(msg);

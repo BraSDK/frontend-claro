@@ -16,6 +16,8 @@ export const ServicioForm = ({ initialData, onSubmit, onCancel }: ServicioFormPr
     categoria: initialData?.categoria || 'HFC' as CategoriaServicio,
   });
 
+  const esEdicion = Boolean(initialData);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({ ...formData, codigo: Number(formData.codigo) });
@@ -23,6 +25,27 @@ export const ServicioForm = ({ initialData, onSubmit, onCancel }: ServicioFormPr
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Código del tarifario de Claro: es la clave del servicio (lo usan las liquidaciones),
+          por eso se escribe al registrar y ya no se cambia al editar */}
+      <div>
+        <label className="block text-sm font-medium text-ink mb-1">Código del Servicio</label>
+        <input
+          type="text"
+          inputMode="numeric"
+          required
+          disabled={esEdicion}
+          value={formData.codigo}
+          onChange={(e) => setFormData({ ...formData, codigo: e.target.value.replace(/\D/g, '') })}   // solo dígitos
+          pattern="[1-9][0-9]*"
+          title="Solo números, sin ceros al inicio"
+          className="w-full px-4 py-2 border border-line rounded-control focus:ring-2 focus:ring-info focus:border-transparent text-sm font-mono disabled:bg-page disabled:text-muted"
+          placeholder="Ej. 9001"
+        />
+        {esEdicion && (
+          <p className="mt-1 text-xs text-muted">El código no se puede cambiar: lo usan las liquidaciones registradas.</p>
+        )}
+      </div>
+
       <div>
         <label className="block text-sm font-medium text-ink mb-1">Nombre del Servicio</label>
         <input

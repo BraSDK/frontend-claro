@@ -112,6 +112,7 @@ export interface CrearObservacionDto {
     nombreSubTipoOrden: string;
     fechaProgramacion: string;
     nombreTecnico?: string;
+    docTecnico?: string | null;           // DNI del técnico (null si el nombre no es de un técnico registrado)
     estadoSistema: number | string;
     detallesLiquidacion: DetalleResponseDto[];
     precioTotalReal?: number | null;      // calculado por el back con los precios del catálogo
@@ -133,6 +134,7 @@ export interface CrearObservacionDto {
     liquidacionId?: number;
     sot?: number;
     tecnico?: string;
+    docTecnico?: string | null;   // solo para mostrar: el back lo calcula desde el nombre
     tipoOrden?: string;
     fechaProgramacion?: string;
     codigoServicio?: number;

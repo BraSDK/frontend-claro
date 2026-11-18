@@ -31,8 +31,9 @@ export const useServicios = (params?: ListServiciosRequest) => {
             await postServicios(nuevoServicio);
             // refrescar
             await fetchServicios();
-        }catch{
-            setError('Error al crear el servicio.')
+        }catch (err: any){
+            // el back explica el motivo (ej. "Ya existe un servicio con el código 9001"); se relanza para que el modal no se cierre
+            throw new Error(err?.response?.data?.error ?? 'Error al crear el servicio.');
         }finally {
             setIsLoading(false);
         }
@@ -52,8 +53,8 @@ export const useServicios = (params?: ListServiciosRequest) => {
                 )
             );
         } catch (err: any) {
-            setError('Error al actualizar el servicio.');
-            throw err;
+            // igual que al crear: el mensaje del back llega al alert de la página
+            throw new Error(err?.response?.data?.error ?? 'Error al actualizar el servicio.');
         } finally{
             setIsLoading(false);
         }

@@ -8,9 +8,11 @@ import type {
     GuardarAdicionalDto,
 } from '../types/liquidacion.types';
 
-export const getLiquidaciones = async ( params?: ListParamsLiquidacionesDto): Promise<ListarRequestLiquidacionesDto[]> => {
+// Devuelve las filas Y el total real (antes solo las filas: el total se tomaba del largo de la página)
+export const getLiquidaciones = async ( params?: ListParamsLiquidacionesDto): Promise<{ items: ListarRequestLiquidacionesDto[]; total: number }> => {
     const response = await api.get('/Liquidacion/Listar', {params});
-    return response.data.listaGenerica ?? response.data.datos ?? response.data;
+    const items: ListarRequestLiquidacionesDto[] = response.data.listaGenerica ?? response.data.datos ?? response.data ?? [];
+    return { items, total: response.data.totalRegistros ?? items.length };
 };
 
 export const postLiquidacion = async ( nuevaLiquidacion: CrearLiquidacionRequest): Promise<any> => {

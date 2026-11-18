@@ -2,10 +2,15 @@ import React, { useState, useEffect, useMemo,useRef } from 'react';
 import { RevoGrid } from '@revolist/react-datagrid';
 import { temaClaro } from '@/theme/revogrid-theme';
 import type { ListarRequestLiquidacionesDto, FilaLiquidacionGrid } from '../../types/liquidacion.types';
-import { getLiquidacionesColumns, gridEditors } from './liquidacionesColumns';
+import { getLiquidacionesColumns, gridEditors, type SugerenciasGrilla } from './liquidacionesColumns';
+import { useTecnicos } from '../../hooks/ordenes/useOrden';
 import { calcularTotal, type PreciosAdicionales } from '../../utils/liquidacion.mapper';
 import {  useServicios } from '../../hooks/servicio/useServicios';
-const MAX_FILAS_EXCEL = 200;
+// La hoja muestra como mínimo 200 filas (para que se vea como una hoja de cálculo)
+// y SIEMPRE deja 100 filas vacías después de los datos para escribir SOT nuevas.
+// Antes se rellenaba "hasta 200": con 200 o más SOT no quedaba ninguna fila libre.
+const MIN_FILAS_HOJA = 200;
+const FILAS_VACIAS_AL_FINAL = 100;
 
 interface LiquidacionesTableProps {
   liquidaciones: ListarRequestLiquidacionesDto[];
@@ -34,6 +39,15 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
 }) => {
       // para traer precios de los servicios
   const { servicios } = useServicios({ cantidadPorPagina: 1000 });   // todo el tarifario, para llenar el costo al escribir el código
+  const { tecnicos } = useTecnicos();
+
+  // Autocompletado de las celdas Técnico y Cód. Servicio (useMemo: las columnas se rehacen solo si cambian las listas)
+  const sugerencias = useMemo<SugerenciasGrilla>(() => ({
+    tecnicos: tecnicos.map((t) => ({ valor: t.nombre.trim(), detalle: t.documento })),
+    servicios: [...servicios]
+      .sort((a, b) => a.codigo - b.codigo)
+      .map((s) => ({ valor: String(s.codigo), detalle: s.nombre })),
+  }), [tecnicos, servicios]);
   const [gridData, setGridData] = useState<Partial<FilaLiquidacionGrid>[]>([]);
   const gridRef = useRef<HTMLRevoGridElement>(null); // traemos todos los metodos de revogrid
 
@@ -44,6 +58,7 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
         liquidacionId: liq.liquidacionId,
         sot: liq.sot,
         tecnico: liq.nombreTecnico,
+        docTecnico: liq.docTecnico,
         tipoOrden: liq.tipoOrden,
         codigoServicio: liq.codigoServicio,
         fechaProgramacion: liq.fechaProgramacion,
@@ -96,14 +111,14 @@ export const LiquidacionesTable: React.FC<LiquidacionesTableProps> = ({
     }));
     const sotsServidor = new Set(servidor.map((f) => f.sot));
 
-    const relleno = Math.max(0, MAX_FILAS_EXCEL - servidor.length);
+    const relleno = Math.max(FILAS_VACIAS_AL_FINAL, MIN_FILAS_HOJA - servidor.length);
     setGridData([
       ...servidor,
       ...Array.from({ length: relleno }, () => ({}))
     ]);
   }, [liquidaciones, isLoading]);
 
-  const columns = useMemo(() => getLiquidacionesColumns(onDelete, onAprobarImportacion, onRechazarImportacion, onRestaurarImportacion,precios), [onDelete, onAprobarImportacion, onRechazarImportacion, precios]);
+  const columns = useMemo(() => getLiquidacionesColumns(onDelete, onAprobarImportacion, onRechazarImportacion, onRestaurarImportacion, precios, sugerencias), [onDelete, onAprobarImportacion, onRechazarImportacion, onRestaurarImportacion, precios, sugerencias]);
 
   // Edición simple → detail.model (1 fila) | Pegado o autollenado → detail.models + detail.data (varias filas)
   const handleAfterEdit = async (e: CustomEvent) => {

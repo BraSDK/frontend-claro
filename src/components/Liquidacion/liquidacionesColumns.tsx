@@ -3,6 +3,7 @@ import { Editor, type Editors } from '@revolist/react-datagrid';
 import type { FilaLiquidacionGrid } from '../../types/liquidacion.types';
 import { esNoPago, type PreciosAdicionales } from '../../utils/liquidacion.mapper';
 import FechaEditor from './FechaEditor';
+import SugerenciaEditor, { type Sugerencia } from './SugerenciaEditor';
 
 const formatSoles = (h: any, props: any) => {
   const valor = props.model[props.prop];
@@ -28,17 +29,26 @@ const titulo = (nombre: string, precio: number | undefined) =>
   precio === undefined ? nombre : `${nombre} · S/ ${precio.toFixed(2)}`;
 
 const EDITOR_FECHA = 'editor-fecha';
+const EDITOR_SUGERENCIA = 'editor-sugerencia';
 
 export const gridEditors: Editors = {
   [EDITOR_FECHA]: Editor(FechaEditor),
+  [EDITOR_SUGERENCIA]: Editor(SugerenciaEditor),
 };
+
+// Opciones del autocompletado de las celdas Técnico y Cód. Servicio
+export interface SugerenciasGrilla {
+  tecnicos: Sugerencia[];    // valor = nombre, detalle = DNI
+  servicios: Sugerencia[];   // valor = código, detalle = nombre del servicio
+}
 
 export const getLiquidacionesColumns = (
     onDelete?: (sot: number) => void,
-    onAprobarImportacion?: (sot: number) => void,  
+    onAprobarImportacion?: (sot: number) => void,
     onRechazarImportacion?: (sot: number) => void,
     onRestaurarImportacion?: (sot: number) => void,
-    precios: PreciosAdicionales = {}
+    precios: PreciosAdicionales = {},
+    sugerencias: SugerenciasGrilla = { tecnicos: [], servicios: [] }
   ): ColumnRegular[] => [
     { 
       prop: 'sot', 
@@ -52,21 +62,37 @@ export const getLiquidacionesColumns = (
       , pin:'colPinStart'
     },
     { 
-        prop: 'tecnico', 
-        name: 'Técnico', 
-        size: 200,
+        prop: 'tecnico',
+        name: 'Técnico',
+        size: 220,
+        editor: EDITOR_SUGERENCIA,
+        sugerencias: sugerencias.tecnicos,
         cellTemplate: (h: any, props: any) => {
-            
             const tecnico = props.model[props.prop];
             if (!tecnico) return h('span', { class: 'text-gray-400 italic text-xs'}, 'Sin asignar');
-            return tecnico;
+            const dni = props.model.docTecnico;
+            // con DNI = técnico registrado; sin DNI = nombre libre (no cuenta en el dashboard por técnico)
+            return h('span', { class: 'truncate', title: dni ? `DNI ${dni}` : 'No coincide con un técnico registrado' }, [
+              tecnico,
+              dni ? h('span', { class: 'ml-1.5 text-[11px] text-gray-400' }, dni) : h('span', { class: 'ml-1.5 text-[11px] text-amber-600' }, '¿?'),
+            ]);
         }
     },
-    { 
-      prop: 'codigoServicio', 
-      name: 'Cód. Servicio', 
-      size: 110,
-      
+    {
+      prop: 'codigoServicio',
+      name: 'Cód. Servicio',
+      size: 200,
+      editor: EDITOR_SUGERENCIA,
+      sugerencias: sugerencias.servicios,
+      cellTemplate: (h: any, props: any) => {
+        const codigo = props.model[props.prop];
+        if (!codigo) return '';
+        const nombre = sugerencias.servicios.find((s) => s.valor === String(codigo))?.detalle;
+        return h('span', { class: 'truncate', title: nombre ?? 'Código no está en el tarifario' }, [
+          h('span', { class: 'font-mono' }, String(codigo)),
+          nombre ? h('span', { class: 'ml-1.5 text-[11px] text-gray-400' }, nombre) : null,
+        ]);
+      },
   },
     { prop: 'tipoOrden', name: 'Tipo Orden', size: 120 },
     { 

@@ -45,9 +45,9 @@ export const ServiciosPage = () => {
         }
         //Solo si la peticion es exitosa
         closeModal();
-      }catch(err){
+      }catch(err: any){
         console.error("Fallo al guardar el servicio:", err);
-        alert("Fallo la petición, mira el error en la consola.");
+        alert(err?.message ?? "Fallo la petición, mira el error en la consola.");   // el modal sigue abierto para corregir
       }
     };
 
