@@ -38,6 +38,7 @@ export interface LiquidacionAuditoriaDto extends ListarRequestLiquidacionesDto {
     fechaValidacion?: string | null;
     mesPago?: string | null;
     semanaPago?: string | null;
+    historialPeriodos?: string[];
 }
 
 export interface PagedResponse<T> {
@@ -56,6 +57,7 @@ export interface ParamsAuditoria {
     auditada?: boolean;
     mesPago?: string;
     semanaPago?: string;
+    excluirImportadas?: boolean;
 }
 
 // Fila plana de la grilla de auditoría
@@ -70,6 +72,8 @@ export interface FilaAuditoria {
     precioEditado?: number | string | null;     // el que se cobra si existe (PrecioTotalEditable)
     montoPagado?: number | string | null;
     estado?: string;                            // etiqueta de ESTADOS_PAGO_LIQ
+    historialPeriodos?: string[];
+    onVerHistorial?: (fila: FilaAuditoria) => void; // solo en FilaAuditoria
 }
 
 // ===== Excel de pagos =====

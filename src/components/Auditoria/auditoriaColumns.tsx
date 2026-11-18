@@ -38,14 +38,32 @@ export const getAuditoriaColumns = (): ColumnRegular[] => [
     {
         prop: 'semanaPago',
         name: 'Periodo',
-        size: 115,
+        size: 145,
         readonly: true,
         cellTemplate: (h: any, props: any) => {
             const mes = props.model.mesPago;
             const sem = props.model.semanaPago;
+            const historial: string[] = props.model.historialPeriodos ?? [];
+    
             if (!mes && !sem) return h('span', { class: 'text-gray-400 text-xs' }, '-');
+    
             const mesFmt = mes?.length === 6 ? `${mes.slice(0, 4)}-${mes.slice(4)}` : (mes ?? '');
-            return h('span', { class: 'font-mono text-xs text-ink' }, [mesFmt, sem].filter(Boolean).join(' · '));
+            const textoActual = [mesFmt, sem].filter(Boolean).join(' · ');
+    
+            return h('div', { class: 'flex items-center justify-between gap-1.5 w-full' }, [
+                h('span', { class: 'font-mono text-xs text-ink' }, textoActual),
+                historial.length > 0
+                    ? h('button', {
+                        type: 'button',
+                        title: 'Ver historial de semanas anteriores',
+                        class: 'inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800 hover:bg-amber-200 transition-colors cursor-pointer',
+                        onClick: (e: MouseEvent) => {
+                            e.stopPropagation();
+                            props.model.onVerHistorial?.(props.model);
+                        },
+                    }, `↺ +${historial.length}`)
+                    : null,
+            ]);
         },
     },
 

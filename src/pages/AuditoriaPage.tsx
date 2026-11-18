@@ -7,6 +7,8 @@ import { FilterBar, Campo, Entrada, Selector } from '@/components/shared/Filtros
 import { DataTable, AccionTabla, BarPaginancion } from '@/components/shared/Tabla';
 import { getAuditoriaColumns } from '@/components/Auditoria/auditoriaColumns';
 import { ImportarPagosModal } from '@/components/Auditoria/ImportarPagosModal';
+import { HistorialPeriodosModal } from '@/components/Auditoria/HistorialPeriodosModal';
+
 import { getLiquidacionesAuditoria, auditarLiquidaciones } from '@/services/auditoria.service';
 import { aNumero } from '@/utils/leerExcel';
 import {
@@ -31,7 +33,7 @@ const aFila = (l: LiquidacionAuditoriaDto): FilaAuditoria => ({
 });
 
 export const AuditoriaPage = () => {
-    const [params, setParams] = useState<ParamsAuditoria>({ pagina: 1, canPagina: CAN_PAGINA });
+    const [params, setParams] = useState<ParamsAuditoria>({ pagina: 1, canPagina: CAN_PAGINA, excluirImportadas: true });
     const [datos, setDatos] = useState<PagedResponse<LiquidacionAuditoriaDto> | null>(null);
     const [cargando, setCargando] = useState(false);
     const [mensaje, setMensaje] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
@@ -47,7 +49,12 @@ export const AuditoriaPage = () => {
 
     const columnas = useMemo(() => getAuditoriaColumns(), []);
     const tiposColumna = useMemo(() => ({ select: new ColumnSelect() }), []);
-    const filas = useMemo(() => (datos?.listaGenerica ?? []).map(aFila), [datos]);
+    const filas = useMemo(() => (datos?.listaGenerica ?? []).map((l) => ({
+        ...aFila(l),
+        historialPeriodos: l.historialPeriodos ?? [],
+        onVerHistorial: (fila: FilaAuditoria) => setHistorialFila(fila),
+    })), [datos]);
+    const [historialFila, setHistorialFila] = useState<FilaAuditoria | null>(null);
 
     const cargar = useCallback(async () => {
         setCargando(true);
@@ -64,6 +71,7 @@ export const AuditoriaPage = () => {
 
     const aplicarFiltros = () => setParams({
         pagina: 1, canPagina: CAN_PAGINA,
+        excluirImportadas: true,
         buscar: buscar.trim() || undefined,
         estadoPago: estadoPago === '' ? undefined : Number(estadoPago),
         auditada: auditada === '' ? undefined : auditada === 'true',
@@ -77,7 +85,7 @@ export const AuditoriaPage = () => {
         setAuditada('');
         setMesPago('');
         setSemanaPago('');
-        setParams({ pagina: 1, canPagina: CAN_PAGINA });
+        setParams({ pagina: 1, canPagina: CAN_PAGINA, excluirImportadas: true });
     };
 
     // Auditoría manual: edición de una celda (detail.model) o pegado/autollenado (detail.models + detail.data).
@@ -200,6 +208,12 @@ export const AuditoriaPage = () => {
                 onCerrar={() => setImportarAbierto(false)}
                 onConfirmado={(n) => { setMensaje({ tipo: 'ok', texto: `Auditoría con Excel: ${n} SOT actualizadas` }); cargar(); }}
             />
+
+            <HistorialPeriodosModal
+                fila={historialFila}
+                onCerrar={() => setHistorialFila(null)}
+            />
+
         </div>
     );
 };
