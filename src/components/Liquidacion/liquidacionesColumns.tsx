@@ -42,6 +42,16 @@ export interface SugerenciasGrilla {
   servicios: Sugerencia[];   // valor = código, detalle = nombre del servicio
 }
 
+const celdaObservacion = (claseColor: string) => (h: any, props: any) => {
+  const texto = props.model[props.prop];
+  if (!texto) return '';
+  return h(
+    'span',
+    { class: `block truncate font-semibold ${claseColor}`, title: texto },
+    texto
+  );
+};
+
 export const getLiquidacionesColumns = (
     onDelete?: (sot: number) => void,
     onAprobarImportacion?: (sot: number) => void,
@@ -122,15 +132,9 @@ export const getLiquidacionesColumns = (
     { prop: 'drop300', name: titulo('Drop 300', precios['DROP 300']), size: 140, cellTemplate: cantidadConSubtotal(precios['DROP 300']) },
 
     // --- OBSERVACIONES (Textos) ---
-    { prop: 'obsFotos', name: 'Obs. Fotos', size: 200 },
-    {
-      prop: 'obsNoPago', name: 'Obs. No Pago', size: 200,
-      cellTemplate: (h: any, props: any) => {
-        const texto = props.model[props.prop];
-        return texto ? h('span', { class: 'text-red-600', title: texto }, texto) : '';
-      },
-    },
-    { prop: 'obsSiPago', name: 'Obs. Sí Pago', size: 200 },
+    { prop: 'obsFotos', name: 'Obs. Fotos', size: 200, cellTemplate: celdaObservacion('text-red-600') },
+    { prop: 'obsNoPago', name: 'Obs. No Pago', size: 200, cellTemplate: celdaObservacion('text-red-600') },
+    { prop: 'obsSiPago', name: 'Obs. Sí Pago', size: 200, cellTemplate: celdaObservacion('text-emerald-600') },
 
     // --- TOTAL Y ESTADO ---
     { 

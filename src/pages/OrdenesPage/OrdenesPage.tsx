@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Images, Plus, RefreshCw } from 'lucide-react';
+import { Images, Plus, RefreshCw, Copy } from 'lucide-react';
 import { FilterBar } from '../../components/ui/FilterBar';
 import { Campo, Entrada, RangoFechas, Boton } from '../../components/ui/Controles';
 import { DataTable, AccionTabla } from '../../components/ui/DataTable';
@@ -32,8 +32,32 @@ export const OrdenesPage = () => {
     const [pagina, setPagina] = useState(1);
 
     const [exito, setExito] = useState<EstadoFotos | null>(null);
+    const [seleccionadas, setSeleccionadas] = useState<number[]>([]);
 
-    /* */
+    const toggleSeleccion = (sotNum: number) => {
+        setSeleccionadas((prev) =>
+            prev.includes(sotNum) ? prev.filter((id) => id !== sotNum) : [...prev, sotNum]
+        );
+    };
+
+    const toggleTodas = (sotsVisibles: number[]) => {
+        const todasMarcadas = sotsVisibles.length > 0 && sotsVisibles.every((s) => seleccionadas.includes(s));
+        if (todasMarcadas) {
+            setSeleccionadas((prev) => prev.filter((s) => !sotsVisibles.includes(s)));
+        } else {
+            setSeleccionadas((prev) => Array.from(new Set([...prev, ...sotsVisibles])));
+        }
+    };
+
+    const copiarSotsSeleccionadas = async () => {
+        if (seleccionadas.length === 0) return;
+        await navigator.clipboard.writeText(seleccionadas.join('\n'));
+        setAviso({
+            tipo: 'ok',
+            texto: `${seleccionadas.length} SOT${seleccionadas.length > 1 ? 's' : ''} copiada${seleccionadas.length > 1 ? 's' : ''} al portapapeles.`,
+        });
+        setTimeout(() => setAviso(null), 2500);
+    };
 
     const onSave = (orden: OrdenTrabajo) => {
         setExito(orden.estadoAlmacen);
@@ -117,6 +141,14 @@ export const OrdenesPage = () => {
                 cantidad={datos?.totalRegistros ?? 0}
                 acciones={
                     <>
+                        {seleccionadas.length > 0 && (
+                            <AccionTabla
+                                icono={<Copy size={16} strokeWidth={1.75} />}
+                                onClick={copiarSotsSeleccionadas}
+                            >
+                                Copiar SOTs ({seleccionadas.length})
+                            </AccionTabla>
+                        )}
                         <AccionTabla icono={<RefreshCw size={16} strokeWidth={1.75} />} onClick={recargar} disabled={cargando}>
                             Actualizar
                         </AccionTabla>
@@ -143,6 +175,9 @@ export const OrdenesPage = () => {
                     nombreTecnico={nombreDe}
                     onVerImagenes={setVisor}
                     onEliminar={eliminar}
+                    seleccionadas={seleccionadas}
+                    onToggleSeleccion={toggleSeleccion}
+                    onToggleTodas={toggleTodas}
                 />
             </DataTable>
 
