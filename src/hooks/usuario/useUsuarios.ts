@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '../useAuth';
+import type { ChangueOtherPasswordRequestDto  } from '../../types/auth.types';
 import { 
   getUsuarios, 
   createUsuario, 
   updateUsuario, 
   deleteUsuario, 
-  updatePasswordUsuario
+  changeUserPassword
 } from '../../services/usuario.service';
 import type { 
   Usuario, 
@@ -14,11 +16,14 @@ import type {
 } from '../../types/usuario.types';
 
 export const useUsuarios = () => {
+  const { rol } = useAuth();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const fetchUsuarios = async (params?: ListUsuariosRequest) => {
+  const [params, setParams] = useState<ListUsuariosRequest>(
+          { pagina: 1, cantidadPorPagina: 20 }
+  );
+  const fetchUsuarios = useCallback( async () => {
     try {
       setIsLoading(true);
       setError(null);
@@ -29,7 +34,7 @@ export const useUsuarios = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [params]);
 
   useEffect(() => {
     fetchUsuarios();
@@ -92,11 +97,11 @@ export const useUsuarios = () => {
     }
   };
 
-  const cambiarPassword = async (id: number, nuevaClave: string) => {
+  const adminChangeUserPassword = async (id:number,request:ChangueOtherPasswordRequestDto ) => {
     try {
       setIsLoading(true);
       setError(null);
-      await updatePasswordUsuario(id, nuevaClave);
+      await changeUserPassword(id,request);
       // Opcional: await fetchUsuarios(); // Descomenta si necesitas refrescar la grilla
     } catch (err: any) {
       const msg = err.response?.data?.error || 'Error al actualizar la contraseña.';
@@ -107,6 +112,8 @@ export const useUsuarios = () => {
     }
   };
 
+  
+
   return {
     usuarios,
     isLoading,
@@ -115,6 +122,6 @@ export const useUsuarios = () => {
     addUsuario,
     editUsuario,
     removeUsuario,
-    cambiarPassword,
+    adminChangeUserPassword,
   };
 };

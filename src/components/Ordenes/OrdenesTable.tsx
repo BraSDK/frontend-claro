@@ -4,6 +4,7 @@ import { Template, type ColumnDataSchemaModel } from '@revolist/react-datagrid';
 import type { ColumnRegular, ColumnTemplateProp } from '@revolist/react-datagrid';
 import { Edit2, ImageIcon, Images, Inbox, Trash2, FileText } from 'lucide-react';
 import { EstadoMapeado, MAPEO_ESTADOS } from '../ui/StatusBadge';
+import { useAuth } from '../../hooks/useAuth';
 import { MAX_TRABAJO_REALIZADO, type EdicionRapidaRequest, type EstadoClaro, type OrdenTrabajo } from '../../types/Ordenes';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
     nombreTecnico?: (doc: string) => string | null;
     onVerImagenes?: (orden: OrdenTrabajo) => void;
     onEliminar?: (orden: OrdenTrabajo) => void;
+    onCambiarPago?: (orden: OrdenTrabajo, procede: boolean) => void;   // checkbox "Procede pago" (almacén)
 }
 
 const opcionesEstado = Object.entries(MAPEO_ESTADOS.campo).map(([valor, info]) => ({ valor, etiqueta: info.label }));
@@ -24,6 +26,9 @@ const COLOR_ESTADO : Record<string,string>= {
     'En progreso':"bg-warning",
     'No completado':"bg-danger"
 } 
+
+// columna normal + qué roles la ven (sin "roles" = todos)
+type ColumnaConRol = ColumnRegular & { roles?: string[] };
 
 const COLOR_VALIDACION_FOTOS : Record<string,string> = {
     'sin validacion':"bg-muted",
@@ -47,7 +52,8 @@ const celdaArchivo = ({ model, onVer }:ColumnDataSchemaModel & { onVer?: (o: Ord
 }
 
 
-export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes }: Props) => {   // nombreTecnico = nombreDe de useTecnicos (lo pasa OrdenesPage)
+export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes, onCambiarPago }: Props) => {   // nombreTecnico = nombreDe de useTecnicos (lo pasa OrdenesPage)
+    const { rol } = useAuth();
     const filas = ordenes.map(o => ({
         ...o,
         cantArchivos: o.archivos?.length ?? 0,
@@ -57,9 +63,9 @@ export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes }: Props) =
         // NUEVO: nombre del técnico cruzando docTecnico ↔ documentoIdentidad; si no lo encuentra, muestra el documento
     }));
     const filasOrdenadas = [...filas].sort( (a,b) => a.ordenTrabajoId - b.ordenTrabajoId);
-    const columnas : ColumnRegular[] = [
+    const todasLasColumnas : ColumnaConRol[] = [
         //prop => propiedad de la columna, name => nombre de la columna,size: tamaño de la columna.
-        { prop: 'ordenTrabajoId', name: 'Orden_ID', size: 120, readonly:true },
+        { prop: 'ordenTrabajoId', name: 'Orden_ID', size: 120, readonly:true ,roles:['ADMIN','ALMACEN']},
         { prop: 'sot', name: 'SOT', size: 120 },
         { prop: 'docTecnico', name: 'Doc. técnico', size: 140},
         { prop: 'tecnico', name: 'Técnico', size: 240, readonly: true },   // NUEVO: lee el campo 'tecnico' armado en filas; readonly porque es un dato calculado, no editable
@@ -69,9 +75,28 @@ export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes }: Props) =
             disabled: props.model.cantArchivos === 0,
         onClick: () => onVerImagenes?.(props.model as OrdenTrabajo),
         }, `🖼 ${props.model.cantArchivos}`) },
-        { prop: 'validacion', name: 'Validacion', size:140, cellTemplate: (h,props)=> h('span',{ class: `${BASE} ${COLOR_VALIDACION_FOTOS[props.model.validacion] ?? 'bg-gray-400'}`},props.model.validacion),readonly:true}
-
+        { prop: 'validacion', name: 'Validacion', size:140, cellTemplate: (h,props)=> h('span',{ class: `${BASE} ${COLOR_VALIDACION_FOTOS[props.model.validacion] ?? 'bg-gray-400'}`},props.model.validacion),readonly:true},
+        // Solo almacén: marca si la SOT procede a pago. Se guarda al instante (PATCH aprobar-sot).
+        {
+            prop: 'procedePago', name: 'Procede pago', size: 120, readonly: true, roles: ['ALMACEN','ADMIN'],
+            cellTemplate: (h, props) => h('input', {
+                type: 'checkbox',
+                class: 'h-4 w-4 cursor-pointer accent-emerald-600',
+                checked: props.model.procedePago === true,
+                title: props.model.procedePago ? 'Procede pago' : 'No procede pago',
+                onChange: (e: Event) => onCambiarPago?.(props.model as OrdenTrabajo, (e.target as HTMLInputElement).checked),
+            }),
+        },
+        {
+            prop: 'procedePago', name: 'PROCEDE PAGO', size: 160, readonly: true, roles: ['TECNICO','ADMIN'],
+            cellTemplate: (h, props) => h('span', {
+                
+                class: `${BASE} ${props.model.procedePago ? 'bg-green-400' : 'bg-red-400'}`},props.model.procedePago ? 'Procede pago' : 'No procede pago'),
+        },
     ];
+
+    // cada rol ve solo sus columnas (en el back, aprobar-sot también exige ADMIN o ALMACEN)
+    const columnas = todasLasColumnas.filter((c) => !c.roles || (rol ? c.roles.includes(rol) : false));
 
    
     return (

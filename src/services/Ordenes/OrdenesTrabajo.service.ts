@@ -1,6 +1,6 @@
 import { api } from '../../api/api';
 import type { PagedResponse } from '../../types/paginacion';
-import type { ArchivoOrden, CrearOrdenRequest, EdicionRapidaRequest, ListarOrdenesParams, OrdenTrabajo, validarImagen } from '../../types/Ordenes';
+import type { AprobarSotRequest, ArchivoOrden, CrearOrdenRequest, EdicionRapidaRequest, ListarOrdenesParams, OrdenTrabajo, validarImagen } from '../../types/Ordenes';
 
 // Un método por endpoint de OrdenTrabajoController (api/OrdenTrabajo). Entre paréntesis, los roles que acepta el back.
 
@@ -62,6 +62,11 @@ export const mensajeError = (err: unknown, porDefecto: string): string => {
     if (!e?.response) return 'No hay conexión con el servidor.';
     if (e.response.status === 403) return 'No tienes permisos para esta acción.';
     return e.response.data?.error ?? e.response.data?.mensaje ?? porDefecto;
+};
+
+// PATCH {id}/aprobar-sot (ADMIN, ALMACEN): marca si la SOT procede a pago
+export const aprobarSot = async (ordenId: number, request: AprobarSotRequest): Promise<void> => {
+    await api.patch(`/OrdenTrabajo/${ordenId}/aprobar-sot`, request);
 };
 
 export const verificarImagenes = async (ordenId: number, request: validarImagen):Promise<OrdenTrabajo> => {

@@ -9,10 +9,11 @@ import { BarPaginancion } from '../../components/Paginacion/BarPaginacion';
 import { ModalData } from '../../components/shared/ModalData';
 import { PictureVisor } from '../../components/shared/PictureVisor';
 import { useOrdenes, usePermisosOrden, useTecnicos } from '../../hooks/ordenes/useOrden';
-import { eliminarOrden, mensajeError } from '../../services/Ordenes/OrdenesTrabajo.service';
+import { aprobarSot, eliminarOrden, mensajeError } from '../../services/Ordenes/OrdenesTrabajo.service';
 import { type OrdenTrabajo ,type validarImagen, EstadoFotos} from '../../types/Ordenes';
 import { RevisionFotos } from "../../components/Ordenes/RevisionFotos";
 import { CheckGuardado } from "../../components/shared/Check";
+import { useAuth } from '@/hooks/useAuth';
 
 const TAMANO_PAGINA = 15;
 
@@ -20,7 +21,7 @@ export const OrdenesPage = () => {
 
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const { puedeCrear } = usePermisosOrden();
+    const { puedeCrear, puedeValidarImagenes } = usePermisosOrden();
     const { nombreDe , tecnicos} = useTecnicos();
 
     // ===== Filtros: lo que escribe el usuario y lo que se aplicó con "Buscar" =====
@@ -32,6 +33,7 @@ export const OrdenesPage = () => {
     const [pagina, setPagina] = useState(1);
 
     const [exito, setExito] = useState<EstadoFotos | null>(null);
+    const { rol } = useAuth();
 
     /* */
 
@@ -78,6 +80,18 @@ export const OrdenesPage = () => {
     // ===== Acciones de fila =====
     const [visor, setVisor] = useState<OrdenTrabajo | null>(null);
     const [aviso, setAviso] = useState<{ tipo: 'ok' | 'error'; texto: string } | null>(null);
+
+    // checkbox "Procede pago" (solo almacén lo ve): se guarda al instante y se recarga la lista
+    const cambiarPago = async (orden: OrdenTrabajo, procede: boolean) => {
+        try {
+            await aprobarSot(orden.ordenTrabajoId, { sot: orden.sot, procedePago: procede });
+            setAviso({ tipo: 'ok', texto: `SOT ${orden.sot}: ${procede ? 'procede pago' : 'no procede pago'}.` });
+        } catch (err) {
+            setAviso({ tipo: 'error', texto: mensajeError(err, 'No se pudo guardar la validación del pago.') });
+        } finally {
+            recargar();   // si falló, el checkbox vuelve a su valor real
+        }
+    };
 
     const eliminar = async (orden: OrdenTrabajo) => {
         if (!window.confirm(`¿Eliminar la SOT ${orden.sot} y sus imágenes? Esta acción no se puede deshacer.`)) return;
@@ -143,6 +157,7 @@ export const OrdenesPage = () => {
                     nombreTecnico={nombreDe}
                     onVerImagenes={setVisor}
                     onEliminar={eliminar}
+                    onCambiarPago={cambiarPago}
                 />
             </DataTable>
 
@@ -156,7 +171,8 @@ export const OrdenesPage = () => {
                 {visor && 
                     <div className="relative">
                         <PictureVisor imgs={visor.archivos} >
-                            <RevisionFotos onSave= {onSave} ordenId={visor.ordenTrabajoId} />
+                            { rol != "TECNICO" &&
+                            <RevisionFotos onSave= {onSave} ordenId={visor.ordenTrabajoId} />}
                         </PictureVisor>
                         { exito && 
                         

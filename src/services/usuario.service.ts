@@ -3,12 +3,15 @@ import type {
   Usuario, 
   ListUsuariosRequest, 
   RegisterRequestDto, 
-  EditRequestDto 
+  EditRequestDto,
+  
 } from '../types/usuario.types';
-
+import type {ChangueOtherPasswordRequestDto} from '../types/auth.types'
 export const getUsuarios = async (params?: ListUsuariosRequest): Promise<Usuario[]> => {
   // Axios convierte automáticamente el objeto "params" en query strings
   // Ejemplo: /User/list?pagina=1&cantidadPorPagina=10&buscarNombreCompleto=Juan
+
+
   const response = await api.get('/User/list', { params });
   
   // Dependiendo de si tu backend devuelve un paginado con metadatos o solo la lista
@@ -34,6 +37,12 @@ export const deleteUsuario = async (id: number): Promise<any> => {
 // En src/services/usuario.service.ts
 export const updatePasswordUsuario = async (id: number, nuevaPassword: string): Promise<any> => {
   const response = await api.put(`/User/${id}/CambiarPassword`, { nuevaPassword });
+  return response.data;
+};
+
+export const changeUserPassword = async (id: number, request:ChangueOtherPasswordRequestDto): Promise<any> => {
+  const response = await api.patch(`/Auth/${id}/changue-password`,request);
+
   return response.data;
 };
 

@@ -54,6 +54,7 @@ export function usePermisosOrden() {
         puedeCrear: rol === 'ADMIN' || rol === 'TECNICO',
         puedeEditarCampos: rol === 'ADMIN' || rol === 'ALMACEN',       // edicion-rapida
         puedeGestionarImagenes: rol === 'ADMIN' || rol === 'TECNICO',  // archivos
+        puedeValidarImagenes: rol === 'ADMIN' || rol === 'ALMACEN',    // verificar-imagenes (el técnico sube, no se aprueba a sí mismo)
         puedeEliminar: true,
         esTecnico: rol === 'TECNICO',
     };

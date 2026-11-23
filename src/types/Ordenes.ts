@@ -21,6 +21,13 @@ export type EstadoFotos = typeof EstadoFotos[keyof typeof EstadoFotos];
 
 //para validar solo la imagen
 
+// PATCH aprobar-sot: almacén decide si la SOT procede a pago (la SOT va para que el back compruebe que es la de la orden)
+export interface AprobarSotRequest {
+    sot: number;
+    procedePago: boolean;
+    motivo?: string;
+}
+
 export interface validarImagen{
     estadoAlmacen: EstadoFotos ;
     observacion?: string;
@@ -47,6 +54,8 @@ export interface OrdenTrabajo {
     usuarioId: number;
     estadoAlmacen: EstadoFotos ;
     observacion?: string;// Usuario.Id (perfil) del técnico
+    procedePago?:boolean;
+    
 }
 
 // ListRequestOrdenesDto (query de GET OrdenTrabajo/List)

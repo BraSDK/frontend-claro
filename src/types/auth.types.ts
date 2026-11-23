@@ -20,3 +20,9 @@ export interface CambiarPasswordRequest {
     passwordActual: string;
     passwordNueva: string;
 }
+
+export interface ChangueOtherPasswordRequestDto
+{
+    idUser : number;
+    newPassword : string;
+}

@@ -31,7 +31,7 @@ export const UsuariosPage = () => {
     editUsuario, 
     removeUsuario, 
     fetchUsuarios,
-    cambiarPassword,
+    adminChangeUserPassword,
   } = useUsuarios();
   const {
     isFilterOpen,
@@ -41,7 +41,7 @@ export const UsuariosPage = () => {
     applyFilters,
     resetFilters,
   } = useUsuariosFilter(usuarios);
-
+  const {UsuarioId} = useAuth();
   // rol de quien inició sesión (sale del token); antes se leía de un localStorage que nadie llenaba
   const { rol } = useAuth();
   const rolLogueado = rol ?? null;
@@ -110,8 +110,10 @@ export const UsuariosPage = () => {
     setModalAbierto(true);
   };
 
-  const handleActualizarPassword = async (id: number, clave: string) => {
-      await cambiarPassword(id, clave);
+  const handleActualizarPassword = async (id: number, newPassword:string) => {
+      
+      
+      await adminChangeUserPassword(Number(UsuarioId),{idUser : id, newPassword : newPassword});
   };
 
   const handleEliminarUsuario = async (id: number) => {
