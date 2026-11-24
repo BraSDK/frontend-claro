@@ -8,8 +8,10 @@ import { MAX_TRABAJO_REALIZADO, type EdicionRapidaRequest, type EstadoClaro, typ
 interface Props {
     ordenes: OrdenTrabajo[];
     cargando?: boolean;
+    esTecnico?: boolean;
     nombreTecnico?: (doc: string) => string | null;
     onVerImagenes?: (orden: OrdenTrabajo) => void;
+    onEditar?: (orden: OrdenTrabajo) => void;
     onEliminar?: (orden: OrdenTrabajo) => void;
     seleccionadas?: number[];
     onToggleSeleccion?: (sot: number) => void;
@@ -48,7 +50,7 @@ const celdaArchivo = ({ model, onVer }:ColumnDataSchemaModel & { onVer?: (o: Ord
     );  
 }
 
-export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes, seleccionadas = [], onToggleSeleccion, onToggleTodas }: Props) => {   // nombreTecnico = nombreDe de useTecnicos (lo pasa OrdenesPage)
+export const OrdenesTable = ({ ordenes, esTecnico = false, nombreTecnico, onVerImagenes, onEditar, seleccionadas = [], onToggleSeleccion, onToggleTodas }: Props) => {   // nombreTecnico = nombreDe de useTecnicos (lo pasa OrdenesPage)
     
     const sotsVisibles = ordenes.map((o) => o.sot);
     const todasMarcadas = sotsVisibles.length > 0 && sotsVisibles.every((s) => seleccionadas.includes(s));
@@ -129,6 +131,46 @@ export const OrdenesTable = ({ ordenes, nombreTecnico, onVerImagenes, selecciona
             readonly: true,
             cellTemplate: (h, props) =>
                 h('span', { class: `${BASE} ${COLOR_VALIDACION_FOTOS[props.model.validacion] ?? 'bg-gray-400'}` }, props.model.validacion),
+        },
+        {
+            prop: 'acciones',
+            name: 'Acciones',
+            size: 95,
+            pin: 'colPinEnd',
+            readonly: true,
+            cellTemplate(h, props) {
+                const orden = props.model as OrdenTrabajo;
+                const sinValidar =
+                    Number(orden.estadoAlmacen) === 0 || props.model.validacion === 'sin validacion';
+
+                // Solo el técnico queda bloqueado cuando la orden ya fue revisada
+                const bloqueado = esTecnico && !sinValidar;
+
+                if (bloqueado) {
+                    return h(
+                        'span',
+                        {
+                            class: 'inline-flex w-full items-center justify-center text-xs text-gray-400',
+                            title: 'Orden ya revisada: no se puede editar',
+                        },
+                        '🔒'
+                    );
+                }
+
+                return h(
+                    'button',
+                    {
+                        type: 'button',
+                        class: 'inline-flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-xs font-medium text-gray-700 hover:bg-amber-50 hover:text-amber-700',
+                        title: 'Editar orden',
+                        onClick(e: MouseEvent) {
+                            e.stopPropagation();
+                            onEditar?.(orden);
+                        },
+                    },
+                    '✏️ Editar'
+                );
+            },
         },
     ];
 

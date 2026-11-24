@@ -9,8 +9,9 @@ import { BarPaginancion } from '../../components/Paginacion/BarPaginacion';
 import { ModalData } from '../../components/shared/ModalData';
 import { PictureVisor } from '../../components/shared/PictureVisor';
 import { useOrdenes, usePermisosOrden, useTecnicos } from '../../hooks/ordenes/useOrden';
-import { eliminarOrden, mensajeError } from '../../services/Ordenes/OrdenesTrabajo.service';
-import { type OrdenTrabajo ,type validarImagen, EstadoFotos} from '../../types/Ordenes';
+import { eliminarOrden, edicionRapida,mensajeError } from '../../services/Ordenes/OrdenesTrabajo.service';
+import { type OrdenTrabajo ,type validarImagen, type EdicionRapidaRequest, EstadoFotos} from '../../types/Ordenes';
+import { EditarOrdenDrawer } from '../../components/Ordenes/EditarOrdenDrawer';
 import { RevisionFotos } from "../../components/Ordenes/RevisionFotos";
 import { CheckGuardado } from "../../components/shared/Check";
 
@@ -20,7 +21,7 @@ export const OrdenesPage = () => {
 
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
-    const { puedeCrear } = usePermisosOrden();
+    const { puedeCrear, esTecnico, puedeGestionarImagenes } = usePermisosOrden();
     const { nombreDe , tecnicos} = useTecnicos();
 
     // ===== Filtros: lo que escribe el usuario y lo que se aplicó con "Buscar" =====
@@ -33,6 +34,7 @@ export const OrdenesPage = () => {
 
     const [exito, setExito] = useState<EstadoFotos | null>(null);
     const [seleccionadas, setSeleccionadas] = useState<number[]>([]);
+    const [ordenEditar, setOrdenEditar] = useState<OrdenTrabajo | null>(null);
 
     const toggleSeleccion = (sotNum: number) => {
         setSeleccionadas((prev) =>
@@ -64,6 +66,14 @@ export const OrdenesPage = () => {
         setTimeout( () => setExito(null),1200)
         recargar();
     }
+
+    const guardarEdicion = async (ordenId: number, cambio: EdicionRapidaRequest) => {
+        await edicionRapida(ordenId, cambio);
+        setAviso({ tipo: 'ok', texto: 'Orden actualizada correctamente.' });
+        setTimeout(() => setAviso(null), 2500);
+        recargar();
+    };
+
     // búsqueda desde la barra superior (?buscar=): cuando cambia la URL se aplica como filtro
     const buscarUrl = searchParams.get('buscar');
     const [buscarUrlPrevio, setBuscarUrlPrevio] = useState(buscarUrl);
@@ -172,8 +182,10 @@ export const OrdenesPage = () => {
                 <OrdenesTable
                     ordenes={ordenes}
                     cargando={cargando}
+                    esTecnico={esTecnico}
                     nombreTecnico={nombreDe}
                     onVerImagenes={setVisor}
+                    onEditar={setOrdenEditar}
                     onEliminar={eliminar}
                     seleccionadas={seleccionadas}
                     onToggleSeleccion={toggleSeleccion}
@@ -188,22 +200,32 @@ export const OrdenesPage = () => {
                 subtitle={visor ? `SOT ${visor.sot}` : undefined}
                 icon={<Images size={20} strokeWidth={1.75} />}
             >
-                {visor && 
+                {visor && (
                     <div className="relative">
-                        <PictureVisor imgs={visor.archivos} >
-                            <RevisionFotos onSave= {onSave} ordenId={visor.ordenTrabajoId} />
+                        <PictureVisor imgs={visor.archivos}>
+                            <RevisionFotos onSave={onSave} ordenId={visor.ordenTrabajoId} />
                         </PictureVisor>
-                        { exito && 
-                        
-                            <CheckGuardado 
-                                texto={ exito == EstadoFotos.CORRECTO ? 'Fotos aprobadas' : 'Fotos observadas ' }
-                                color={ exito == EstadoFotos.CORRECTO ? 'success':'warning' }
-                            >
-                            </CheckGuardado>
-                        }
+                        {exito && (
+                            <CheckGuardado
+                                texto={exito == EstadoFotos.CORRECTO ? 'Fotos aprobadas' : 'Fotos observadas '}
+                                color={exito == EstadoFotos.CORRECTO ? 'success' : 'warning'}
+                            />
+                        )}
                     </div>
-                }
+                )}
             </ModalData>
+
+            <EditarOrdenDrawer
+                orden={ordenEditar}
+                esTecnico={esTecnico}
+                puedeGestionarImagenes={puedeGestionarImagenes}
+                onCerrar={() => setOrdenEditar(null)}
+                onGuardado={() => {
+                    setAviso({ tipo: 'ok', texto: 'Orden actualizada correctamente.' });
+                    setTimeout(() => setAviso(null), 2500);
+                    recargar();
+                }}
+            />
         </div>
     );
 };

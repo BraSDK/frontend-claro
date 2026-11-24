@@ -51,8 +51,9 @@ export function useOrdenes(params: ListarOrdenesParams) {
 export function usePermisosOrden() {
     const { rol } = useAuth();
     return {
+        rol,
         puedeCrear: rol === 'ADMIN' || rol === 'TECNICO',
-        puedeEditarCampos: rol === 'ADMIN' || rol === 'ALMACEN',       // edicion-rapida
+        puedeEditarCampos: rol === 'ADMIN' || rol === 'ALMACEN' || rol === 'TECNICO',       // edicion-rapida
         puedeGestionarImagenes: rol === 'ADMIN' || rol === 'TECNICO',  // archivos
         puedeEliminar: true,
         esTecnico: rol === 'TECNICO',
